@@ -1,5 +1,12 @@
 // This is app.js
 
+// ***** START: EYE DIAGRAM TEMPLATE (From PDF) *****
+// (เก็บภาพ template สำหรับ canvas ไว้ใน Base64)
+// This is a blank image placeholder. Replace with a real Base64 image if you have one.
+const EYE_DIAGRAM_TEMPLATE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARcAAACyCAMAAAAY0/JTAAAASlBMVEX///8AAABTU1NhYWFpaWnDw8Ovr6+3t7fMzMzj4+Pb29vOzs6+vr6pqamNjY3c3Nzy8vLn5+d4eHjW1tZQUFCRkZGfn5/ExMSwsLCJiYlwcHBpLjpJAAAAw0lEQVR42u3ZsQ0AIAwDwTz/04xWIAg4JCeEwE/Sq1SqN/0DAAAAAAD8aQgAAAAAAAAAAGwOA8B0A8fHl8cAAAAAAAAAALA5DAAAAAAAAJA5DAAAAAAAANCdQwEAAAAAAIDsHAYAAAAAAADkDAYAAAAAAACkDocCAAAAAACAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAA7DkBpJkBFjA74z4AAAAASUVORK5CYII=';
+// ***** END: EYE DIAGRAM TEMPLATE *****
+
+
 // ฟังก์ชันสำหรับเปิดหน้าต่าง BP Chart
 function openBpChart(historyData) {
     const chartWindow = window.open("", "_blank");
@@ -95,7 +102,6 @@ function openBpChart(historyData) {
         </html>
     `;
     
-    // 3. Write to new window
     chartWindow.document.open();
     chartWindow.document.write(content);
     chartWindow.document.close();
@@ -109,16 +115,14 @@ function openVitalsChart(historyData) {
         return;
     }
 
-    // 1. Process Data
     const sortedData = [...historyData].sort((a, b) => a.datetimeSort.localeCompare(b.datetimeSort));
     const labels = sortedData.map(d => d.datetime);
     const pulseData = sortedData.map(d => d.pulse);
-    const hrData = sortedData.map(d => d.hr); // ***** ADDED HR DATA *****
+    const hrData = sortedData.map(d => d.hr); 
     const rrData = sortedData.map(d => d.rr);
     const tempData = sortedData.map(d => d.temp);
     const fbsData = sortedData.map(d => d.fbs);
 
-    // 2. Create HTML Content
     const content = `
         <!DOCTYPE html>
         <html lang="th">
@@ -150,7 +154,6 @@ function openVitalsChart(historyData) {
                                 tension: 0.1,
                                 yAxisID: 'yPrimary'
                             },
-                            // ***** MODIFIED START *****
                             {
                                 label: 'HR (bpm)',
                                 data: ${JSON.stringify(hrData)},
@@ -159,7 +162,6 @@ function openVitalsChart(historyData) {
                                 tension: 0.1,
                                 yAxisID: 'yPrimary'
                             },
-                            // ***** MODIFIED END *****
                             {
                                 label: 'RR (rpm)',
                                 data: ${JSON.stringify(rrData)},
@@ -211,13 +213,165 @@ function openVitalsChart(historyData) {
         </html>
     `;
 
-    // 3. Write to new window
     chartWindow.document.open();
     chartWindow.document.write(content);
     chartWindow.document.close();
 }
 
+// ***** START: EYE EXAM HISTORY DATA (DEMO) *****
+const eyeExamHistoryData = [
+    { datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', stt_od: 15, stt_os: 14, iop_od: 18, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/eee/888?text=Exam+Sheet+1' },
+    { datetimeSort: '2025-12-30T14:00:00', datetime: '30 Dec 2025 14:00', dvm: 'Dr. See', plr_od: 'Sluggish', plr_os: '+', stt_od: 10, stt_os: 12, iop_od: 22, iop_os: 20, fluorescein_od: 'Positive', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ddd/777?text=Exam+Sheet+2+(Corneal+Ulcer+OD)' },
+    { datetimeSort: '2025-12-29T11:00:00', datetime: '29 Dec 2025 11:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', stt_od: null, stt_os: null, iop_od: 17, iop_os: 17, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: null },
+    { datetimeSort: '2025-12-28T16:00:00', datetime: '28 Dec 2025 16:00', dvm: 'Dr. See', plr_od: '-', plr_os: 'Sluggish', stt_od: 5, stt_os: 8, iop_od: 45, iop_os: 25, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ccc/666?text=Exam+Sheet+3+(Glaucoma+OD)' }
+];
+// ***** END: EYE EXAM HISTORY DATA (DEMO) *****
 
+// ***** START: EYE EXAM HISTORY FUNCTIONS *****
+function renderEyeExamHistoryTable(data) {
+    const tableBody = document.getElementById('eyeHistoryTableBody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-[var(--color-text-muted)]">No eye exam history found.</td></tr>`;
+        return;
+    }
+
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.classList.add('hover:bg-gray-50', 'dark:hover:bg-[--color-bg-secondary]/50');
+        
+        // ถ้ามี imageUrl ให้สร้าง thumbnail ถ้าไม่มี ให้แสดง N/A
+        const imageUrl = item.imageUrl 
+            ? `<img src="${item.imageUrl}" alt="Exam" class="history-thumbnail" data-full-src="${item.imageUrl}">` // Added data-full-src
+            : '<span class="text-[var(--color-text-muted)]">N/A</span>';
+            
+        row.innerHTML = `
+            <td class="p-3 sticky left-0">${item.datetime}</td>
+            <td class="p-3">${item.dvm}</td>
+            <td class="p-3">${item.plr_od || 'N/A'}</td>
+            <td class="p-3">${item.plr_os || 'N/A'}</td>
+            <td class="p-3">${item.stt_od || 'N/A'}</td>
+            <td class="p-3">${item.stt_os || 'N/A'}</td>
+            <td class="p-3">${item.iop_od || 'N/A'}</td>
+            <td class="p-3">${item.iop_os || 'N/A'}</td>
+            <td class="p-3">${item.fluorescein_od || 'N/A'}</td>
+            <td class="p-3">${item.fluorescein_os || 'N/A'}</td>
+            <td class="p-3">${imageUrl}</td>
+            <td class="p-3">
+                <button class="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)]" title="View/Edit">
+                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                </button>
+            </td>
+        `;
+        
+        // Add sticky styles for first cell
+        const firstTd = row.querySelector('td:first-child');
+        firstTd.style.backgroundColor = 'var(--color-bg-content)';
+        row.addEventListener('mouseenter', () => firstTd.style.backgroundColor = 'var(--color-bg-secondary)');
+        row.addEventListener('mouseleave', () => firstTd.style.backgroundColor = 'var(--color-bg-content)');
+
+        tableBody.appendChild(row);
+    });
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+// ***** END: EYE EXAM HISTORY FUNCTIONS *****
+
+
+// ***** START: DRAWING DEMO FUNCTIONS *****
+let fabricCanvas = null;
+let drawingMode = 'pen';
+
+function initializeDrawingDemo(templateUrl) {
+    if (fabricCanvas) {
+        fabricCanvas.dispose(); // ล้าง canvas เก่า (ถ้ามี)
+    }
+
+    const canvasElement = document.getElementById('drawing-canvas');
+    const container = canvasElement.parentElement; // div ที่ครอบ canvas
+
+    // สร้าง canvas
+    fabricCanvas = new fabric.Canvas('drawing-canvas', {
+        isDrawingMode: true,
+        width: container.clientWidth, // ตั้งขนาด canvas ให้เต็ม container
+        height: (container.clientWidth / 283) * 204 // รักษาอัตราส่วน (283x204 คือขนาดภาพต้นแบบ)
+    });
+
+    // ตั้งค่าปากกาเริ่มต้น
+    fabricCanvas.freeDrawingBrush.color = '#E11D48'; // สีแดง
+    fabricCanvas.freeDrawingBrush.width = 3;
+
+    // โหลดภาพพื้นหลัง
+    fabric.Image.fromURL(templateUrl, function(img) {
+        fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
+            // ย่อ/ขยายภาพให้พอดีกับ canvas
+            scaleX: fabricCanvas.width / img.width,
+            scaleY: fabricCanvas.height / img.height
+        });
+    });
+
+    // listeners สำหรับปุ่ม Pen/Text
+    const penBtn = document.getElementById('drawing-mode-btn');
+    const textBtn = document.getElementById('text-mode-btn');
+    const colorPicker = document.getElementById('drawing-color-picker');
+
+    penBtn.onclick = () => {
+        fabricCanvas.isDrawingMode = true;
+        drawingMode = 'pen';
+        penBtn.classList.add('bg-blue-600', 'text-white');
+        textBtn.classList.remove('bg-blue-600', 'text-white');
+        textBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
+    };
+    
+    textBtn.onclick = () => {
+        fabricCanvas.isDrawingMode = false;
+        drawingMode = 'text';
+        textBtn.classList.add('bg-blue-600', 'text-white');
+        penBtn.classList.remove('bg-blue-600', 'text-white');
+        penBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
+    };
+
+    // Listener สำหรับเพิ่ม Text
+    fabricCanvas.on('mouse:down', function(options) {
+        if (drawingMode !== 'text') {
+            return;
+        }
+        // ตรวจสอบว่าถ้าคลิกบนพื้นที่ว่าง (ไม่ได้คลิกบน object)
+        if (!options.target || options.target.type !== 'i-text') {
+            const pointer = fabricCanvas.getPointer(options.e);
+            const text = new fabric.IText('Tap to edit', {
+                left: pointer.x,
+                top: pointer.y,
+                fill: colorPicker.value,
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center'
+            });
+            fabricCanvas.add(text);
+            fabricCanvas.setActiveObject(text);
+            text.enterEditing();
+        }
+    });
+
+    // Listener สำหรับเปลี่ยนสี
+    colorPicker.onchange = () => {
+        const color = colorPicker.value;
+        fabricCanvas.freeDrawingBrush.color = color;
+        // (ถ้ามี object ที่เลือกอยู่ ก็เปลี่ยนสี object นั้น)
+        const activeObject = fabricCanvas.getActiveObject();
+        if (activeObject && activeObject.type === 'i-text') {
+            activeObject.set('fill', color);
+            fabricCanvas.renderAll();
+        }
+    };
+}
+// ***** END: DRAWING DEMO FUNCTIONS *****
+
+
+// --- Main DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- (DEMO) Load assessment_content.html into main placeholder ---
@@ -232,13 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(html => {
                 contentPlaceholder.innerHTML = html;
-                
-                // After loading content, we must re-initialize
-                // scripts that depend on this new content
-                initializeAssessmentScripts();
-                
-                // We also need to re-render any Lucide icons
-                // that were loaded with the content
+                initializeAssessmentScripts(); // <--- This function is crucial
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
@@ -273,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- DF Modal ---
+    // --- Modal: DF ---
     const openButton = document.getElementById('open-df-popup');
     const modal = document.getElementById('df-popup-modal');
     const closeButtonX = document.getElementById('df-popup-close-x');
@@ -285,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cancelButton) cancelButton.addEventListener('click', hidePopup);
     if (modal) { modal.addEventListener('click', (event) => { if (event.target === modal) hidePopup(); }); }
 
-    // --- TF Modal ---
+    // --- Modal: TF ---
     const openButtonTF = document.getElementById('open-tf-popup');
     const modalTF = document.getElementById('tf-popup-modal');
     const closeButtonXTF = document.getElementById('tf-popup-close-x');
@@ -297,16 +445,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cancelButtonTF) cancelButtonTF.addEventListener('click', hidePopupTF);
     if (modalTF) { modalTF.addEventListener('click', (event) => { if (event.target === modalTF) hidePopupTF(); }); }
 
-    // --- Vital Signs Modal Logic (Merged) ---
+    // --- Modal: Vital Signs ---
     const openVitalsButton = document.getElementById('open-vitals-popup');
     const vitalsModal = document.getElementById('vitals-popup-modal');
     const closeVitalsX = document.getElementById('close-vitals-popup-x');
     const closeVitalsCancel = document.getElementById('close-vitals-popup-cancel');
+    const vitalsTabLinks = vitalsModal.querySelectorAll('.vitals-tab-link');
+    const vitalsTabContents = vitalsModal.querySelectorAll('.vitals-tab-content');
 
     const showVitalsPopup = () => { 
         if (vitalsModal) vitalsModal.classList.remove('hidden'); 
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons(); // วาด icon ใหม่เมื่อเปิด
+            lucide.createIcons(); 
         }
     };
     const hideVitalsPopup = () => { if (vitalsModal) vitalsModal.classList.add('hidden'); };
@@ -320,11 +470,120 @@ document.addEventListener('DOMContentLoaded', () => {
         }); 
     }
     
-    // --- Problem List Modal ---
-    // Note: This logic is now inside 'initializeAssessmentScripts'
-    // because the button 'open-problem-list-modal' is loaded dynamically.
+    // --- Modal: Eye Exam (NEW) ---
+    const openEyeButton = document.getElementById('open-eye-popup');
+    const eyeModal = document.getElementById('eye-exam-modal');
+    const closeEyeX = document.getElementById('close-eye-popup-x');
+    const closeEyeCancel = document.getElementById('close-eye-popup-cancel');
+    const eyeTabLinks = eyeModal.querySelectorAll('.eye-tab-link');
+    const eyeTabContents = eyeModal.querySelectorAll('.eye-tab-content');
 
-    // --- Copy to Clipboard ---
+    const showEyePopup = () => { 
+        if (eyeModal) eyeModal.classList.remove('hidden'); 
+        renderEyeExamHistoryTable(eyeExamHistoryData); // โหลดข้อมูล History เมื่อเปิด
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons(); 
+        }
+    };
+    const hideEyePopup = () => { if (eyeModal) eyeModal.classList.add('hidden'); };
+    
+    if (openEyeButton) openEyeButton.addEventListener('click', showEyePopup);
+    if (closeEyeX) closeEyeX.addEventListener('click', hideEyePopup);
+    if (closeEyeCancel) closeEyeCancel.addEventListener('click', hideEyePopup);
+    
+    // --- Modal: Drawing Demo (NEW) ---
+    const drawingModal = document.getElementById('drawing-demo-modal');
+    const openDrawingBtn = document.getElementById('open-drawing-demo-btn');
+    const closeDrawingX = document.getElementById('close-drawing-demo-x');
+    const cancelDrawingBtn = document.getElementById('drawing-demo-cancel');
+    const saveDrawingBtn = document.getElementById('drawing-demo-save');
+    const drawingResultImg = document.getElementById('drawing-result-image');
+    
+    const showDrawingPopup = () => {
+        if (drawingModal) drawingModal.classList.remove('hidden');
+        initializeDrawingDemo(EYE_DIAGRAM_TEMPLATE); // เริ่มต้น canvas เมื่อเปิด
+    }
+    const hideDrawingPopup = () => { if (drawingModal) drawingModal.classList.add('hidden'); }
+
+    if (openDrawingBtn) openDrawingBtn.addEventListener('click', showDrawingPopup);
+    if (closeDrawingX) closeDrawingX.addEventListener('click', hideDrawingPopup);
+    if (cancelDrawingBtn) cancelDrawingBtn.addEventListener('click', hideDrawingPopup);
+    
+    // "Fake Save" logic
+    if (saveDrawingBtn) {
+        saveDrawingBtn.addEventListener('click', () => {
+            if (fabricCanvas) {
+                const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.8 });
+                drawingResultImg.src = dataURL;
+                hideDrawingPopup(); // ซ่อนหน้าต่างวาดภาพ
+            }
+        });
+    }
+
+    // --- Modal: Image Viewer (NEW) ---
+    const imageViewerModal = document.getElementById('image-viewer-modal');
+    const closeImageViewerX = document.getElementById('close-image-viewer-x');
+    const fullImageViewerSrc = document.getElementById('full-image-viewer-src');
+    const eyeHistoryTableBody = document.getElementById('eyeHistoryTableBody');
+
+    const hideImageViewer = () => { if (imageViewerModal) imageViewerModal.classList.add('hidden'); };
+    
+    if (eyeHistoryTableBody) {
+        eyeHistoryTableBody.addEventListener('click', function(event) {
+            // เช็คว่ากดที่รูป thumbnail (ที่มี class 'history-thumbnail')
+            if (event.target.classList.contains('history-thumbnail')) {
+                fullImageViewerSrc.src = event.target.dataset.fullSrc; // ใช้ data-full-src
+                imageViewerModal.classList.remove('hidden'); // แสดง modal
+            }
+        });
+    }
+    if (closeImageViewerX) closeImageViewerX.addEventListener('click', hideImageViewer);
+    if (imageViewerModal) imageViewerModal.addEventListener('click', (event) => {
+        if (event.target === imageViewerModal) hideImageViewer(); // ปิดเมื่อคลิกพื้นหลัง
+    });
+
+
+    // --- Tab Switching Logic (Vital Signs) ---
+    vitalsTabLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const tabId = link.dataset.tab;
+            vitalsTabLinks.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('tab-inactive');
+            });
+            link.classList.remove('tab-inactive');
+            link.classList.add('tab-active');
+            vitalsTabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            vitalsModal.querySelector(`#content-${tabId}`).classList.remove('hidden');
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    });
+
+    // --- Tab Switching Logic (Eye Exam) (NEW) ---
+    eyeTabLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const tabId = link.dataset.tab; // e.g., "eye-history"
+            eyeTabLinks.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('tab-inactive');
+            });
+            link.classList.remove('tab-inactive');
+            link.classList.add('tab-active');
+            eyeTabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            eyeModal.querySelector(`#content-${tabId}`).classList.remove('hidden');
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    });
+
+    // --- Copy to Clipboard Function ---
     function copyToClipboard(text) {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -352,14 +611,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- (MODIFIED) Initialization function for dynamically loaded content ---
+    // --- Initialization function for dynamically loaded content ---
     function initializeAssessmentScripts() {
         
         // --- Problem List Modal (Dynamic Content) ---
         const openProblemListBtn = document.getElementById('open-problem-list-modal');
-        const problemListModal = document.getElementById('problem-list-modal'); // This is in index.html
-        const closeProblemListBtnX = document.getElementById('problem-list-popup-close-x'); // This is in index.html
-        const cancelProblemListBtn = document.getElementById('problem-list-popup-cancel'); // This is in index.html
+        const problemListModal = document.getElementById('problem-list-modal'); 
+        const closeProblemListBtnX = document.getElementById('problem-list-popup-close-x'); 
+        const cancelProblemListBtn = document.getElementById('problem-list-popup-cancel'); 
         
         const showProblemListPopup = () => { if (problemListModal) problemListModal.classList.remove('hidden'); };
         const hideProblemListPopup = () => { if (problemListModal) problemListModal.classList.add('hidden'); };
@@ -522,14 +781,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     // --- Problem List Modal (Tagging Section) ---
-    // This logic is for elements *inside* the modal, so it can be initialized once.
     const categoryData = {
         "common": [ { term: "Depressed", tags: "TAG A, TAG B" }, { term: "Loss of appetile", tags: "TAG A, TAG C" }, { term: "Acute Vomitting", tags: "TAG B, TAG D" }, { term: "Chronic Vomitting", tags: "TAG B, TAG E" }, { term: "Respiratory distress", tags: "TAG F" }, { term: "Lameness", tags: "TAG G" }, { term: "Dental tartar", tags: "TAG H" } ],
         "eye": [ { term: "Corneal ulcer", tags: "Eye, Trauma" }, { term: "Glaucoma", tags: "Eye, Chronic" }, { term: "Uveitis", tags: "Eye, Inflammation" }, { term: "Cataract", tags: "Eye, Age" } ],
-        "ear": [ { term: "Otitis externa", tags: "Ear, Infection" }, { term: "Ear mites", tags: "Ear, Parasite" }, { term: "Aural hematoma", tags: "Ear, Trauma" } ],
+        "ear": [ { term: "Otitis externa", tags: "Ear, Infection" }, { term: "Ear mites", tags: "Ear, Parasite" }, { term:m: "Aural hematoma", tags: "Ear, Trauma" } ],
         "nose": [ { term: "Nasal discharge", tags: "Nose, Symptom" }, { term: "Sneezing", tags: "Nose, Symptom" } ],
         "throat": [ { term: "Coughing", tags: "Throat, Symptom" }, { term: "Pharyngitis", tags: "Throat, Inflammation" } ],
-        "abdomen": [ { term: "Abdominal pain", tags: "Abdomen, Symptom" }, { term: "Diarrhea", tags: "Abdomen, GI" }, { term: "Foreign body", tags: "Abdomen, GI" }, { term: "Bloating", tags: "Abdomen, Symptom" }, { term: "Constipation", tags: "Abdomen, GI" }, { term: "Ascites", tags: "Abdomen, Fluid" }, { term: "Hepatomegaly", tags: "Abdomen, Organ" }, { term: "Splenomegaly", tags: "Abdomen, Organ" }, { term: "Abdominal mass", tags: "Abdomen, Symptom" }, { term: "Tenesmus", tags: "Abdomen, GI" }, { term: "Flatulence", tags: "Abdomen, GI" }, { term: "Hematochezia", tags: "Abdomen, GI" }, { term: "Melena", tags: "Abdomen, GI" }, { term: "Polyphagia", tags: "Abdomen, GI" }, { term: "Pica", tags: "Abdomen, GI" }, { term: "Regurgitation", tags: "Abdomen, GI" }, { term: "Jaundice", tags: "Abdomen, Liver" }, { term: "Pancreatitis", tags: "Abdomen, Organ" }, { term: "Gastroenteritis", tags: "Abdomen, GI" }, { term: "Peritonitis", tags: "Abdomen, Inflammation" } ],
+        "abdomen": [ { term: "Abdominal pain", tags: "Abdomen, Symptom" }, { term: "Diarrhea", tags: "Abdomen, GI" }, { term: "Foreign body", tags: "Abdomen, GI" } ],
         "trauma": [ { term: "Laceration", tags: "Trauma, Skin" }, { term: "Hit by car", tags: "Trauma, HBC" } ],
         "bone": [ { term: "Fracture", tags: "Bone, Trauma" }, { term: "Arthritis", tags: "Bone, Chronic" } ],
         "behavier": [ { term: "Aggression", tags: "Behavior" }, { term: "Anxiety", tags: "Behavior" } ]
@@ -591,36 +849,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // **** START: Vital Signs Internal Script (Merged) ****
     // This logic is for elements *inside* the modal, so it can be initialized once.
-
-    // --- Tab Switching Logic (Vital Signs) ---
-    const tabLinks = document.querySelectorAll('.tab-link');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const tabId = link.dataset.tab;
-            tabLinks.forEach(tab => {
-                tab.classList.remove('tab-active');
-                tab.classList.add('tab-inactive');
-            });
-            link.classList.remove('tab-inactive');
-            link.classList.add('tab-active');
-            tabContents.forEach(content => {
-                if (content.id === `content-${tabId}`) {
-                    content.classList.remove('hidden');
-                } else {
-                    content.classList.add('hidden');
-                }
-            });
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        });
-    });
-
-    // --- History Table Logic (Vital Signs) ---
     
-    // ***** MODIFIED START: Updated vsHistoryData *****
+    // --- History Table Logic (Vital Signs) ---
     const vsHistoryData = [
         { id: 1, datetimeSort: '2025-12-31T17:00:00', datetime: '31 Dec 2025 17:00', bp: '140/90', pulse: 92, hr: 95, rr: 22, temp: 100.5, fbs: 150, crt: '<2', mucous: 'Pale', pulse_quality: 'Weak', lung: 'Crackles', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Post-seizure.' },
         { id: 2, datetimeSort: '2025-12-31T13:00:00', datetime: '31 Dec 2025 13:00', bp: '100/60', pulse: 120, hr: 120, rr: 28, temp: 97.0, fbs: 80, crt: '>2', mucous: 'Blue', pulse_quality: 'Thready', lung: 'Wheeze', heart: 'Normal', loc: 'E1V1M1', pain: 10, cyanosis: true, seizure: false, arrest: true, note: 'Code Blue.' },
@@ -643,11 +873,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 19, datetimeSort: '2025-12-27T09:00:00', datetime: '27 Dec 2025 09:00', bp: '126/82', pulse: 78, hr: null, rr: 18, temp: 98.6, fbs: 118, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
         { id: 20, datetimeSort: '2025-12-26T21:00:00', datetime: '26 Dec 2025 21:00', bp: '124/80', pulse: 76, hr: 78, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Admission.' },
     ];
-    // ***** MODIFIED END: Updated vsHistoryData *****
 
     const vsTableBody = document.getElementById('historyTableBody');
     const vsNoHistoryMessage = document.getElementById('noHistoryMessage');
-    const vsHistoryHeaders = document.querySelectorAll('.history-sort-header'); 
+    const vsHistoryHeaders = document.querySelectorAll('#historyTable .history-sort-header'); 
 
     let vsCurrentSort = {
         column: 'datetimeSort',
@@ -673,7 +902,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const arrestText = item.arrest ? '<span class="font-semibold text-[var(--color-danger)]">Yes</span>' : '<span class="text-[var(--color-text-muted)]">No</span>';
             const noteSnippet = item.note.length > 20 ? item.note.substring(0, 20) + '...' : item.note;
 
-            // ***** MODIFIED START: Added hr and pulse_quality to row template *****
             const row = `
                 <tr>
                     <td class="text-[var(--color-text-base)] sticky left-0">${item.datetime}</td>
@@ -701,8 +929,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                 </tr>
             `;
-            // ***** MODIFIED END *****
-            
             const rowElement = document.createElement('tr');
             rowElement.innerHTML = row;
             const firstTd = rowElement.querySelector('td:first-child');
@@ -728,10 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 valB = b['datetimeSort'];
                 return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
             }
-            
-            // ***** MODIFIED START: Added 'hr' to numeric sort *****
             if (['pulse', 'hr', 'rr', 'temp', 'pain', 'fbs'].includes(column)) {
-            // ***** MODIFIED END *****
                 return direction === 'asc' ? valA - valB : valB - valA;
             }
             if (['cyanosis', 'seizure', 'arrest'].includes(column)) {
@@ -802,7 +1025,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // **** (Req 5 & 6) เพิ่ม Event Listeners สำหรับปุ่ม Chart ****
     const bpChartBtn = document.getElementById('bp-chart-btn');
     const vitalsChartBtn = document.getElementById('vitals-chart-btn');
 
@@ -821,7 +1043,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Initialize Lucide Icons (Final call on initial load) ---
-    // This renders icons in the static parts of index.html
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
