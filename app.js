@@ -113,6 +113,7 @@ function openVitalsChart(historyData) {
     const sortedData = [...historyData].sort((a, b) => a.datetimeSort.localeCompare(b.datetimeSort));
     const labels = sortedData.map(d => d.datetime);
     const pulseData = sortedData.map(d => d.pulse);
+    const hrData = sortedData.map(d => d.hr); // ***** ADDED HR DATA *****
     const rrData = sortedData.map(d => d.rr);
     const tempData = sortedData.map(d => d.temp);
     const fbsData = sortedData.map(d => d.fbs);
@@ -149,6 +150,16 @@ function openVitalsChart(historyData) {
                                 tension: 0.1,
                                 yAxisID: 'yPrimary'
                             },
+                            // ***** MODIFIED START *****
+                            {
+                                label: 'HR (bpm)',
+                                data: ${JSON.stringify(hrData)},
+                                borderColor: 'rgba(239, 68, 68, 1)', // Red
+                                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                tension: 0.1,
+                                yAxisID: 'yPrimary'
+                            },
+                            // ***** MODIFIED END *****
                             {
                                 label: 'RR (rpm)',
                                 data: ${JSON.stringify(rrData)},
@@ -182,7 +193,7 @@ function openVitalsChart(historyData) {
                             yPrimary: {
                                 type: 'linear',
                                 position: 'left',
-                                title: { display: true, text: 'Pulse, RR, Temp' },
+                                title: { display: true, text: 'Pulse, HR, RR, Temp' },
                                 min: 0
                             },
                             yFBS: {
@@ -210,8 +221,6 @@ function openVitalsChart(historyData) {
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- (DEMO) Load assessment_content.html into main placeholder ---
-    // In a real application, you would load this content based on the active tab.
-    // We use fetch() to load the partial HTML file.
     const contentPlaceholder = document.getElementById('emr-content-placeholder');
     if (contentPlaceholder) {
         fetch('assessment_content.html')
@@ -344,22 +353,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- (MODIFIED) Initialization function for dynamically loaded content ---
-    // This function will be called *after* 'assessment_content.html' is loaded.
     function initializeAssessmentScripts() {
         
         // --- Problem List Modal (Dynamic Content) ---
         const openProblemListBtn = document.getElementById('open-problem-list-modal');
-        const problemListModal = document.getElementById('problem-list-modal'); // This is in emr.html
-        const closeProblemListBtnX = document.getElementById('problem-list-popup-close-x'); // This is in emr.html
-        const cancelProblemListBtn = document.getElementById('problem-list-popup-cancel'); // This is in emr.html
+        const problemListModal = document.getElementById('problem-list-modal'); // This is in index.html
+        const closeProblemListBtnX = document.getElementById('problem-list-popup-close-x'); // This is in index.html
+        const cancelProblemListBtn = document.getElementById('problem-list-popup-cancel'); // This is in index.html
         
         const showProblemListPopup = () => { if (problemListModal) problemListModal.classList.remove('hidden'); };
         const hideProblemListPopup = () => { if (problemListModal) problemListModal.classList.add('hidden'); };
         
         if (openProblemListBtn) openProblemListBtn.addEventListener('click', showProblemListPopup);
-        // We only need to add event listeners to buttons *within* the modal once,
-        // so those are handled outside this function (or should be).
-        // Let's check if they exist already.
+        
         if (closeProblemListBtnX && !closeProblemListBtnX.dataset.listenerAttached) {
             closeProblemListBtnX.addEventListener('click', hideProblemListPopup);
             closeProblemListBtnX.dataset.listenerAttached = 'true';
@@ -614,28 +620,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- History Table Logic (Vital Signs) ---
     
+    // ***** MODIFIED START: Updated vsHistoryData *****
     const vsHistoryData = [
-        { id: 1, datetimeSort: '2025-12-31T17:00:00', datetime: '31 Dec 2025 17:00', bp: '140/90', pulse: 92, rr: 22, temp: 100.5, fbs: 150, crt: '<2', mucous: 'Pale', lung: 'Crackles', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Post-seizure.' },
-        { id: 2, datetimeSort: '2025-12-31T13:00:00', datetime: '31 Dec 2025 13:00', bp: '100/60', pulse: 120, rr: 28, temp: 97.0, fbs: 80, crt: '>2', mucous: 'Blue', lung: 'Wheeze', heart: 'Normal', loc: 'E1V1M1', pain: 10, cyanosis: true, seizure: false, arrest: true, note: 'Code Blue.' },
-        { id: 3, datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', bp: '118/79', pulse: 70, rr: 18, temp: 98.5, fbs: 110, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: 'Post-meal.' },
-        { id: 4, datetimeSort: '2025-12-30T21:00:00', datetime: '30 Dec 2025 21:00', bp: '116/78', pulse: 68, rr: 16, temp: 98.2, fbs: 105, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: 'Sleeping.' },
-        { id: 5, datetimeSort: '2025-12-30T17:00:00', datetime: '30 Dec 2025 17:00', bp: '120/80', pulse: 72, rr: 18, temp: 98.6, fbs: 100, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 6, datetimeSort: '2025-12-30T13:00:00', datetime: '30 Dec 2025 13:00', bp: '124/82', pulse: 76, rr: 18, temp: 99.0, fbs: 98, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: 'Agitated.' },
-        { id: 7, datetimeSort: '2025-12-30T09:00:00', datetime: '30 Dec 2025 09:00', bp: '120/80', pulse: 72, rr: 18, temp: 98.6, fbs: 112, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 8, datetimeSort: '2025-12-29T21:00:00', datetime: '29 Dec 2025 21:00', bp: '118/78', pulse: 70, rr: 18, temp: 98.4, fbs: 108, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 9, datetimeSort: '2025-12-29T17:00:00', datetime: '29 Dec 2025 17:00', bp: '130/85', pulse: 80, rr: 20, temp: 99.1, fbs: 120, crt: '2', mucous: 'Dry', lung: 'Rhonchi', heart: 'Normal', loc: 'E3V4M5', pain: 5, cyanosis: true, seizure: false, arrest: false, note: 'Episode of SOB.' },
-        { id: 10, datetimeSort: '2025-12-29T13:00:00', datetime: '29 Dec 2025 13:00', bp: '122/80', pulse: 74, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 11, datetimeSort: '2025-12-29T09:00:00', datetime: '29 Dec 2025 09:00', bp: '120/80', pulse: 72, rr: 18, temp: 98.6, fbs: 110, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 12, datetimeSort: '2025-12-28T21:00:00', datetime: '28 Dec 2025 21:00', bp: '116/76', pulse: 68, rr: 18, temp: 98.2, fbs: 103, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 13, datetimeSort: '2025-12-28T17:00:00', datetime: '28 Dec 2025 17:00', bp: '118/78', pulse: 70, rr: 18, temp: 98.5, fbs: 105, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 14, datetimeSort: '2025-12-28T13:00:00', datetime: '28 Dec 2025 13:00', bp: '120/80', pulse: 72, rr: 18, temp: 98.6, fbs: 110, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 15, datetimeSort: '2025-12-28T09:00:00', datetime: '28 Dec 2025 09:00', bp: '122/80', pulse: 75, rr: 18, temp: 98.7, fbs: 111, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 16, datetimeSort: '2025-12-27T21:00:00', datetime: '27 Dec 2025 21:00', bp: '140/90', pulse: 90, rr: 22, temp: 100.4, fbs: 140, crt: '<2', mucous: 'Pale', lung: 'Normal', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Seizure event, post-ictal.' },
-        { id: 17, datetimeSort: '2025-12-27T17:00:00', datetime: '27 Dec 2025 17:00', bp: '130/85', pulse: 82, rr: 20, temp: 99.0, fbs: 125, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Restless.' },
-        { id: 18, datetimeSort: '2025-12-27T13:00:00', datetime: '27 Dec 2025 13:00', bp: '128/84', pulse: 80, rr: 18, temp: 98.8, fbs: 122, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 19, datetimeSort: '2025-12-27T09:00:00', datetime: '27 Dec 2025 09:00', bp: '126/82', pulse: 78, rr: 18, temp: 98.6, fbs: 118, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
-        { id: 20, datetimeSort: '2025-12-26T21:00:00', datetime: '26 Dec 2025 21:00', bp: '124/80', pulse: 76, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Admission.' },
+        { id: 1, datetimeSort: '2025-12-31T17:00:00', datetime: '31 Dec 2025 17:00', bp: '140/90', pulse: 92, hr: 95, rr: 22, temp: 100.5, fbs: 150, crt: '<2', mucous: 'Pale', pulse_quality: 'Weak', lung: 'Crackles', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Post-seizure.' },
+        { id: 2, datetimeSort: '2025-12-31T13:00:00', datetime: '31 Dec 2025 13:00', bp: '100/60', pulse: 120, hr: 120, rr: 28, temp: 97.0, fbs: 80, crt: '>2', mucous: 'Blue', pulse_quality: 'Thready', lung: 'Wheeze', heart: 'Normal', loc: 'E1V1M1', pain: 10, cyanosis: true, seizure: false, arrest: true, note: 'Code Blue.' },
+        { id: 3, datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', bp: '118/79', pulse: 70, hr: 72, rr: 18, temp: 98.5, fbs: 110, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: 'Post-meal.' },
+        { id: 4, datetimeSort: '2025-12-30T21:00:00', datetime: '30 Dec 2025 21:00', bp: '116/78', pulse: 68, hr: null, rr: 16, temp: 98.2, fbs: 105, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: 'Sleeping.' },
+        { id: 5, datetimeSort: '2025-12-30T17:00:00', datetime: '30 Dec 2025 17:00', bp: '120/80', pulse: 72, hr: 72, rr: 18, temp: 98.6, fbs: 100, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 6, datetimeSort: '2025-12-30T13:00:00', datetime: '30 Dec 2025 13:00', bp: '124/82', pulse: 76, hr: 80, rr: 18, temp: 99.0, fbs: 98, crt: '<2', mucous: 'Normal', pulse_quality: '', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: 'Agitated.' },
+        { id: 7, datetimeSort: '2025-12-30T09:00:00', datetime: '30 Dec 2025 09:00', bp: '120/80', pulse: 72, hr: 72, rr: 18, temp: 98.6, fbs: 112, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 8, datetimeSort: '2025-12-29T21:00:00', datetime: '29 Dec 2025 21:00', bp: '118/78', pulse: 70, hr: null, rr: 18, temp: 98.4, fbs: 108, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 3, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 9, datetimeSort: '2025-12-29T17:00:00', datetime: '29 Dec 2025 17:00', bp: '130/85', pulse: 80, hr: 80, rr: 20, temp: 99.1, fbs: 120, crt: '2', mucous: 'Dry', pulse_quality: 'Bounding', lung: 'Rhonchi', heart: 'Normal', loc: 'E3V4M5', pain: 5, cyanosis: true, seizure: false, arrest: false, note: 'Episode of SOB.' },
+        { id: 10, datetimeSort: '2025-12-29T13:00:00', datetime: '29 Dec 2025 13:00', bp: '122/80', pulse: 74, hr: 75, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 11, datetimeSort: '2025-12-29T09:00:00', datetime: '29 Dec 2025 09:00', bp: '120/80', pulse: 72, hr: 72, rr: 18, temp: 98.6, fbs: 110, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 12, datetimeSort: '2025-12-28T21:00:00', datetime: '28 Dec 2025 21:00', bp: '116/76', pulse: 68, hr: null, rr: 18, temp: 98.2, fbs: 103, crt: '<2', mucous: 'Normal', pulse_quality: '', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 4, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 13, datetimeSort: '2025-12-28T17:00:00', datetime: '28 Dec 2025 17:00', bp: '118/78', pulse: 70, hr: 70, rr: 18, temp: 98.5, fbs: 105, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 14, datetimeSort: '2025-12-28T13:00:00', datetime: '28 Dec 2025 13:00', bp: '120/80', pulse: 72, hr: 74, rr: 18, temp: 98.6, fbs: 110, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 15, datetimeSort: '2025-12-28T09:00:00', datetime: '28 Dec 2025 09:00', bp: '122/80', pulse: 75, hr: 75, rr: 18, temp: 98.7, fbs: 111, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 5, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 16, datetimeSort: '2025-12-27T21:00:00', datetime: '27 Dec 2025 21:00', bp: '140/90', pulse: 90, hr: 90, rr: 22, temp: 100.4, fbs: 140, crt: '<2', mucous: 'Pale', pulse_quality: 'Weak', lung: 'Normal', heart: 'Murmur', loc: 'E3V4M5', pain: 7, cyanosis: false, seizure: true, arrest: false, note: 'Seizure event, post-ictal.' },
+        { id: 17, datetimeSort: '2025-12-27T17:00:00', datetime: '27 Dec 2025 17:00', bp: '130/85', pulse: 82, hr: 85, rr: 20, temp: 99.0, fbs: 125, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Restless.' },
+        { id: 18, datetimeSort: '2025-12-27T13:00:00', datetime: '27 Dec 2025 13:00', bp: '128/84', pulse: 80, hr: 80, rr: 18, temp: 98.8, fbs: 122, crt: '<2', mucous: 'Normal', pulse_quality: '', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 19, datetimeSort: '2025-12-27T09:00:00', datetime: '27 Dec 2025 09:00', bp: '126/82', pulse: 78, hr: null, rr: 18, temp: 98.6, fbs: 118, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: '' },
+        { id: 20, datetimeSort: '2025-12-26T21:00:00', datetime: '26 Dec 2025 21:00', bp: '124/80', pulse: 76, hr: 78, rr: 18, temp: 98.6, fbs: 115, crt: '<2', mucous: 'Normal', pulse_quality: 'Strong', lung: 'Normal', heart: 'Normal', loc: 'E4V5M6', pain: 6, cyanosis: false, seizure: false, arrest: false, note: 'Admission.' },
     ];
+    // ***** MODIFIED END: Updated vsHistoryData *****
 
     const vsTableBody = document.getElementById('historyTableBody');
     const vsNoHistoryMessage = document.getElementById('noHistoryMessage');
@@ -665,16 +673,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const arrestText = item.arrest ? '<span class="font-semibold text-[var(--color-danger)]">Yes</span>' : '<span class="text-[var(--color-text-muted)]">No</span>';
             const noteSnippet = item.note.length > 20 ? item.note.substring(0, 20) + '...' : item.note;
 
+            // ***** MODIFIED START: Added hr and pulse_quality to row template *****
             const row = `
                 <tr>
                     <td class="text-[var(--color-text-base)] sticky left-0">${item.datetime}</td>
                     <td class="text-[var(--color-text-base)]">${item.bp}</td>
                     <td class="text-[var(--color-text-base)]">${item.pulse}</td>
+                    <td class="text-[var(--color-text-base)]">${item.hr || 'N/A'}</td>
                     <td class="text-[var(--color-text-base)]">${item.rr}</td>
                     <td class="text-[var(--color-text-base)]">${item.temp}</td>
                     <td class="text-[var(--color-text-base)]">${item.fbs}</td>
                     <td class="text-[var(--color-text-base)]">${item.crt}</td>
                     <td class="text-[var(--color-text-base)]">${item.mucous}</td>
+                    <td class="text-[var(--color-text-base)]">${item.pulse_quality || 'N/A'}</td>
                     <td class="text-[var(--color-text-base)]">${item.lung}</td>
                     <td class="text-[var(--color-text-base)]">${item.heart}</td>
                     <td class="text-[var(--color-text-base)]">${item.loc}</td>
@@ -690,6 +701,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                 </tr>
             `;
+            // ***** MODIFIED END *****
+            
             const rowElement = document.createElement('tr');
             rowElement.innerHTML = row;
             const firstTd = rowElement.querySelector('td:first-child');
@@ -715,7 +728,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 valB = b['datetimeSort'];
                 return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
             }
-            if (['pulse', 'rr', 'temp', 'pain', 'fbs'].includes(column)) {
+            
+            // ***** MODIFIED START: Added 'hr' to numeric sort *****
+            if (['pulse', 'hr', 'rr', 'temp', 'pain', 'fbs'].includes(column)) {
+            // ***** MODIFIED END *****
                 return direction === 'asc' ? valA - valB : valB - valA;
             }
             if (['cyanosis', 'seizure', 'arrest'].includes(column)) {
@@ -805,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Initialize Lucide Icons (Final call on initial load) ---
-    // This renders icons in the static parts of emr.html
+    // This renders icons in the static parts of index.html
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
