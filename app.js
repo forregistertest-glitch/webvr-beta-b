@@ -1,10 +1,132 @@
-// This is app.js
+// This is app.js (ฉบับแก้ไขสมบูรณ์)
 
-// ***** START: EYE DIAGRAM TEMPLATE (From PDF) *****
-// (เก็บภาพ template สำหรับ canvas ไว้ใน Base64)
-// This is a blank image placeholder. Replace with a real Base64 image if you have one.
-const EYE_DIAGRAM_TEMPLATE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARcAAACyCAMAAAAY0/JTAAAASlBMVEX///8AAABTU1NhYWFpaWnDw8Ovr6+3t7fMzMzj4+Pb29vOzs6+vr6pqamNjY3c3Nzy8vLn5+d4eHjW1tZQUFCRkZGfn5/ExMSwsLCJiYlwcHBpLjpJAAAAw0lEQVR42u3ZsQ0AIAwDwTz/04xWIAg4JCeEwE/Sq1SqN/0DAAAAAAD8aQgAAAAAAAAAAGwOA8B0A8fHl8cAAAAAAAAAALA5DAAAAAAAAJA5DAAAAAAAANCdQwEAAAAAAIDsHAYAAAAAAADkDAYAAAAAAACkDocCAAAAAACAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAAyBwGAAAAAAAA7DkBpJkBFjA74z4AAAAASUVORK5CYII=';
-// ***** END: EYE DIAGRAM TEMPLATE *****
+// ***** START: DRAWING DEMO FUNCTIONS *****
+let fabricCanvas = null;
+let drawingHistory = []; // สำหรับ Undo
+let drawingLock = false; // ป้องกันการ Undo/Clear ระหว่างทำงาน
+
+// (ฟังก์ชันนี้จะถูกย้ายเข้าไปใน initializeDrawingDemo)
+function saveDrawingState() {
+    if (drawingLock) return;
+    drawingHistory.push(JSON.stringify(fabricCanvas.toJSON()));
+}
+
+function initializeDrawingDemo(templateUrl) {
+    if (fabricCanvas) {
+        fabricCanvas.dispose(); // ล้าง canvas เก่า (ถ้ามี)
+    }
+    drawingHistory = []; // ล้างประวัติ Undo
+
+    const canvasElement = document.getElementById('drawing-canvas');
+    const container = canvasElement.parentElement;
+    if (!container) return; 
+
+    // สร้าง canvas
+    fabricCanvas = new fabric.Canvas('drawing-canvas', {
+        width: container.clientWidth,
+        height: container.clientWidth, // เริ่มต้นด้วยสี่เหลี่ยมจัตุรัส
+        isDrawingMode: true,
+    });
+    
+    // ตั้งค่าปากกาเริ่มต้น
+    fabricCanvas.freeDrawingBrush.color = '#E11D48'; // สีแดง
+    fabricCanvas.freeDrawingBrush.width = 3;
+
+    // โหลดภาพพื้นหลัง (จาก 'eyeexam.png')
+    fabric.Image.fromURL(templateUrl, function(img) {
+        // ตั้งขนาด Canvas ตามอัตราส่วนของภาพ
+        fabricCanvas.setHeight(container.clientWidth * (img.height / img.width));
+        
+        fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
+            scaleX: fabricCanvas.width / img.width,
+            scaleY: fabricCanvas.height / img.height
+        });
+        
+        // บันทึกสถานะเริ่มต้น (ภาพเปล่า) สำหรับ Undo
+        saveDrawingState();
+        
+    }, { crossOrigin: 'anonymous' }); // Need crossOrigin for local file loading demo in some setups
+
+    // --- ผูก Event ปุ่มเครื่องมือวาดภาพ ---
+    const penBtn = document.getElementById('drawing-mode-btn');
+    const textBtn = document.getElementById('text-mode-btn');
+    const colorPicker = document.getElementById('drawing-color-picker');
+    const undoBtn = document.getElementById('drawing-undo-btn');
+    const clearBtn = document.getElementById('drawing-clear-btn');
+
+    if (penBtn) penBtn.onclick = () => {
+        fabricCanvas.isDrawingMode = true;
+        penBtn.classList.add('bg-blue-600', 'text-white');
+        textBtn.classList.remove('bg-blue-600', 'text-white');
+        textBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
+    };
+    
+    if (textBtn) textBtn.onclick = () => {
+        fabricCanvas.isDrawingMode = false;
+        textBtn.classList.add('bg-blue-600', 'text-white');
+        penBtn.classList.remove('bg-blue-600', 'text-white');
+        penBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
+    };
+
+    if (colorPicker) colorPicker.onchange = () => {
+        const color = colorPicker.value;
+        fabricCanvas.freeDrawingBrush.color = color;
+        const activeObject = fabricCanvas.getActiveObject();
+        if (activeObject && activeObject.type === 'i-text') {
+            activeObject.set('fill', color);
+            fabricCanvas.renderAll();
+        }
+    };
+    
+    // -- (NEW) Undo/Clear Logic --
+    if (undoBtn) undoBtn.onclick = () => {
+        if (drawingHistory.length > 1) { // ต้องมีสถานะเริ่มต้น + สถานะปัจจุบัน
+            drawingLock = true;
+            drawingHistory.pop(); // ลบสถานะล่าสุด
+            const prevState = drawingHistory[drawingHistory.length - 1]; // โหลดสถานะก่อนหน้า
+            fabricCanvas.loadFromJSON(prevState, () => {
+                fabricCanvas.renderAll();
+                drawingLock = false;
+            });
+        }
+    };
+    
+    if (clearBtn) clearBtn.onclick = () => {
+        if (drawingHistory.length > 0) {
+            drawingLock = true;
+            const initialState = drawingHistory[0]; // กลับไปสถานะแรกสุด (ภาพเปล่า)
+            drawingHistory = [initialState]; // รีเซ็ตประวัติ
+            fabricCanvas.loadFromJSON(initialState, () => {
+                fabricCanvas.renderAll();
+                drawingLock = false;
+            });
+        }
+    };
+
+    // --- Listeners สำหรับการวาดและพิมพ์ ---
+    fabricCanvas.on('mouse:down', function(options) {
+        if (!fabricCanvas.isDrawingMode && (!options.target || options.target.type !== 'i-text')) {
+            const pointer = fabricCanvas.getPointer(options.e);
+            const text = new fabric.IText('Tap to edit', {
+                left: pointer.x,
+                top: pointer.y,
+                fill: colorPicker.value,
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center'
+            });
+            fabricCanvas.add(text);
+            fabricCanvas.setActiveObject(text);
+            text.enterEditing();
+        }
+    });
+
+    // บันทึกสถานะทุกครั้งที่วาด/แก้ไขเสร็จ
+    fabricCanvas.on('object:added', saveDrawingState);
+    fabricCanvas.on('object:modified', saveDrawingState);
+
+}
+// ***** END: DRAWING DEMO FUNCTIONS *****
 
 
 // ฟังก์ชันสำหรับเปิดหน้าต่าง BP Chart
@@ -15,14 +137,12 @@ function openBpChart(historyData) {
         return;
     }
 
-    // 1. Process Data
     const sortedData = [...historyData].sort((a, b) => a.datetimeSort.localeCompare(b.datetimeSort));
     const labels = sortedData.map(d => d.datetime);
     const systolicData = sortedData.map(d => d.bp.split('/')[0] ? parseInt(d.bp.split('/')[0], 10) : null);
     const diastolicData = sortedData.map(d => d.bp.split('/')[1] ? parseInt(d.bp.split('/')[1], 10) : null);
     const pulseData = sortedData.map(d => d.pulse);
 
-    // 2. Create HTML Content
     const content = `
         <!DOCTYPE html>
         <html lang="th">
@@ -50,7 +170,7 @@ function openBpChart(historyData) {
                                 type: 'bar',
                                 label: 'Systolic (mmHg)',
                                 data: ${JSON.stringify(systolicData)},
-                                backgroundColor: 'rgba(156, 163, 175, 0.7)', // Gray
+                                backgroundColor: 'rgba(156, 163, 175, 0.7)',
                                 borderColor: 'rgba(156, 163, 175, 1)',
                                 borderWidth: 1,
                                 yAxisID: 'yBP'
@@ -59,7 +179,7 @@ function openBpChart(historyData) {
                                 type: 'bar',
                                 label: 'Diastolic (mmHg)',
                                 data: ${JSON.stringify(diastolicData)},
-                                backgroundColor: 'rgba(239, 68, 68, 0.7)', // Red
+                                backgroundColor: 'rgba(239, 68, 68, 0.7)',
                                 borderColor: 'rgba(239, 68, 68, 1)',
                                 borderWidth: 1,
                                 yAxisID: 'yBP'
@@ -68,7 +188,7 @@ function openBpChart(historyData) {
                                 type: 'line',
                                 label: 'Pulse (bpm)',
                                 data: ${JSON.stringify(pulseData)},
-                                backgroundColor: 'rgba(59, 130, 246, 0.2)', // Blue
+                                backgroundColor: 'rgba(59, 130, 246, 0.2)',
                                 borderColor: 'rgba(59, 130, 246, 1)',
                                 borderWidth: 2,
                                 fill: false,
@@ -91,7 +211,7 @@ function openBpChart(historyData) {
                                 type: 'linear',
                                 position: 'right',
                                 title: { display: true, text: 'Pulse (bpm)' },
-                                grid: { drawOnChartArea: false }, // Hide grid lines for this axis
+                                grid: { drawOnChartArea: false },
                                 min: 0
                             }
                         }
@@ -220,10 +340,10 @@ function openVitalsChart(historyData) {
 
 // ***** START: EYE EXAM HISTORY DATA (DEMO) *****
 const eyeExamHistoryData = [
-    { datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', stt_od: 15, stt_os: 14, iop_od: 18, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/eee/888?text=Exam+Sheet+1' },
-    { datetimeSort: '2025-12-30T14:00:00', datetime: '30 Dec 2025 14:00', dvm: 'Dr. See', plr_od: 'Sluggish', plr_os: '+', stt_od: 10, stt_os: 12, iop_od: 22, iop_os: 20, fluorescein_od: 'Positive', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ddd/777?text=Exam+Sheet+2+(Corneal+Ulcer+OD)' },
-    { datetimeSort: '2025-12-29T11:00:00', datetime: '29 Dec 2025 11:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', stt_od: null, stt_os: null, iop_od: 17, iop_os: 17, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: null },
-    { datetimeSort: '2025-12-28T16:00:00', datetime: '28 Dec 2025 16:00', dvm: 'Dr. See', plr_od: '-', plr_os: 'Sluggish', stt_od: 5, stt_os: 8, iop_od: 45, iop_os: 25, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ccc/666?text=Exam+Sheet+3+(Glaucoma+OD)' }
+    { datetimeSort: '2025-12-31T09:00:00', datetime: '31 Dec 2025 09:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '+', menace_os: '+', stt_od: 15, stt_os: 14, iop_od: 18, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/eee/888?text=Exam+Sheet+1' },
+    { datetimeSort: '2025-12-30T14:00:00', datetime: '30 Dec 2025 14:00', dvm: 'Dr. See', plr_od: 'Sluggish', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: '+', dazzle_os: '+', menace_od: '-', menace_os: '+', stt_od: 10, stt_os: 12, iop_od: 22, iop_os: 20, fluorescein_od: 'Positive', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ddd/777?text=Exam+Sheet+2+(Corneal+Ulcer+OD)' },
+    { datetimeSort: '2025-12-29T11:00:00', datetime: '29 Dec 2025 11:00', dvm: 'Dr. Eye', plr_od: '+', plr_os: '+', palpebral_od: '+', palpebral_os: '+', dazzle_od: null, dazzle_os: null, menace_od: '+', menace_os: '+', stt_od: null, stt_os: null, iop_od: 17, iop_os: 17, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: null },
+    { datetimeSort: '2025-12-28T16:00:00', datetime: '28 Dec 2025 16:00', dvm: 'Dr. See', plr_od: '-', plr_os: 'Sluggish', palpebral_od: '+', palpebral_os: '+', dazzle_od: '-', dazzle_os: 'Sluggish', menace_od: '-', menace_os: '-', stt_od: 5, stt_os: 8, iop_od: 45, iop_os: 25, fluorescein_od: 'Neg', fluorescein_os: 'Neg', imageUrl: 'https://placehold.co/400x300/ccc/666?text=Exam+Sheet+3+(Glaucoma+OD)' }
 ];
 // ***** END: EYE EXAM HISTORY DATA (DEMO) *****
 
@@ -234,7 +354,7 @@ function renderEyeExamHistoryTable(data) {
     tableBody.innerHTML = '';
     
     if (data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-[var(--color-text-muted)]">No eye exam history found.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="18" class="p-4 text-center text-[var(--color-text-muted)]">No eye exam history found.</td></tr>`;
         return;
     }
 
@@ -242,9 +362,8 @@ function renderEyeExamHistoryTable(data) {
         const row = document.createElement('tr');
         row.classList.add('hover:bg-gray-50', 'dark:hover:bg-[--color-bg-secondary]/50');
         
-        // ถ้ามี imageUrl ให้สร้าง thumbnail ถ้าไม่มี ให้แสดง N/A
         const imageUrl = item.imageUrl 
-            ? `<img src="${item.imageUrl}" alt="Exam" class="history-thumbnail" data-full-src="${item.imageUrl}">` // Added data-full-src
+            ? `<img src="${item.imageUrl}" alt="Exam" class="history-thumbnail" data-full-src="${item.imageUrl}">`
             : '<span class="text-[var(--color-text-muted)]">N/A</span>';
             
         row.innerHTML = `
@@ -252,12 +371,18 @@ function renderEyeExamHistoryTable(data) {
             <td class="p-3">${item.dvm}</td>
             <td class="p-3">${item.plr_od || 'N/A'}</td>
             <td class="p-3">${item.plr_os || 'N/A'}</td>
+            <td class="p-3">${item.palpebral_od || 'N/A'}</td>
+            <td class="p-3">${item.palpebral_os || 'N/A'}</td>
+            <td class="p-3">${item.dazzle_od || 'N/A'}</td>
+            <td class="p-3">${item.dazzle_os || 'N/A'}</td>
+            <td class="p-3">${item.menace_od || 'N/A'}</td>
+            <td class="p-3">${item.menace_os || 'N/A'}</td>
             <td class="p-3">${item.stt_od || 'N/A'}</td>
             <td class="p-3">${item.stt_os || 'N/A'}</td>
-            <td class="p-3">${item.iop_od || 'N/A'}</td>
-            <td class="p-3">${item.iop_os || 'N/A'}</td>
             <td class="p-3">${item.fluorescein_od || 'N/A'}</td>
             <td class="p-3">${item.fluorescein_os || 'N/A'}</td>
+            <td class="p-3">${item.iop_od || 'N/A'}</td>
+            <td class="p-3">${item.iop_os || 'N/A'}</td>
             <td class="p-3">${imageUrl}</td>
             <td class="p-3">
                 <button class="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)]" title="View/Edit">
@@ -266,7 +391,6 @@ function renderEyeExamHistoryTable(data) {
             </td>
         `;
         
-        // Add sticky styles for first cell
         const firstTd = row.querySelector('td:first-child');
         firstTd.style.backgroundColor = 'var(--color-bg-content)';
         row.addEventListener('mouseenter', () => firstTd.style.backgroundColor = 'var(--color-bg-secondary)');
@@ -280,96 +404,6 @@ function renderEyeExamHistoryTable(data) {
 }
 // ***** END: EYE EXAM HISTORY FUNCTIONS *****
 
-
-// ***** START: DRAWING DEMO FUNCTIONS *****
-let fabricCanvas = null;
-let drawingMode = 'pen';
-
-function initializeDrawingDemo(templateUrl) {
-    if (fabricCanvas) {
-        fabricCanvas.dispose(); // ล้าง canvas เก่า (ถ้ามี)
-    }
-
-    const canvasElement = document.getElementById('drawing-canvas');
-    const container = canvasElement.parentElement; // div ที่ครอบ canvas
-    if (!container) return; // Add check
-
-    // สร้าง canvas
-    fabricCanvas = new fabric.Canvas('drawing-canvas', {
-        isDrawingMode: true,
-        width: container.clientWidth, // ตั้งขนาด canvas ให้เต็ม container
-        height: (container.clientWidth / 283) * 204 // รักษาอัตราส่วน (283x204 คือขนาดภาพต้นแบบ)
-    });
-
-    // ตั้งค่าปากกาเริ่มต้น
-    fabricCanvas.freeDrawingBrush.color = '#E11D48'; // สีแดง
-    fabricCanvas.freeDrawingBrush.width = 3;
-
-    // โหลดภาพพื้นหลัง
-    fabric.Image.fromURL(templateUrl, function(img) {
-        fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
-            // ย่อ/ขยายภาพให้พอดีกับ canvas
-            scaleX: fabricCanvas.width / img.width,
-            scaleY: fabricCanvas.height / img.height
-        });
-    });
-
-    // listeners สำหรับปุ่ม Pen/Text
-    const penBtn = document.getElementById('drawing-mode-btn');
-    const textBtn = document.getElementById('text-mode-btn');
-    const colorPicker = document.getElementById('drawing-color-picker');
-
-    if (penBtn) penBtn.onclick = () => {
-        fabricCanvas.isDrawingMode = true;
-        drawingMode = 'pen';
-        penBtn.classList.add('bg-blue-600', 'text-white');
-        textBtn.classList.remove('bg-blue-600', 'text-white');
-        textBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
-    };
-    
-    if (textBtn) textBtn.onclick = () => {
-        fabricCanvas.isDrawingMode = false;
-        drawingMode = 'text';
-        textBtn.classList.add('bg-blue-600', 'text-white');
-        penBtn.classList.remove('bg-blue-600', 'text-white');
-        penBtn.classList.add('bg-gray-200', 'dark:bg-[--color-bg-secondary]');
-    };
-
-    // Listener สำหรับเพิ่ม Text
-    fabricCanvas.on('mouse:down', function(options) {
-        if (drawingMode !== 'text') {
-            return;
-        }
-        // ตรวจสอบว่าถ้าคลิกบนพื้นที่ว่าง (ไม่ได้คลิกบน object)
-        if (!options.target || options.target.type !== 'i-text') {
-            const pointer = fabricCanvas.getPointer(options.e);
-            const text = new fabric.IText('Tap to edit', {
-                left: pointer.x,
-                top: pointer.y,
-                fill: colorPicker.value,
-                fontSize: 20,
-                originX: 'center',
-                originY: 'center'
-            });
-            fabricCanvas.add(text);
-            fabricCanvas.setActiveObject(text);
-            text.enterEditing();
-        }
-    });
-
-    // Listener สำหรับเปลี่ยนสี
-    if (colorPicker) colorPicker.onchange = () => {
-        const color = colorPicker.value;
-        fabricCanvas.freeDrawingBrush.color = color;
-        // (ถ้ามี object ที่เลือกอยู่ ก็เปลี่ยนสี object นั้น)
-        const activeObject = fabricCanvas.getActiveObject();
-        if (activeObject && activeObject.type === 'i-text') {
-            activeObject.set('fill', color);
-            fabricCanvas.renderAll();
-        }
-    };
-}
-// ***** END: DRAWING DEMO FUNCTIONS *****
 
 
 // --- Main DOMContentLoaded ---
@@ -459,6 +493,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons(); 
         }
+        // Load history data on open
+        renderVsHistoryTable(vsHistoryData);
     };
     const hideVitalsPopup = () => { if (vitalsModal) vitalsModal.classList.add('hidden'); };
 
@@ -478,6 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeEyeCancel = document.getElementById('close-eye-popup-cancel');
     const eyeTabLinks = eyeModal.querySelectorAll('.eye-tab-link');
     const eyeTabContents = eyeModal.querySelectorAll('.eye-tab-content');
+    const openDrawingBtn = document.getElementById('open-drawing-tool'); // <-- Find the single button
 
     const showEyePopup = () => { 
         if (eyeModal) eyeModal.classList.remove('hidden'); 
@@ -494,7 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Modal: Drawing Demo (NEW) ---
     const drawingModal = document.getElementById('drawing-demo-modal');
-    const openDrawingBtn = document.getElementById('open-drawing-demo-btn');
     const closeDrawingX = document.getElementById('close-drawing-demo-x');
     const cancelDrawingBtn = document.getElementById('drawing-demo-cancel');
     const saveDrawingBtn = document.getElementById('drawing-demo-save');
@@ -502,7 +538,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const showDrawingPopup = () => {
         if (drawingModal) drawingModal.classList.remove('hidden');
-        initializeDrawingDemo(EYE_DIAGRAM_TEMPLATE); // เริ่มต้น canvas เมื่อเปิด
+        // Load local file 'eyeexam.png'
+        initializeDrawingDemo('eyeexam.png'); 
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons(); // Render icons in drawing modal
+        }
     }
     const hideDrawingPopup = () => { if (drawingModal) drawingModal.classList.add('hidden'); }
 
@@ -531,23 +571,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (eyeHistoryTableBody) {
         eyeHistoryTableBody.addEventListener('click', function(event) {
-            // เช็คว่ากดที่รูป thumbnail (ที่มี class 'history-thumbnail')
             if (event.target.classList.contains('history-thumbnail')) {
-                fullImageViewerSrc.src = event.target.dataset.fullSrc; // ใช้ data-full-src
-                imageViewerModal.classList.remove('hidden'); // แสดง modal
+                fullImageViewerSrc.src = event.target.dataset.fullSrc; 
+                imageViewerModal.classList.remove('hidden'); 
             }
         });
     }
     if (closeImageViewerX) closeImageViewerX.addEventListener('click', hideImageViewer);
     if (imageViewerModal) imageViewerModal.addEventListener('click', (event) => {
-        if (event.target === imageViewerModal) hideImageViewer(); // ปิดเมื่อคลิกพื้นหลัง
+        if (event.target === imageViewerModal) hideImageViewer(); 
     });
 
 
     // --- Tab Switching Logic (Vital Signs) ---
     vitalsTabLinks.forEach(link => {
         link.addEventListener('click', () => {
-            const tabId = link.dataset.tab;
+            const tabId = link.dataset.tab; // e.g. "vitals-history"
             vitalsTabLinks.forEach(tab => {
                 tab.classList.remove('tab-active');
                 tab.classList.add('tab-inactive');
