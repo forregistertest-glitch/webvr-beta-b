@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="kahis-theme.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=vital_signs,person_edit" />
     
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,74 +18,115 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
     <style>
-        /* This style block is just for Alpine's [x-cloak] utility */
+        /* Utility */
         [x-cloak] { display: none !important; }
 
-        /* ***** NEW: Style for clickable thumbnail in history table ***** */
-        .history-thumbnail {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: transform 0.2s;
+        /* History Table Thumbnails */
+        .history-thumbnail { width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem; cursor: pointer; transition: transform 0.2s; }
+        .history-thumbnail:hover { transform: scale(1.1); }
+        
+        /* ==========================================================================
+           GLOBAL TABLE STYLES (มาตรฐานเดียวสำหรับทุกตาราง)
+           ========================================================================== */
+        
+        /* 1. ขนาดและระยะห่าง (เหมือน Vital Signs) */
+        #eyeHistoryTable th, #eyeHistoryTable td,
+        #historyTable th, #historyTable td,
+        #assessment-history-table th, #assessment-history-table td,
+        #ext-doc-table th, #ext-doc-table td,
+        #lisHistoryTable th, #lisHistoryTable td {
+             padding: 12px 16px; 
+             white-space: nowrap; 
+             vertical-align: middle;
+             border-bottom: 1px solid var(--color-border-base);
+             color: var(--color-text-base);
         }
-        .history-thumbnail:hover {
-            transform: scale(1.1);
+
+        /* 2. Sticky Headers (หัวตารางลอยติดบน) */
+        #eyeHistoryTable thead th, 
+        #historyTable thead th,
+        #assessment-history-table thead th,
+        #ext-doc-table thead th,
+        #lisHistoryTable thead th { 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            background-color: var(--color-bg-secondary); 
+            font-weight: 600; /* ความหนาตัวอักษรมาตรฐาน */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         
-        /* ***** NEW: BUG FIX for Eye Exam History Table Sticky Header/Column ***** */
-        #eyeHistoryTable th, #eyeHistoryTable td {
-            padding: 12px 16px;
-            white-space: nowrap; 
-        }
-        #eyeHistoryTable th {
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-weight: 600;
-        }
-         #eyeHistoryTable th:hover {
-            background-color: var(--color-border-base);
-         }
-        #eyeHistoryTable tbody tr {
-            border-bottom: 1px solid var(--color-border-base);
-            transition: background-color 0.2s;
-        }
-        #eyeHistoryTable tbody tr:last-child {
-            border-bottom: none;
-        }
-        #eyeHistoryTable tbody tr:hover {
-            background-color: var(--color-bg-secondary);
-        }
-        
-        #eyeHistoryTable thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10; /* Lower z-index for header */
-            background-color: var(--color-bg-secondary);
-        }
-        #eyeHistoryTable th:first-child,
-        #eyeHistoryTable td:first-child {
-            position: sticky;
-            left: 0;
+        .history-sort-header { cursor: pointer; transition: background-color 0.2s; }
+        .history-sort-header:hover { background-color: var(--color-border-base); }
+
+        /* 3. Sticky First Column (คอลัมน์แรกติดซ้าย) */
+        #eyeHistoryTable th:first-child, #eyeHistoryTable td:first-child,
+        #historyTable th:first-child, #historyTable td:first-child,
+        #lisHistoryTable th:first-child, #lisHistoryTable td:first-child,
+        #ext-doc-table th:first-child, #ext-doc-table td:first-child { 
+            position: sticky; 
+            left: 0; 
             background-color: var(--color-bg-content); 
+            z-index: 20; 
+            border-right: 1px solid var(--color-border-base);
         }
-        #eyeHistoryTable th:first-child {
-            z-index: 20; /* Higher z-index for corner */
-            background-color: var(--color-bg-secondary); 
+        /* (มุมซ้ายบนสุด - ต้องอยู่บนสุด) */
+        #eyeHistoryTable thead th:first-child, 
+        #historyTable thead th:first-child,
+        #lisHistoryTable thead th:first-child,
+        #ext-doc-table thead th:first-child {
+            z-index: 30; 
+            background-color: var(--color-bg-secondary);
         }
-         #eyeHistoryTable tbody tr:hover td:first-child {
-            background-color: var(--color-bg-secondary); 
-         }
-         #eyeHistoryTable th:first-child, #eyeHistoryTable td:first-child {
-            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
-         }
-         .dark #eyeHistoryTable th:first-child, .dark #eyeHistoryTable td:first-child {
-            box-shadow: 2px 0 5px -2px rgba(0,0,0,0.2);
-         }
-         /* ***** END: BUG FIX ***** */
+
+        /* 4. Hover Effect (แก้สีเพี้ยนคอลัมน์แรก) */
+        tbody tr { transition: background-color 0.15s; }
+        tbody tr:hover { background-color: var(--color-bg-secondary) !important; }
+        tbody tr:hover > td:first-child { background-color: var(--color-bg-secondary) !important; }
+
+        /* 5. Eye Exam Specific (หัวตาราง 2 บรรทัด) */
+        .eye-header-multiline {
+            white-space: normal !important; /* ให้ตัดคำได้ */
+            text-align: left !important;    /* ชิดซ้ายเหมือน VS */
+            vertical-align: bottom !important; /* ชิดล่างให้ตรงกับบรรทัด Date */
+            min-width: 80px;
+            line-height: 1.2;
+            padding-bottom: 8px !important; /* เว้นระยะล่างนิดหน่อย */
+        }
+        .eye-header-sub {
+            display: block;        /* ขึ้นบรรทัดใหม่ */
+            font-size: 0.75em;     /* ตัวเล็กกว่า */
+            font-weight: normal;   /* ตัวบาง */
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        /* LIS Modal Styles */
+        .modal-container { max-width: 1100px; margin: 0; background: white; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh; width: 100%; }
+        .dark .modal-container { background-color: var(--color-bg-content); }
+        .list-frame { border: 1px solid var(--color-border-base); border-radius: 4px; display: flex; flex-direction: column; overflow: hidden; height: 100%; background-color: var(--color-bg-content); }
+        .list-header { font-weight: 700; background-color: var(--color-bg-secondary); padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-border-base); flex-shrink: 0; color: var(--color-text-base); z-index: 10; }
+        .list-body { overflow-y: auto; flex: 1; }
+        .test-list-item { padding: 0.5rem 1rem; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s; }
+        .dark .test-list-item { border-bottom-color: var(--color-bg-secondary); }
+        .test-list-item:hover { background-color: #e5e7eb; }
+        .dark .test-list-item:hover { background-color: var(--color-bg-secondary); }
+        .checkbox-label { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem; color: var(--color-text-base); }
+        .checkbox-label:hover { background-color: #f3f4f6; }
+        .dark .checkbox-label:hover { background-color: var(--color-bg-secondary); }
+        
+        /* Form Styles */
+        .form-input, .form-select { width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid var(--color-border-base); background-color: var(--color-bg-content); color: var(--color-text-base); }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 0.25rem; }
+        .form-checkbox { height: 1rem; width: 1rem; border-radius: 0.25rem; border: 1px solid var(--color-border-base); }
+        .form-input-datetime { position: relative; color: var(--color-text-base); }
+        .form-input-datetime::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+        .dark .form-input-datetime::-webkit-calendar-picker-indicator { filter: invert(0.6); }
     </style>
+    
 </head>
 <body class="text-sm">
 
@@ -206,34 +248,21 @@
         </div>
     </div>
 
-<!-- ... โค้ดเดิม (ส่วน Pet Info Bar) ... -->
-    </div>
-
     <nav class="bg-white dark:bg-[--color-bg-content] shadow-sm -mt-px dark:border-b dark:border-[--color-border-base]">
         <div class="max-w-full mx-auto">
-            <div class="flex space-x-1">
+            <div class="flex space-x-1 overflow-x-auto">
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="quick_view_content.html">Quick view</a>
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="subj_content.html">Subj</a>
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="obj_content.html">Obj</a>
-                
                 <a href="#" class="tab-active emr-tab dark:text-[--color-primary-500] dark:border-[--color-primary-500] px-3 py-2 text-sm" data-target="assessment_content.html">Assessment</a>
-                
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="plan_content.html">Plan</a>
-                
-                <!-- 
-                  VVV START: ส่วนที่แก้ไข VVV
-                  เหตุผล: เปลี่ยนจาก href="sysexam_v2.html" เป็น data-target 
-                  เพื่อให้ app.js โหลดเป็นโมดูลแทนการเปลี่ยนหน้า
-                -->
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="sys_exam_content.html">Sys Exam</a>
-                <!-- 
-                  ^^^ END: ส่วนที่แก้ไข ^^^
-                -->
-                
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_pe_content.html">Order PE</a>
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_tx_content.html">Order TX</a>
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_lis_content.html">Order LIS</a>
-                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_lor_content.html">Order LOR</a>
+                
+                <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_path_content.html">Order Path</a>
+                
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="order_rx_content.html">Order RX</a>
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="lab_viewer_content.html">Lab Viewer</a>
                 <a href="#" class="tab-inactive emr-tab dark:text-[--color-text-muted] px-3 py-2 text-sm" data-target="pets_note_content.html">Pet's Note</a>
@@ -241,45 +270,12 @@
             </div>
         </div>
     </nav>
-<!-- ... โค้ดเดิม (ส่วน <main>) ... -->
 
-<!-- ... โค้ดเดิม (ส่วน Footer) ... -->
-    
-    <main id="emr-content-placeholder">
-        </main>
-
-    <footer class="sticky bottom-0 bg-white dark:bg-[--color-bg-content] shadow-inner border-t border-gray-300 dark:border-[--color-border-base] p-3 z-40">
-        <div class="flex justify-between items-center">
-             <div class="flex space-x-2">
-                 <button id="open-df-popup" class="bg-orange-500 hover:bg-orange-600 dark:bg-[--color-orange-500] dark:hover:bg-[--color-orange-600] text-white px-4 py-2 rounded-lg text-sm font-medium">
-                     ลงข้อมูล DF
-                 </button>
-                 <button id="open-tf-popup" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                     ลงข้อมูล TF (Tech Fee)
-                 </button>
-                 <button id="open-vitals-popup" class="bg-blue-600 hover:bg-blue-700 dark:bg-[--color-primary-600] dark:hover:bg-[--color-primary-700] text-white px-4 py-2 rounded-lg text-sm font-medium">
-                     <i data-lucide="heart-pulse" class="inline-block w-4 h-4 mr-1.5"></i> Vital Signs
-                 </button>
-                 
-                 <button id="open-eye-popup" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                     <i data-lucide="eye" class="inline-block w-4 h-4 mr-1.5"></i> Eye Exam
-                 </button>
-                 </div>
-             <div class="flex items-center space-x-4">
-                  <label for="darkmode-toggle" class="flex items-center cursor-pointer text-xs text-gray-700 dark:text-[--color-text-muted]">
-                      <input type="checkbox" id="darkmode-toggle" class="mr-1">
-                      Darkmode
-                  </label>
-                  <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-                         class="bg-yellow-400 hover:bg-yellow-500 dark:bg-[--color-yellow-400] dark:hover:bg-[--color-yellow-500] text-black p-2 rounded-full shadow-lg z-20">
-                     <i data-lucide="arrow-up" class="w-5 h-5"></i>
-                 </button>
-             </div>
-         </div>
-     </footer>
+    <main id="emr-content-placeholder"></main>
 
     <div class="bg-gray-800 dark:bg-[--color-text-base] text-gray-300 dark:text-[--color-text-muted] p-4 text-xs">
-        <div class="container mx-auto flex justify-between">
+        <div class="container mx-auto grid grid-cols-3 items-center">
+            
             <div class="grid grid-cols-3 gap-x-6">
                 <a href="#" class="hover:underline">Hyperlink text to announcement 1</a>
                 <a href="#" class="hover:underline">Hyperlink text to announcement 2</a>
@@ -288,10 +284,14 @@
                 <a href="#" class="hover:underline">Hyperlink text to announcement 2</a>
                 <a href="#" class="hover:underline">Hyperlink text to announcement 3</a>
             </div>
-            <div class="text-right">
+
+            <div class="text-center">
                 <div>ระบบเวชระเบียนอิเล็กทรอนิกส์ โรงพยาบาลสัตว์มหาวิทยาลัยเกษตรศาสตร์</div>
                 <div>Version X.X.X.X, 31 Dec 2025</div>
             </div>
+
+            <div></div>
+
         </div>
     </div>
 
@@ -555,29 +555,36 @@
                                     <tr>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime">
                                             <div class="flex items-center">
-                                                Date/Time
+                                                Date/Time (Eff.)
                                                 <span class="sort-icon desc">
                                                     <i data-lucide="arrow-down" class="w-4 h-4"></i>
                                                 </span>
                                             </div>
                                         </th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="temp">Temp (°F)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="rr">RR (rpm)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="hr">HR (bpm)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="bp">BP (mmHg)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pulse">Pulse (bpm)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="crt">CRT (sec)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="fbs">FBS (mg/dL)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="rr">RR</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="hr">HR</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="bp">BP</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pulse">Pulse</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="crt">CRT</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="fbs">FBS</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="mm">MM</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="lung">Lung</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="heart">Heart</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pulse_quality">Pulse (Quality)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pulse_quality">Pulse Q.</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="loc">L.O.C</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="pain">Pain</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="cyanosis">Cyanosis</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="seizure">Seizure</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="arrest">Arrest</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="note">Note</th>
+                                        
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">DVM</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Dept</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">User Record</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Create Time</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Update Time</th>
+                                        
                                         <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Actions</th>
                                     </tr>
                                 </thead>
@@ -593,7 +600,7 @@
                     
                     <div id="content-new-vitals" class="vitals-tab-content hidden space-y-4 p-6 md:p-8">
                         
-                        <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                     <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
                             <div class="flex justify-between items-center mb-5">
                                 <h2 class="text-xl font-semibold flex items-center text-[var(--color-text-base)]">
                                     <i data-lucide="heart-pulse" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
@@ -750,35 +757,64 @@
                                 <textarea id="system-review-notes" rows="4" class="form-input" placeholder="พิมพ์ข้อความสั้นๆ"></textarea>
                             </div>
                         </section>
-
                         <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
                             <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]">
                                 <i data-lucide="calendar-clock" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
-                                Record Date/Time
+                                Effective Date/Time
                             </h2>
+                            <p class="text-xs text-[var(--color-text-muted)] mb-3 -mt-3">
+                                (เวลาของข้อมูลที่ต้องการให้แสดงผล)
+                            </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="vs-date" class="form-label">Date</label>
-                                    <input type="date" id="vs-date" class="form-input form-input-datetime" placeholder="Current date/time" required>
+                                    <label for="vs-effective-date" class="form-label">Date</label>
+                                    <input type="date" id="vs-effective-date" class="form-input form-input-datetime" placeholder="Current date" required>
                                 </div>
                                 <div>
-                                    <label for="vs-time" class="form-label">Time</label>
-                                    <input type="time" id="vs-time" class="form-input form-input-datetime" placeholder="Current date/time" required>
+                                    <label for="vs-effective-time" class="form-label">Time</label>
+                                    <input type="time" id="vs-effective-time" class="form-input form-input-datetime" placeholder="Current time" required>
                                 </div>
                             </div>
                         </section>
-                    </div>
+                        <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                            <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]">
+                                <i data-lucide="users" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+                                Record Meta (ข้อมูลการบันทึก)
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="vs-dvm" class="form-label">DVM (Optional)</label>
+                                    <select id="vs-dvm" class="form-input form-select">
+                                        <option value="" selected>(None)</option>
+                                        <option value="Dr. AAA">Dr. AAA</option>
+                                        <option value="Dr. BBB">Dr. BBB</option>
+                                        <option value="Dr. CCC">Dr. CCC</option>
+                                        <option value="Dr. Eye">Dr. Eye</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="vs-department" class="form-label">Department (Default from Login)</label>
+                                    <select id="vs-department" class="form-input form-select">
+                                        <option value="101 อายุรกรรม" selected>101 อายุรกรรม (Default)</option>
+                                        <option value="201 ฉุกเฉิน">201 ฉุกเฉิน</option>
+                                        <option value="301 คลินิกพิเศษ">301 คลินิกพิเศษ</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        </div>
                 </main>
-            </div>
+            </div>    
 
             <footer class="flex-shrink-0 flex justify-between items-center p-4 border-t border-[var(--color-border-base)] bg-[var(--color-bg-secondary)]">
                 <button id="close-vitals-popup-cancel" class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-[var(--color-border-base)] dark:hover:bg-[var(--color-border-base)] text-gray-700 dark:text-[var(--color-text-base)] text-sm font-medium">
                     Close
                 </button>
-                <button class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-[var(--color-green-600)] text-white hover:bg-[var(--color-green-700)] dark:bg-[var(--color-green-600)] dark:hover:bg-[var(--color-green-700)] transition-colors text-sm font-medium">
-                    <i data-lucide="save" class="w-4 h-4"></i>
-                    <span>Save Vital Signs</span>
-                </button>
+                <button id="btn-save-vitals" class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 dark:bg-[--color-primary-600] dark:hover:bg-[--color-primary-700] transition-colors text-sm font-medium">
+    <i data-lucide="save" class="w-4 h-4"></i>
+    <span>Save Vital Signs</span>
+</button>
             </footer>
         </div>
     </div>
@@ -825,23 +861,41 @@
                             <table id="eyeHistoryTable" class="min-w-full text-sm">
                                 <thead class="bg-[var(--color-bg-secondary)]">
                                     <tr>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime" style="width: 160px;">Date/Time</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="dvm" style="width: 120px;">DVM</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="plr_od">PLR (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="plr_os">PLR (OS)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="palpebral_od">Palpebral (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="palpebral_os">Palpebral (OS)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="dazzle_od">Dazzle (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="dazzle_os">Dazzle (OS)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="menace_od">Menace (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="menace_os">Menace (OS)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="stt_od">STT (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="stt_os">STT (OS)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="fluorescein_od">Fluorescein (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="fluorescein_os">Fluorescein (OS)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="iop_od">IOP (OD)</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="iop_os">IOP (OS)</th>
-                                        <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]" style="width: 80px;">Image</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime" style="min-width: 160px;">
+                                            <div class="flex items-center">
+                                                Date/Time (Eff.) 
+                                                <span class="sort-icon desc"><i data-lucide="arrow-down" class="w-4 h-4 ml-1"></i></span>
+                                            </div>
+                                        </th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">PLR<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">PLR<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Palp<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Palp<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Dazzle<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Dazzle<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Menace<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Menace<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">STT<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">STT<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Fluoro<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Fluoro<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">IOP<span class="eye-header-sub">(OD)</span></th>
+                                        <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">IOP<span class="eye-header-sub">(OS)</span></th>
+                                        
+                                        <th scope="col" class="text-center font-semibold text-[var(--color-text-base)]" style="min-width: 80px; vertical-align: middle;">Image</th>
+                                        
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">DVM</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Dept</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">User</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Create</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Update</th>
                                         <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Actions</th>
                                     </tr>
                                 </thead>
@@ -1059,7 +1113,199 @@
             </div>
         </div>
     </div>
-        
+
+    <div id="lis-popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 md:p-8 z-[100] hidden">
+        <div class="max-w-7xl w-full mx-auto bg-[var(--color-bg-content)] rounded-lg shadow-lg overflow-hidden border border-[var(--color-border-base)] flex flex-col" style="max-height: 90vh;">
+
+            <div id="lis-form-view" class="flex flex-col flex-1 h-full overflow-hidden">
+                <header class="relative flex justify-between items-center p-6 border-b border-[var(--color-border-base)] flex-shrink-0">
+                    <div><h1 class="text-2xl font-bold text-[var(--color-text-base)]">LIS Request</h1></div>
+                    <button id="close-lis-popup-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </header>
+
+                <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+                    
+                    <aside class="w-full lg:w-72 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-[var(--color-border-base)] bg-[var(--color-bg-secondary)] overflow-y-auto">
+                        <nav class="flex lg:flex-col" aria-label="Tabs">
+                            <button class="lis-tab-link tab-active w-1/2 lg:w-full text-left px-6 py-4 text-sm font-medium" data-tab="lis-history">
+                                <div class="flex items-center space-x-3"><i data-lucide="history" class="w-5 h-5"></i><span>History</span></div>
+                                <span class="text-xs block text-[var(--color-text-muted)] mt-1 ml-8">ประวัติ LIS (Pending/Completed)</span>
+                            </button>
+                            <button class="lis-tab-link tab-inactive w-1/2 lg:w-full text-left px-6 py-4 text-sm font-medium" data-tab="new-lis">
+                                <div class="flex items-center space-x-3"><i data-lucide="clipboard-list" class="w-5 h-5"></i><span>New LIS Request</span></div>
+                                <span class="text-xs block text-[var(--color-text-muted)] mt-1 ml-8">บันทึกข้อมูล LIS ใหม่</span>
+                            </button>
+                        </nav>
+                    </aside>
+
+                    <main class="w-full flex-1 overflow-y-auto max-h-[calc(90vh-140px)] p-6 md:p-8 relative">
+                        
+                        <div id="content-new-lis" class="lis-tab-content hidden space-y-8">
+                            
+                            <section>
+                                <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-[--color-text-base]">1. Select Tests</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[350px]">
+                                    
+                                    <div class="list-frame">
+                                        <div class="list-header">LIS Category</div>
+                                        <ul id="lis-category-list" class="list-body text-sm dark:text-[--color-text-base]">
+                                            <li data-category="health_s" class="test-list-item font-semibold bg-gray-100 dark:bg-[rgba(139,125,107,0.15)]">ตรวจสุขภาพ S</li>
+                                            <li data-category="health_m" class="test-list-item">ตรวจสุขภาพ M</li>
+                                            <li data-category="health_l" class="test-list-item">ตรวจสุขภาพ L</li>
+                                            <li data-category="detail_1" class="test-list-item">ตรวจละเอียดมาก 1</li>
+                                            <li data-category="detail_2" class="test-list-item">ตรวจละเอียดมาก 2</li>
+                                            <li data-category="detail_3" class="test-list-item">ตรวจละเอียดมาก 3</li>
+                                            <li data-category="detail_4" class="test-list-item">ตรวจละเอียดมาก 4</li>
+                                            <li data-category="detail_5" class="test-list-item">ตรวจละเอียดมาก 5</li>
+                                            <li data-category="detail_6" class="test-list-item">ตรวจละเอียดมาก 6</li>
+                                            <li data-category="detail_7" class="test-list-item">ตรวจละเอียดมาก 7</li>
+                                            <li data-category="detail_8" class="test-list-item">ตรวจละเอียดมาก 8</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="list-frame">
+                                        <div class="list-header flex items-center">
+                                            <input type="checkbox" id="check-all-tests" class="form-checkbox mr-2">
+                                            <label for="check-all-tests" class="text-sm font-bold cursor-pointer">Cost Items</label>
+                                        </div>
+                                        <ul id="lis-cost-item-list" class="list-body text-sm">
+                                            <li class="p-3 text-center text-gray-500">Select a category</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="list-frame">
+                                        <div class="list-header">LIS Items (Preview)</div>
+                                        <div id="lis-preview-list" class="list-body p-3 text-sm space-y-1">
+                                            <p id="lis-preview-placeholder" class="text-center text-gray-500 mt-4">(No items selected)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex justify-end">
+                                    <button id="btn-add-selected-tests" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">
+                                        <i data-lucide="plus" class="w-4 h-4 inline mr-1"></i> Add Selected Tests
+                                    </button>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-[--color-text-base]">2. Selected Tests (<span id="lis-selected-count">0</span> Items)</h2>
+                                <div class="border dark:border-[--color-border-base] rounded-lg overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead>
+                                            <tr class="bg-gray-200 text-gray-700 dark:bg-[--color-bg-secondary] dark:text-[--color-text-base]">
+                                                <th class="p-2 w-[5%]">#</th>
+                                                <th class="p-2 w-[40%]">Term (ชื่อรายการแล็บ)</th>
+                                                <th class="p-2 w-[15%]">Kind (หมวด)</th>
+                                                <th class="p-2 w-[15%]">จำนวนสั่ง</th>
+                                                <th class="p-2 w-[15%]">Unit</th>
+                                                <th class="p-2 w-[10%]">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="lis-selected-table-body" class="dark:text-[--color-text-base] divide-y dark:divide-[--color-border-base]">
+                                            <tr><td colspan="6" class="p-3 text-center text-gray-500">No tests added</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+
+                            <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                                <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]"><i data-lucide="activity" class="w-6 h-6 mr-3 text-pink-600"></i> 3. Note (บันทึก)</h2>
+                                <textarea id="lis-note" rows="2" class="form-input" placeholder="พิมพ์ข้อความสั้นๆ"></textarea>
+                            </section>
+
+                            <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                                <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]"><i data-lucide="calendar-clock" class="w-6 h-6 mr-3 text-pink-600"></i> 4. Effective Date/Time</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div><label class="form-label">Date</label><input type="date" id="lis-effective-date" class="form-input"></div>
+                                    <div><label class="form-label">Time</label><input type="time" id="lis-effective-time" class="form-input"></div>
+                                </div>
+                            </section>
+
+                            <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                                <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]"><i data-lucide="users" class="w-6 h-6 mr-3 text-pink-600"></i> 5. Record Meta</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div><label class="form-label">DVM</label><select id="lis-dvm" class="form-input"><option>Dr. AAA</option></select></div>
+                                    <div><label class="form-label">Dept</label><select id="lis-department" class="form-input"><option>101 อายุรกรรม</option></select></div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div id="content-lis-history" class="lis-tab-content h-full flex flex-col">
+                            <h2 class="text-xl font-semibold flex items-center text-[var(--color-text-base)] mb-5"><i data-lucide="history" class="w-6 h-6 mr-3 text-pink-600"></i> ประวัติ LIS Request</h2>
+                            <div class="rounded-lg border border-[var(--color-border-base)] shadow-sm overflow-auto flex-1">
+                                <table id="lisHistoryTable" class="min-w-full text-sm text-left">
+                                    <thead class="bg-[var(--color-bg-secondary)] font-semibold text-[var(--color-text-base)]">
+                                        <tr>
+                                            <th class="p-3 whitespace-nowrap sticky left-0 z-20 bg-[var(--color-bg-secondary)]">Date/Time</th>
+                                            <th class="p-3 whitespace-nowrap">Acc No.</th>
+                                            <th class="p-3 whitespace-nowrap">Tests</th>
+                                            <th class="p-3 whitespace-nowrap">Note</th>
+                                            <th class="p-3 whitespace-nowrap">DVM</th>
+                                            <th class="p-3 whitespace-nowrap">Dept</th>
+                                            <th class="p-3 whitespace-nowrap">User</th>
+                                            <th class="p-3 whitespace-nowrap">Create</th>
+                                            <th class="p-3 whitespace-nowrap">Update</th>
+                                            <th class="p-3 whitespace-nowrap text-center">Status</th>
+                                            <th class="p-3 whitespace-nowrap">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lisHistoryTableBody" class="divide-y divide-[var(--color-border-base)]">
+                                        </tbody>
+                                </table>
+                            </div>
+                            <div id="noLisHistoryMessage" class="hidden text-center p-8 text-[var(--color-text-muted)]">
+                                <i data-lucide="folder-clock" class="w-12 h-12 mx-auto mb-4"></i>
+                                <p>No LIS history found.</p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+
+                <footer class="flex-shrink-0 flex justify-between items-center p-4 border-t border-[var(--color-border-base)] bg-[var(--color-bg-secondary)]">
+                    <button id="close-lis-popup-cancel" class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium">Close</button>
+                    <button id="btn-save-lis" class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-pink-600 text-white hover:bg-pink-700 font-medium">
+                        <i data-lucide="save" class="w-4 h-4"></i><span>Save LIS Request</span>
+                    </button>
+                </footer>
+            </div>
+
+            <div id="lis-summary-view" class="modal-container absolute inset-0 hidden p-6 text-center flex flex-col justify-center items-center bg-white dark:bg-[var(--color-bg-content)]">
+                <button id="close-lis-summary-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <h3 class="text-3xl font-bold text-green-700 mb-6">LAB Request Submitted Successfully!</h3>
+                <div class="text-sm text-left p-4 border rounded bg-gray-50 w-full max-w-md">
+                    <p class="font-bold mb-3">Acc No: LIS68012345</p>
+                    <p>Hemato: CBC</p>
+                    <p>Blood Chem: BUN, Creatinine</p>
+                </div>
+                <div class="flex justify-center space-x-4 mt-6">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded font-medium"><i data-lucide="printer" class="w-4 h-4 inline mr-1"></i> Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="path-popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 md:p-8 z-[100] hidden">
+        <div class="max-w-4xl w-full mx-auto bg-[var(--color-bg-content)] rounded-lg shadow-lg overflow-hidden border border-[var(--color-border-base)] flex flex-col" style="max-height: 90vh;">
+            <header class="relative flex justify-between items-center p-6 border-b border-[var(--color-border-base)] flex-shrink-0">
+              <h1 class="text-2xl font-bold text-[var(--color-text-base)]">Pathology Request (Prototype)</h1>
+              <button id="close-path-popup-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+                <i data-lucide="x" class="w-6 h-6"></i>
+              </button>
+            </header>
+            <main class="w-full flex-1 overflow-y-auto p-6 md:p-8">
+              <h2 class="text-xl font-semibold text-[var(--color-text-base)]">Pathology Request Module</h2>
+              <p class="text-[var(--color-text-muted)] mt-2">This is a placeholder for the Path Request UI, based on the Vital Signs modal structure.</p>
+            </main>
+            <footer class="flex-shrink-0 flex justify-between items-center p-4 border-t border-[var(--color-border-base)] bg-[var(--color-bg-secondary)]">
+              <button id="close-path-popup-cancel" class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-[var(--color-border-base)] dark:hover:bg-gray-300 dark:text-[var(--color-text-base)] text-sm font-medium">
+                  Close
+              </button>
+              <button id="btn-save-path" class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-fuchsia-700 text-white hover:bg-fuchsia-800 transition-colors text-sm font-medium">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Save Path Request</span>
+              </button>
+            </footer>
+          </div>
+    </div>
     <script>
         lucide.createIcons();
     </script> 
@@ -1080,8 +1326,57 @@
     <script src="extdoc-logic.js"></script>
     <script src="extdoc-init.js"></script>
     <script src="extdoc-addnew-init.js"></script>
-    </body>
-</html>
+    <script src="order-pe-init.js"></script>
 
-</body>
+    <div class="fixed bottom-4 right-4 z-50 flex items-center space-x-3">
+
+        <div id="action-menu-container" class="action-menu-container">
+            
+            <button id="open-df-popup-fab" class="fab-btn bg-orange-500 hover:bg-orange-600 text-white" title="ลงข้อมูล DF">
+                <i data-lucide="stethoscope" class="w-5 h-5"></i>
+            </button>
+            
+            <button id="open-tf-popup-fab" class="fab-btn bg-cyan-600 hover:bg-cyan-700 text-white" title="ลงข้อมูล TF">
+                <i data-lucide="user-round-pen" class="w-5 h-5"></i> 
+            </button>
+            
+            <button id="open-vitals-popup-fab" class="fab-btn bg-blue-600 hover:bg-blue-700 text-white" title="Vital Signs">
+                <i data-lucide="activity" class="w-5 h-5"></i> 
+            </button>
+            
+            <button id="open-eye-popup-fab" class="fab-btn bg-indigo-600 hover:bg-indigo-700 text-white" title="Eye Exam">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+            </button>
+
+            <button id="open-lis-popup-fab" class="fab-btn bg-pink-600 hover:bg-pink-700 text-white" title="LIS Request">
+                <i data-lucide="test-tube-diagonal" class="w-5 h-5"></i>
+            </button>
+
+            <button id="open-path-popup-fab" class="fab-btn bg-fuchsia-700 hover:bg-fuchsia-800 text-white" title="Path Request">
+                <i data-lucide="microscope" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="flex items-center space-x-3">
+            
+            <button id="menu-toggle-btn" class="fab-btn bg-orange-500 hover:bg-orange-600 text-white" title="Open Actions Menu">
+                <i id="menu-icon-open" data-lucide="chevron-left" class="w-6 h-6"></i>
+                <i id="menu-icon-close" data-lucide="x" class="w-6 h-6 hidden" style="background-color: #FEEBC8; color: #9A3412; border-radius: 9999px; padding: 0.25rem;"></i>
+            </button>
+
+            <button id="theme-btn-light" class="fab-btn bg-white hover:bg-gray-200" title="Light Mode">
+                <i data-lucide="sun" class="w-5 h-5 text-gray-700"></i>
+            </button>
+            
+            <button id="theme-btn-dark" class="fab-btn bg-yellow-900 hover:bg-yellow-800 text-white" title="Beige Mode (Dark)">
+                <i data-lucide="moon" class="w-5 h-5"></i>
+            </button>
+
+            <button id="go-to-top-btn" class="fab-btn bg-yellow-400 hover:bg-yellow-500 text-black" title="Go to Top">
+                <i data-lucide="arrow-up" class="w-5 h-5"></i>
+            </button>
+
+        </div>
+    </div>
+    
+    </body>
 </html>

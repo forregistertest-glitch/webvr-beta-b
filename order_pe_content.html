@@ -1,1 +1,137 @@
-<div class="p-4"><h1 class="text-xl font-semibold dark:text-[--color-text-base]">Order PE Module</h1><p class="dark:text-[--color-text-base]">(Module content for Order PE)</p></div>
+<div class="p-4">
+    <h1 class="text-xl font-semibold text-gray-700 dark:text-[--color-text-base]">Order Physical Examination (PE)</h1>
+    <p class="text-xs text-gray-600 dark:text-[--color-text-muted] mb-4">
+        (หน้านี้ใช้สำหรับสร้าง "คำสั่งล่วงหน้า" (Planned Order) ที่จะไปแสดงในแท็บ Objective และ Plan)
+    </p>
+
+    <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+        <h2 class="text-xl font-semibold mb-5 flex items-center text-[--color-text-base]">
+            <i data-lucide="calendar-clock" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+            1. Target (เป้าหมายคำสั่ง)
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="md:col-span-1 space-y-4">
+                <div>
+                    <label for="pe-target-date" class="form-label">Target Date (วันที่ต้องการให้ทำ)</label>
+                    <input type="date" id="pe-target-date" class="form-input form-input-datetime" placeholder="Select date" required>
+                </div>
+                <div>
+                    <label for="pe-target-time" class="form-label">Target Time (เวลาที่ต้องการให้ทำ)</label>
+                    <input type="time" id="pe-target-time" class="form-input form-input-datetime" placeholder="Select time" required>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 space-y-4">
+                <div>
+                    <label for="pe-target-dvm" class="form-label">Target DVM (Optional)</label>
+                    <select id="pe-target-dvm" class="form-input form-select">
+                        <option value="" selected>(None)</option>
+                        <option value="Dr. AAA">Dr. AAA</option>
+                        <option value="Dr. BBB">Dr. BBB</option>
+                        <option value="Dr. CCC">Dr. CCC</option>
+                        <option value="Dr. Eye">Dr. Eye</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="pe-target-dept" class="form-label">Target Department (Optional)</label>
+                    <select id="pe-target-dept" class="form-input form-select">
+                        <option value="" selected>(None)</option>
+                        <option value="101 อายุรกรรม">101 อายุรกรรม</option>
+                        <option value="201 ฉุกเฉิน">201 ฉุกเฉิน</option>
+                        <option value="301 คลินิกพิเศษ">301 คลินิกพิเศษ</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="p-6 mt-4 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+        <h2 class="text-xl font-semibold mb-5 flex items-center text-[--color-text-base]">
+            <i data-lucide="list-plus" class="w-6 h-6 mr-3 text-[var(--color-primary-500)]"></i>
+            2. Select Orders (เลือกรายการตรวจ)
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="md:col-span-1 space-y-3">
+                <p class="font-medium dark:text-[--color-text-base]">Select Orders for Set:</p>
+
+                <button id="btn-order-pe-vitals" class="w-full text-left p-3 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-[--color-primary-600] dark:hover:bg-[--color-primary-700] text-white">
+                    <div class="font-semibold flex items-center">
+                        <i data-lucide="heart-pulse" class="w-4 h-4 mr-2"></i>
+                        Order Vital Signs
+                    </div>
+                    <p class="text-xs text-blue-200 dark:text-blue-200 mt-1">
+                        (Temp, HR, RR, BP, Pulse, CRT, FBS, MM, Lung, Heart, Pulse Quality, LOC, Pain, Critical Events, Note)
+                    </p>
+                </button>
+
+                <button id="btn-order-pe-eye" class="w-full text-left p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">
+                    <div class="font-semibold flex items-center">
+                        <i data-lucide="eye" class="w-4 h-4 mr-2"></i>
+                        Order Eye Exam
+                    </div>
+                    <p class="text-xs text-indigo-200 dark:text-indigo-200 mt-1">
+                        (PLR, Palpebral, Dazzle, Menace, STT, Fluorescein, IOP, Note)
+                    </p>
+                </button>
+
+                <button id="btn-order-pe-other-a" class="w-full text-left p-3 rounded-lg bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500 text-white">
+                    <div class="font-semibold flex items-center">
+                        <i data-lucide="beaker" class="w-4 h-4 mr-2"></i>
+                        Order Other A (Test)
+                    </div>
+                    <p class="text-xs text-gray-200 dark:text-gray-300 mt-1">(Lab / Blood test...)</p>
+                </button>
+                <button id="btn-order-pe-other-b" class="w-full text-left p-3 rounded-lg bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500 text-white">
+                    <div class="font-semibold flex items-center">
+                        <i data-lucide="bone" class="w-4 h-4 mr-2"></i>
+                        Order Other B (Test)
+                    </div>
+                    <p class="text-xs text-gray-200 dark:text-gray-300 mt-1">(X-Ray / Imaging...)</p>
+                </button>
+            </div>
+
+            <div class="md:col-span-2 border dark:border-[--color-border-base] rounded-lg p-3 bg-gray-50 dark:bg-[--color-bg-secondary]">
+                <h3 class="font-semibold mb-3 dark:text-[--color-text-base]">Current Order Set:</h3>
+                <ul id="pe-order-summary-list" class="space-y-2 text-xs">
+                    <li id="pe-summary-placeholder" class="text-gray-500 dark:text-[--color-text-muted]">
+                        (ยังไม่ได้เลือกรายการตรวจ)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div class="mt-4 p-4 flex justify-end">
+        <button id="btn-save-order-set" class="bg-green-600 hover:bg-green-700 dark:bg-[--color-green-600] dark:hover:bg-[--color-green-700] text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center">
+            <i data-lucide="save" class="w-4 h-4 mr-1.5"></i>
+            Save Order Set
+        </button>
+    </div>
+</div>
+
+<div id="order-note-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] hidden">
+    <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-md w-full p-6 relative">
+        <button id="btn-note-modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-[--color-text-base]">
+            Order Note (for <span id="note-modal-item-name">...</span>)
+        </h2>
+        <input type="hidden" id="note-modal-item-type">
+        
+        <textarea id="note-modal-textarea" class="w-full border border-gray-300 dark:border-[--color-border-base] rounded-lg p-2 text-sm dark:bg-[--color-bg-secondary] dark:text-[--color-text-base]" rows="3" placeholder="Add a note for this order (optional)"></textarea>
+        
+        <div class="flex justify-end space-x-3 mt-6">
+            <button id="btn-note-modal-cancel" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] dark:text-[--color-text-base] px-4 py-2 rounded-lg text-sm font-medium">
+                Cancel
+            </button>
+            <button id="btn-note-modal-add" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                Add to Order
+            </button>
+        </div>
+    </div>
+</div>

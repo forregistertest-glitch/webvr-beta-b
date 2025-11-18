@@ -26,22 +26,35 @@ function renderTable(data) {
             ? `<span class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">Disable</span>`
             : "";
 
-        let dateTimeLink = "";
+        // (ใหม่) สร้าง galleryJson หนึ่งครั้ง
+        let galleryJson = null;
         if (item.images && item.images.length > 0) {
-            // เราจะใช้ JSON.stringify ใน data-gallery เพื่อเก็บ Array ของรูปภาพ
-            const galleryJson = JSON.stringify(item.images);
+            galleryJson = JSON.stringify(item.images);
+        }
+
+        // (Logic เดิม) สร้าง dateTimeLink
+        let dateTimeLink = "";
+        if (galleryJson) {
             dateTimeLink = `<a href="#" class="text-blue-600 dark:text-[--color-primary-500] hover:underline open-album-link" data-gallery='${galleryJson}'>${item.datetimeStr}</a>`;
         } else {
             dateTimeLink = `<span class="text-gray-900 dark:text-[--color-text-base]">${item.datetimeStr}</span>`;
+        }
+        
+        // (ใหม่) สร้าง imgLink
+        let imgLink = "";
+        if (galleryJson) {
+            // ถ้ามีรูป ให้สร้าง Link ที่คลิกได้
+            imgLink = `<a href="#" class="text-blue-600 dark:text-[--color-primary-500] hover:underline open-album-link" data-gallery='${galleryJson}'>${item.img}</a>`;
+        } else {
+            // ถ้าไม่มีรูป (images: []) ให้แสดงเป็นตัวเลขธรรมดา
+            imgLink = `<span class="text-gray-900 dark:text-[--color-text-base]">${item.img}</span>`;
         }
 
         newRowsHTML += `
             <tr class="hover:bg-gray-50 dark:hover:bg-[var(--color-bg-secondary)]">
                 <td class="p-3 sticky-col">${dateTimeLink}</td>
                 <td class="p-3">${item.docType}</td>
-                <td class="p-3"><a href="#" class="text-gray-900 dark:text-[--color-text-base] hover:underline">${item.img}</a></td>
-                <td class="p-3"><a href="#" class="text-gray-900 dark:text-[--color-text-base] hover:underline">${item.pdf}</a></td>
-                <td class="p-3"><a href="#" class="text-gray-900 dark:text-[--color-text-base] hover:underline">${item.note}</a></td>
+                <td class="p-3">${imgLink}</td> <td class="p-3"><a href="#" class="text-gray-900 dark:text-[--color-text-base] hover:underline">${item.pdf}</a></td> <td class="p-3"><a href="#" class="text-gray-900 dark:text-[--color-text-base] hover:underline">${item.note}</a></td>
                 <td class="p-3">${item.dvm}</td>
                 <td class="p-3">${item.department}</td>
                 <td class="p-3">User สิทธิ์</td>

@@ -271,3 +271,146 @@ th { background-color: var(--color-bg-secondary, #f3f4f6); cursor: pointer; }
     filter: invert(0.6);
 }
 /* **** END: Styles from VitalSign_Prototype.html **** */
+/* ===============================================
+START: BETA 3.1 (BETA 4.0) Floating Action Button Styles
+===============================================
+*/
+
+/* 1. สไตล์ของปุ่มลอย (FAB) */
+.fab-btn {
+    width: 3rem;  /* 48px */
+    height: 3rem; /* 48px */
+    border-radius: 9999px; /* ทำให้กลม */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease-in-out;
+    
+    /* (ค่า Default สำหรับปุ่มที่ไม่มีสี เช่น Light Mode) */
+    background-color: white; 
+    color: rgb(55 65 81); /* text-gray-700 */
+}
+.fab-btn:hover {
+    transform: scale(1.1);
+}
+
+/* (แก้ไขสีไอคอน Lucide ในปุ่มสีสว่าง) */
+.fab-btn.text-gray-700 i[data-lucide] {
+    color: rgb(55 65 81);
+}
+.fab-btn.text-black i[data-lucide] {
+    color: #1f2937;
+}
+
+/* 2. สไตล์ของ "Container" ที่ซ่อนปุ่ม Action ไว้ */
+.action-menu-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* (space-x-3) */
+    
+    /* (สถานะเริ่มต้น: ซ่อน) */
+    opacity: 0;
+    transform: translateX(100%); 
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 3. สไตล์เมื่อเมนู "Active" (ถูกกดเปิด) */
+.action-menu-container.active {
+    opacity: 1;
+    transform: translateX(0); /* เลื่อนกลับมาที่เดิม */
+    pointer-events: auto;     /* ทำให้คลิกได้ */
+}
+
+/* ===============================================
+END: BETA 3.1 Floating Action Button Styles
+===============================================
+*/
+/* ===============================================
+START: BETA 3.2 (BETA 4.1) Copy Sparkle Effect
+===============================================
+*/
+
+/* นี่คือตัว "Copied!" ที่ลอยออกมา
+  (อิงจากดีไซน์ของ lucide.dev)
+*/
+.copied-sparkle-toast {
+    position: absolute;
+    /* (ตำแหน่งจะถูกกำหนดโดย JS) */
+    
+    background-color: var(--color-text-base);
+    color: var(--color-bg-content);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    
+    /* (ป้องกันไม่ให้ผู้ใช้คลิกโดน) */
+    pointer-events: none; 
+    
+    /* (กำหนด z-index สูงๆ) */
+    z-index: 150; 
+    
+    /* (เรียก Animation) */
+    animation: sparkle-pop 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+/* (นี่คือ "ประกายวิ้งๆ" ที่อยู่ข้างใต้) */
+.copied-sparkle-toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* (สีของประกายไฟ - ใช้สีเขียวของโปรเจค) */
+    background-image: linear-gradient(45deg, 
+        var(--color-green-600), 
+        var(--color-primary-500), 
+        var(--color-orange-500)
+    );
+    
+    border-radius: 9999px;
+    transform: scale(1.2);
+    filter: blur(8px);
+    opacity: 0.7;
+    z-index: -1;
+    
+    /* (เรียก Animation ประกายไฟ) */
+    animation: sparkle-pop 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+/* (Keyframes สำหรับการ "เด้ง" และ "จางหาย") */
+@keyframes sparkle-pop {
+    0% {
+        transform: translate(0, 0) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(0, -25px) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, -40px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* ===============================================
+END: BETA 3.2 Copy Sparkle Effect
+===============================================
+*/
+
+/* ***** START: BETA 4.0 - LIS/Path Button Colors ***** */
+.bg-pink-600 { background-color: #db2777; }
+.hover\:bg-pink-700:hover { background-color: #be185d; }
+.dark .bg-pink-600 { background-color: #db2777; }
+.dark .hover\:bg-pink-700:hover { background-color: #be185d; }
+
+.bg-fuchsia-700 { background-color: #701a75; }
+.hover\:bg-fuchsia-800:hover { background-color: #581c87; }
+.dark .bg-fuchsia-700 { background-color: #701a75; }
+.dark .hover\:bg-fuchsia-800:hover { background-color: #581c87; }
+/* ***** END: BETA 4.0 ***** */
