@@ -660,34 +660,7 @@ function initializeVitalSignsSaveLogic() {
 }
 
 // =================================================================
-// END: BETA 4.0 - Final Verified
-// =================================================================
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (UPDATED BETA 4.2)
-// =================================================================
-
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (UPDATED BETA 4.3)
-// =================================================================
-
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (FINAL - BETA 4.4)
-// =================================================================
-
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (FINAL VERSION - BETA 4.6)
-// =================================================================
-
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (CORRECTED BETA 4.7)
-// =================================================================
-
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (THEME MATCHING - BETA 4.9)
-// =================================================================
-
-// =================================================================
-// START: ORDER LAB & PATHOLOGY LOGIC (FINAL FIX - BETA 5.0)
+// START: ORDER LAB & PATHOLOGY LOGIC (FINAL FIX - BETA 5.1.2)
 // =================================================================
 
 // Global State (เก็บค่านอกฟังก์ชัน เพื่อกันค่าหาย)
@@ -695,6 +668,7 @@ let globalLisCart = [];
 let globalLisPriority = 'Routine'; 
 
 // --- 1. ORDER LAB (CLINICAL PATHOLOGY) ---
+// --- 1. ORDER LAB (CLINICAL PATHOLOGY) - BETA 5.1.2 Revision 2 (Radio Logic) ---
 function initializeLisScripts() {
     const categoryList = document.getElementById('lis-category-list');
     const itemList = document.getElementById('lis-item-list');
@@ -703,36 +677,10 @@ function initializeLisScripts() {
     const totalPriceEl = document.getElementById('lis-total-price');
     const btnSave = document.getElementById('btn-save-lis-order');
     
-    const btnRoutine = document.getElementById('btn-prio-routine');
-    const btnStat = document.getElementById('btn-prio-stat');
     const checkFasting = document.getElementById('lis-fasting');
 
-    // --- Priority Logic (Corrected Function Name) ---
-    function updatePriorityUI() {
-        if (!btnRoutine || !btnStat) return;
-
-        const baseStyle = "flex-1 py-2 px-3 rounded border text-sm font-bold transition-all shadow-sm";
-
-        if (globalLisPriority === 'Routine') {
-            // Routine Active: พื้นเทาเข้ม ตัวขาว (ตามขอ)
-            btnRoutine.className = `${baseStyle} bg-gray-700 text-white border-gray-600 ring-2 ring-gray-400`;
-            // Stat Inactive: พื้นขาว ตัวแดง
-            btnStat.className = `${baseStyle} bg-white text-red-600 border-gray-300 hover:bg-red-50 dark:bg-transparent dark:border-red-900 dark:text-red-400`;
-        } else {
-            // Routine Inactive: พื้นขาว ตัวเทา
-            btnRoutine.className = `${baseStyle} bg-white text-gray-600 border-gray-300 hover:bg-gray-50 dark:bg-transparent dark:border-gray-600 dark:text-gray-300`;
-            // Stat Active: พื้นเทาเข้ม (เหมือน Routine) แต่ตัวแดง (ตามขอ)
-            btnStat.className = `${baseStyle} bg-gray-700 text-red-400 border-gray-600 ring-2 ring-red-500`;
-        }
-    }
-
-    // Bind Events
-    if (btnRoutine && btnStat) {
-        // ใช้ globalLisPriority เพื่อจำค่า
-        btnRoutine.onclick = (e) => { e.preventDefault(); globalLisPriority = 'Routine'; updatePriorityUI(); };
-        btnStat.onclick = (e) => { e.preventDefault(); globalLisPriority = 'STAT'; updatePriorityUI(); };
-        updatePriorityUI(); // Init UI
-    }
+    // Priority Logic: ไม่ต้องมีฟังก์ชันสลับสีแล้ว เพราะใช้ Radio Button (CSS Native)
+    // เราจะอ่านค่าตอนกด Save ทีเดียวเลย
 
     function renderLisCategories() {
         if (!categoryList) return;
@@ -769,7 +717,6 @@ function initializeLisScripts() {
                 const li = document.createElement('li');
                 li.className = "p-3 bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm hover:shadow-md hover:border-pink-300 cursor-pointer transition-all flex justify-between items-center group mb-2";
                 
-                // [TAG STYLE: Clean Look] พื้นขาว ตัวเทา ขอบเทา (อ่านง่ายทุกโหมด)
                 const containerBadge = item.container 
                     ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white text-gray-700 border border-gray-400 ml-2 shadow-sm dark:bg-transparent dark:text-[--color-text-base] dark:border-[--color-text-base]">
                         <i data-lucide="test-tube-2" class="w-3 h-3 mr-1 text-gray-500 dark:text-[--color-text-base]"></i>${item.container}
@@ -851,30 +798,41 @@ function initializeLisScripts() {
     }
 
     if (btnSave) {
-        btnSave.addEventListener('click', () => {
+        btnSave.onclick = (e) => {
+            e.preventDefault();
+            
             if (globalLisCart.length === 0) return alert("Please select at least one test.");
             
             const accessionNo = `LAB-${new Date().getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`;
             const isFasted = checkFasting ? checkFasting.checked : false;
             
+            // [FIX] อ่านค่าจาก Radio Button ที่ถูก Checked อยู่ ณ ตอนนั้น
+            const selectedRadio = document.querySelector('input[name="lis_priority"]:checked');
+            const priorityVal = selectedRadio ? selectedRadio.value : 'Routine';
+            
             const extraDetails = {
-                priority: globalLisPriority,
+                priority: priorityVal,
                 fasting: isFasted
             };
 
             showSuccessModal(accessionNo, globalLisCart, totalPriceEl.innerText, extraDetails);
             
-            // Reset UI but keep State for demo flow if needed, or reset state:
+            // Reset UI
             globalLisCart = [];
             updateLisCartUI();
-            globalLisPriority = 'Routine';
-            updatePriorityUI();
+            
+            // Reset Form Elements
             if(checkFasting) checkFasting.checked = false;
-        });
+            
+            // Reset Radio to Routine (ใช้ ID prio-routine ที่เราสร้างในขั้นตอนที่ 1)
+            const routineRadio = document.getElementById('prio-routine');
+            if(routineRadio) routineRadio.checked = true;
+        };
     }
+
+    // Init
     renderLisCategories();
     updateLisCartUI(); 
-    updatePriorityUI(); // เรียกฟังก์ชันที่ถูกต้องแล้ว!
 }
 
 
