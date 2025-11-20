@@ -10,176 +10,309 @@
 // - Patient Info: hn, pet_name, owner_name
 // =================================================================
 
+// [ส่วนที่ 1: แก้ไข activityLogData ใหม่ทั้งหมด (Full Set 90 Entries)]
+
+// =================================================================
+// START: ฐานข้อมูลกลาง (Central Activity Log) - Updated Schema Beta 5.2.2
+// =================================================================
+// Data Count: VS(20) + Eye(20) + LIS(30) + Path(20) = 90 Entries
+// =================================================================
+
 let activityLogData = [
     
-    // --- [GROUP 1] VITAL SIGNS (ยังคงใช้โครงสร้างเดิมบางส่วน แต่เพิ่ม Field ใหม่ให้ครบ) ---
+    // ==========================================
+    // [GROUP 1] VITAL SIGNS (20 Items)
+    // ==========================================
+    // 1.1 - 1.5 : Recent & Planning (Manual)
     {
-        entry_id: "E-VS001", order_no: "ORD-VS001", acc_no: null, // VS ไม่มี Acc No
-        activity_type: "Vital Signs", 
-        order_status: "Done", lis_process_status: null, // VS ไม่ส่ง LIS
-        
+        entry_id: "E-VS001", order_no: "ORD-VS001", acc_no: null, 
+        activity_type: "Vital Signs", order_status: "Done", lis_process_status: null,
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-        
         effective_time: "31 Dec 2025, 17:00:00", 
         order_create_date: "31 Dec 2025, 17:01:15", order_update_date: "31 Dec 2025, 17:01:15", request_date: null,
-        
         order_note: "",
         parameters: { Temp: '100.5', RR: '22', HR: '95', BP: '140/90', Pulse: '92', CRT: '<2', FBS: '150', MM: 'Pale', Lung: 'Crackles', Heart: 'Murmur', Pulse_Quality: 'Weak', LOC: 'E3V4M5', Pain: '7', Cyanosis: 'Yes', Seizure: 'Yes', Arrest: 'No', Note: 'Post-seizure.' },
-        
         recorded_by: "User A (Tech)", dvm: "Dr. AAA", department: "101 อายุรกรรม",
         last_updated_by: "User A (Tech)", last_updated_on: "31 Dec 2025, 17:01:15", disable_remark: ""
     },
     {
         entry_id: "E-VS002", order_no: "ORD-VS002", acc_no: null,
-        activity_type: "Vital Signs", 
-        order_status: "Done", lis_process_status: null,
-        
+        activity_type: "Vital Signs", order_status: "Done", lis_process_status: null,
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
-        effective_time: "30 Dec 2025, 09:00:00",
-        order_create_date: "30 Dec 2025, 09:05:00", order_update_date: "30 Dec 2025, 09:05:00", request_date: null,
-
+        effective_time: "31 Dec 2025, 13:00:00",
+        order_create_date: "31 Dec 2025, 13:05:00", order_update_date: "31 Dec 2025, 13:05:00", request_date: null,
         order_note: "",
-        parameters: { Temp: '98.5', RR: '20', HR: '88', BP: '120/80', Pulse: '88', CRT: '<2', FBS: '90', Note: 'Routine Check' },
-
+        parameters: { Temp: '99.2', RR: '20', HR: '90', BP: '130/85', Pulse: '90', CRT: '<2', FBS: '120', MM: 'Pink', Lung: 'Clear', Heart: 'Normal', Note: 'Post-Lunch' },
         recorded_by: "User B (Nurse)", dvm: "Dr. BBB", department: "201 ฉุกเฉิน",
-        last_updated_by: "User B (Nurse)", last_updated_on: "30 Dec 2025, 09:05:00", disable_remark: ""
+        last_updated_by: "User B (Nurse)", last_updated_on: "31 Dec 2025, 13:05:00", disable_remark: ""
     },
-
-
-    // --- [GROUP 2] LAB ORDERS (LIS) - แสดงสถานะต่างๆ ---
-
-    // 2.1 สถานะ DONE (ส่งแล้ว) -> มี Acc No, มี Request Date, มี LIS Status
     {
-        entry_id: "E-LAB001", order_no: "ORD-LAB001", acc_no: "LIS-6801001", 
-        activity_type: "LIS", 
-        order_status: "Done", lis_process_status: "Completed", // ผลออกแล้ว
-        
+        entry_id: "E-VS003", order_no: "ORD-VS003", acc_no: null,
+        activity_type: "Vital Signs", order_status: "Pending", lis_process_status: null,
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
-        effective_time: "31 Dec 2025, 10:00:00", // เวลาเก็บตัวอย่าง
-        order_create_date: "31 Dec 2025, 09:50:00", // เวลาหมอกดสั่ง
-        order_update_date: "31 Dec 2025, 10:05:00", // เวลาส่ง Lab
-        request_date: "31 Dec 2025, 10:05:00",      // เวลาเกิด Acc No
-
+        effective_time: "01 Jan 2026, 02:00:00", // Future Plan
+        order_create_date: "31 Dec 2025, 18:00:00", order_update_date: "31 Dec 2025, 18:00:00", request_date: null,
+        order_note: "Monitor Q4H - Check Seizure",
+        parameters: {},
+        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101 อายุรกรรม",
+        last_updated_by: "Dr. AAA", last_updated_on: "31 Dec 2025, 18:00:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-VS004", order_no: "ORD-VS004", acc_no: null,
+        activity_type: "Vital Signs", order_status: "Pending", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: "01 Jan 2026, 06:00:00", // Future Plan
+        order_create_date: "31 Dec 2025, 18:00:00", order_update_date: "31 Dec 2025, 18:00:00", request_date: null,
+        order_note: "Monitor Q4H",
+        parameters: {},
+        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101 อายุรกรรม",
+        last_updated_by: "Dr. AAA", last_updated_on: "31 Dec 2025, 18:00:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-VS005", order_no: "ORD-VS005", acc_no: null,
+        activity_type: "Vital Signs", order_status: "Disable", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: "30 Dec 2025, 12:00:00",
+        order_create_date: "30 Dec 2025, 11:00:00", order_update_date: "30 Dec 2025, 11:30:00", request_date: null,
+        order_note: "Cancelled check",
+        parameters: {},
+        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101 อายุรกรรม",
+        last_updated_by: "Dr. AAA", last_updated_on: "30 Dec 2025, 11:30:00", disable_remark: "Patient sleeping"
+    },
+    // 1.6 - 1.20 : Generated History (15 items)
+    ...Array.from({ length: 15 }, (_, i) => ({
+        entry_id: `E-VS-HIST-${i}`, order_no: `ORD-VS-H${i}`, acc_no: null,
+        activity_type: "Vital Signs", order_status: "Done", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: `${30 - i} Dec 2025, 09:00:00`,
+        order_create_date: `${30 - i} Dec 2025, 09:10:00`, order_update_date: `${30 - i} Dec 2025, 09:10:00`, request_date: null,
         order_note: "",
-        parameters: { tests: ["CBC", "BUN", "CRE"], note: "Pre-op check" },
+        parameters: { Temp: (99.5 + Math.random()).toFixed(1), RR: '24', HR: '100', BP: '130/80', Pulse: '100', CRT: '<2', Note: 'Daily Monitoring' },
+        recorded_by: "User Tech", dvm: "Dr. Staff", department: "IPD",
+        last_updated_by: "User Tech", last_updated_on: `${30 - i} Dec 2025, 09:10:00`, disable_remark: ""
+    })),
 
-        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101 อายุรกรรม",
-        last_updated_by: "User A (Tech)", last_updated_on: "31 Dec 2025, 10:05:00", disable_remark: ""
+
+    // ==========================================
+    // [GROUP 2] EYE EXAM (20 Items)
+    // ==========================================
+    // 2.1 - 2.5 : Recent & Status (Manual)
+    {
+        entry_id: "E-EYE001", order_no: "ORD-EYE001", acc_no: "EYE-001", 
+        activity_type: "Eye Exam", order_status: "Done", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: "31 Dec 2025, 09:00:00",
+        order_create_date: "31 Dec 2025, 09:00:00", order_update_date: "31 Dec 2025, 09:05:00", request_date: null,
+        order_note: "",
+        parameters: { plr_od: '+', plr_os: '+', iop_od: 18, iop_os: 19, fluorescein_od: 'Neg', fluorescein_os: 'Neg', Note: "Annual Check" },
+        recorded_by: "Dr. Eye", dvm: "Dr. Eye", department: "301 คลินิกพิเศษ",
+        last_updated_by: "User C", last_updated_on: "31 Dec 2025, 09:05:00", disable_remark: ""
     },
     {
-        entry_id: "E-LAB002", order_no: "ORD-LAB002", acc_no: "LIS-6801002", 
-        activity_type: "LIS", 
-        order_status: "Done", lis_process_status: "Accepted", // Lab รับเรื่องแล้ว กำลังตรวจ
-        
+        entry_id: "E-EYE002", order_no: "ORD-EYE002", acc_no: "EYE-002",
+        activity_type: "Eye Exam", order_status: "Done", lis_process_status: null,
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
-        effective_time: "31 Dec 2025, 14:00:00",
-        order_create_date: "31 Dec 2025, 13:55:00",
-        order_update_date: "31 Dec 2025, 14:10:00", 
-        request_date: "31 Dec 2025, 14:10:00",
-
-        order_note: "STAT Request",
-        parameters: { tests: ["ELECTROLYTES", "LACTATE"], note: "Emergency" },
-
-        recorded_by: "Dr. BBB", dvm: "Dr. BBB", department: "201 ฉุกเฉิน",
-        last_updated_by: "User B (Nurse)", last_updated_on: "31 Dec 2025, 14:10:00", disable_remark: ""
+        effective_time: "30 Dec 2025, 14:00:00",
+        order_create_date: "30 Dec 2025, 14:00:00", order_update_date: "30 Dec 2025, 14:10:00", request_date: null,
+        order_note: "Follow up Ulcer",
+        parameters: { plr_od: 'Sluggish', iop_od: 22, fluorescein_od: 'Positive', Note: "Corneal Ulcer OD" },
+        recorded_by: "Dr. Eye", dvm: "Dr. Eye", department: "301 คลินิกพิเศษ",
+        last_updated_by: "User C", last_updated_on: "30 Dec 2025, 14:10:00", disable_remark: ""
     },
-
-    // 2.2 สถานะ PENDING (PLAN) -> ยังไม่ส่ง, ไม่มี Acc No, แก้ไขได้
     {
-        entry_id: "E-LAB003", order_no: "ORD-LAB003", acc_no: null, 
-        activity_type: "LIS", 
-        order_status: "Pending", lis_process_status: null,
-        
+        entry_id: "E-EYE003", order_no: "ORD-EYE003", acc_no: null,
+        activity_type: "Eye Exam", order_status: "Pending", lis_process_status: null,
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
-        effective_time: "01 Jan 2026, 08:00:00", // Plan ไว้พรุ่งนี้เช้า
-        order_create_date: "31 Dec 2025, 20:00:00", 
-        order_update_date: "31 Dec 2025, 20:00:00", 
-        request_date: null,
-
-        order_note: "งดน้ำอาหารหลังเที่ยงคืน", // Note เตือนความจำ
-        parameters: { tests: ["GLU", "LIPID_PROFILE"], note: "Fasting Blood Sugar" },
-
-        recorded_by: "Dr. CCC", dvm: "Dr. CCC", department: "301 คลินิกพิเศษ",
-        last_updated_by: "Dr. CCC", last_updated_on: "31 Dec 2025, 20:00:00", disable_remark: ""
+        effective_time: "02 Jan 2026, 10:00:00", // Plan
+        order_create_date: "31 Dec 2025, 15:00:00", order_update_date: "31 Dec 2025, 15:00:00", request_date: null,
+        order_note: "Re-check Ulcer & IOP",
+        parameters: {},
+        recorded_by: "Dr. Eye", dvm: "Dr. Eye", department: "301 คลินิกพิเศษ",
+        last_updated_by: "Dr. Eye", last_updated_on: "31 Dec 2025, 15:00:00", disable_remark: ""
     },
-
-    // 2.3 สถานะ DISABLE (ยกเลิก Plan) -> ไม่มี Acc No, ขีดฆ่า
     {
-        entry_id: "E-LAB004", order_no: "ORD-LAB004", acc_no: null, 
-        activity_type: "LIS", 
-        order_status: "Disable", lis_process_status: null,
-        
-        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
-        effective_time: "30 Dec 2025, 10:00:00",
-        order_create_date: "30 Dec 2025, 09:00:00",
-        order_update_date: "30 Dec 2025, 09:30:00", // เวลาที่กดยกเลิก
-        request_date: null,
-
-        order_note: "เจ้าของไม่สะดวกตรวจ",
-        parameters: { tests: ["URINALYSIS"], note: "" },
-
-        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101 อายุรกรรม",
-        last_updated_by: "Dr. AAA", last_updated_on: "30 Dec 2025, 09:30:00", disable_remark: "Client refused"
+        entry_id: "E-EYE004", order_no: "ORD-EYE004", acc_no: null,
+        activity_type: "Eye Exam", order_status: "Pending", lis_process_status: null,
+        hn: "52000001", pet_name: "ทองดี", owner_name: "คุณสมชาย",
+        effective_time: "02 Jan 2026, 11:00:00", // Plan for other patient
+        order_create_date: "31 Dec 2025, 15:00:00", order_update_date: "31 Dec 2025, 15:00:00", request_date: null,
+        order_note: "Full Eye Exam",
+        parameters: {},
+        recorded_by: "Dr. Eye", dvm: "Dr. Eye", department: "301 คลินิกพิเศษ",
+        last_updated_by: "Dr. Eye", last_updated_on: "31 Dec 2025, 15:00:00", disable_remark: ""
     },
+    {
+        entry_id: "E-EYE005", order_no: "ORD-EYE005", acc_no: null,
+        activity_type: "Eye Exam", order_status: "Disable", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: "29 Dec 2025, 10:00:00",
+        order_create_date: "29 Dec 2025, 09:00:00", order_update_date: "29 Dec 2025, 09:30:00", request_date: null,
+        order_note: "Cancel",
+        parameters: {},
+        recorded_by: "Dr. Eye", dvm: "Dr. Eye", department: "301 คลินิกพิเศษ",
+        last_updated_by: "Dr. Eye", last_updated_on: "29 Dec 2025, 09:30:00", disable_remark: "Duplicate"
+    },
+    // 2.6 - 2.20 : Generated History (15 items)
+    ...Array.from({ length: 15 }, (_, i) => ({
+        entry_id: `E-EYE-HIST-${i}`, order_no: `ORD-EYE-H${i}`, acc_no: `EYE-H${i}`,
+        activity_type: "Eye Exam", order_status: "Done", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: `${25 - i} Dec 2025, 14:00:00`,
+        order_create_date: `${25 - i} Dec 2025, 14:00:00`, order_update_date: `${25 - i} Dec 2025, 14:15:00`, request_date: null,
+        order_note: "",
+        parameters: { plr_od: '+', iop_od: 15 + i, fluorescein_od: 'Neg', Note: 'F/U Glaucoma' },
+        recorded_by: "User Tech", dvm: "Dr. Eye", department: "301",
+        last_updated_by: "User Tech", last_updated_on: `${25 - i} Dec 2025, 14:15:00`, disable_remark: ""
+    })),
 
 
-    // --- [GROUP 3] PATHOLOGY ORDERS (PATH) ---
+    // ==========================================
+    // [GROUP 3] LAB ORDERS (LIS) (30 Items)
+    // ==========================================
+    // 3.1 - 3.5 : Done (Completed/Reported)
+    {
+        entry_id: "E-LAB001", order_no: "ORD-LAB001", acc_no: "LIS-6801001", activity_type: "LIS", order_status: "Done", lis_process_status: "Reported",
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด", effective_time: "31 Dec 2025, 10:00:00",
+        order_create_date: "31 Dec 2025, 09:50:00", order_update_date: "31 Dec 2025, 10:05:00", request_date: "31 Dec 2025, 10:05:00",
+        order_note: "", parameters: { tests: ["CBC", "BUN", "CRE"], note: "Pre-op check" }, recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101", last_updated_by: "User A", last_updated_on: "31 Dec 2025, 10:05:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-LAB002", order_no: "ORD-LAB002", acc_no: "LIS-6801002", activity_type: "LIS", order_status: "Done", lis_process_status: "Accepted",
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด", effective_time: "31 Dec 2025, 14:00:00",
+        order_create_date: "31 Dec 2025, 13:55:00", order_update_date: "31 Dec 2025, 14:10:00", request_date: "31 Dec 2025, 14:10:00",
+        order_note: "STAT", parameters: { tests: ["ELECTROLYTES", "LACTATE"], note: "Emergency" }, recorded_by: "Dr. BBB", dvm: "Dr. BBB", department: "201", last_updated_by: "User B", last_updated_on: "31 Dec 2025, 14:10:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-LAB003", order_no: "ORD-LAB003", acc_no: "LIS-6801003", activity_type: "LIS", order_status: "Done", lis_process_status: "Waiting",
+        hn: "52000001", pet_name: "ทองดี", owner_name: "คุณสมชาย", effective_time: "31 Dec 2025, 15:30:00",
+        order_create_date: "31 Dec 2025, 15:20:00", order_update_date: "31 Dec 2025, 15:35:00", request_date: "31 Dec 2025, 15:35:00",
+        order_note: "", parameters: { tests: ["CBC"], note: "Pre-surg" }, recorded_by: "Dr. Surg", dvm: "Dr. Surg", department: "102", last_updated_by: "User Nurse", last_updated_on: "31 Dec 2025, 15:35:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-LAB004", order_no: "ORD-LAB004", acc_no: "LIS-6801004", activity_type: "LIS", order_status: "Done", lis_process_status: "Completed",
+        hn: "52000002", pet_name: "มะลิ", owner_name: "คุณสมหญิง", effective_time: "31 Dec 2025, 09:00:00",
+        order_create_date: "31 Dec 2025, 08:50:00", order_update_date: "31 Dec 2025, 09:05:00", request_date: "31 Dec 2025, 09:05:00",
+        order_note: "", parameters: { tests: ["UA", "UPC"], note: "Renal check" }, recorded_by: "Dr. CCC", dvm: "Dr. CCC", department: "301", last_updated_by: "User C", last_updated_on: "31 Dec 2025, 09:05:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-LAB005", order_no: "ORD-LAB005", acc_no: "LIS-6801005", activity_type: "LIS", order_status: "Done", lis_process_status: "Reported",
+        hn: "52000003", pet_name: "ด่าง", owner_name: "คุณวิชัย", effective_time: "31 Dec 2025, 11:00:00",
+        order_create_date: "31 Dec 2025, 10:50:00", order_update_date: "31 Dec 2025, 11:15:00", request_date: "31 Dec 2025, 11:15:00",
+        order_note: "", parameters: { tests: ["4DX"], note: "Annual Vaccine" }, recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101", last_updated_by: "User A", last_updated_on: "31 Dec 2025, 11:15:00", disable_remark: ""
+    },
+    // 3.6 - 3.8 : Pending (Plan)
+    {
+        entry_id: "E-LAB006", order_no: "ORD-LAB006", acc_no: null, activity_type: "LIS", order_status: "Pending", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด", effective_time: "01 Jan 2026, 08:00:00",
+        order_create_date: "31 Dec 2025, 20:00:00", order_update_date: "31 Dec 2025, 20:00:00", request_date: null,
+        order_note: "งดน้ำอาหาร", parameters: { tests: ["GLU", "LIPID"], note: "Fasting Check" }, recorded_by: "Dr. CCC", dvm: "Dr. CCC", department: "301", last_updated_by: "Dr. CCC", last_updated_on: "31 Dec 2025, 20:00:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-LAB007", order_no: "ORD-LAB007", acc_no: null, activity_type: "LIS", order_status: "Pending", lis_process_status: null,
+        hn: "52000001", pet_name: "ทองดี", owner_name: "คุณสมชาย", effective_time: "02 Jan 2026, 09:00:00",
+        order_create_date: "31 Dec 2025, 16:00:00", order_update_date: "31 Dec 2025, 16:00:00", request_date: null,
+        order_note: "Follow up CBC", parameters: { tests: ["CBC"], note: "Anemia F/U" }, recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101", last_updated_by: "Dr. AAA", last_updated_on: "31 Dec 2025, 16:00:00", disable_remark: ""
+    },
+    {
+        entry_id: "E-LAB008", order_no: "ORD-LAB008", acc_no: null, activity_type: "LIS", order_status: "Pending", lis_process_status: null,
+        hn: "52000004", pet_name: "มีบุญ", owner_name: "คุณใจดี", effective_time: "01 Jan 2026, 10:00:00",
+        order_create_date: "31 Dec 2025, 14:00:00", order_update_date: "31 Dec 2025, 14:00:00", request_date: null,
+        order_note: "T4 TSH", parameters: { tests: ["T4", "TSH"], note: "Endocrine" }, recorded_by: "Dr. BBB", dvm: "Dr. BBB", department: "201", last_updated_by: "Dr. BBB", last_updated_on: "31 Dec 2025, 14:00:00", disable_remark: ""
+    },
+    // 3.9 - 3.10 : Disable
+    {
+        entry_id: "E-LAB009", order_no: "ORD-LAB009", acc_no: null, activity_type: "LIS", order_status: "Disable", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด", effective_time: "30 Dec 2025, 10:00:00",
+        order_create_date: "30 Dec 2025, 09:00:00", order_update_date: "30 Dec 2025, 09:30:00", request_date: null,
+        order_note: "ยกเลิก", parameters: { tests: ["URINALYSIS"], note: "" }, recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101", last_updated_by: "Dr. AAA", last_updated_on: "30 Dec 2025, 09:30:00", disable_remark: "User Cancel"
+    },
+    {
+        entry_id: "E-LAB010", order_no: "ORD-LAB010", acc_no: null, activity_type: "LIS", order_status: "Disable", lis_process_status: null,
+        hn: "52000001", pet_name: "ทองดี", owner_name: "คุณสมชาย", effective_time: "29 Dec 2025, 10:00:00",
+        order_create_date: "29 Dec 2025, 09:00:00", order_update_date: "29 Dec 2025, 09:30:00", request_date: null,
+        order_note: "Duplicate", parameters: { tests: ["CBC"], note: "" }, recorded_by: "Dr. Surg", dvm: "Dr. Surg", department: "102", last_updated_by: "Dr. Surg", last_updated_on: "29 Dec 2025, 09:30:00", disable_remark: "Duplicate"
+    },
+    // 3.11 - 3.30 : Generated History (20 items)
+    ...Array.from({ length: 20 }, (_, i) => ({
+        entry_id: `E-LAB-HIST-${i}`, order_no: `ORD-LAB-H${i}`, acc_no: `LIS-H${i}`,
+        activity_type: "LIS", order_status: "Done", lis_process_status: (i % 3 === 0 ? "Reported" : "Completed"),
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: `${25 - i} Dec 2025, 10:00:00`,
+        order_create_date: `${25 - i} Dec 2025, 09:50:00`, order_update_date: `${25 - i} Dec 2025, 10:00:00`, request_date: `${25 - i} Dec 2025, 10:00:00`,
+        order_note: "",
+        parameters: { tests: (i % 2 === 0 ? ["CBC", "CHEM"] : ["ELECTROLYTES"]), note: "Routine" },
+        recorded_by: "User Lab", dvm: "Dr. Staff", department: "Lab",
+        last_updated_by: "User Lab", last_updated_on: `${25 - i} Dec 2025, 10:00:00`, disable_remark: ""
+    })),
 
-    // 3.1 Path Done
+
+    // ==========================================
+    // [GROUP 4] PATHOLOGY ORDERS (20 Items)
+    // ==========================================
+    // 4.1 Done (Waiting for Result)
     {
         entry_id: "E-PATH001", order_no: "ORD-PATH001", acc_no: "PATH-680050", 
-        activity_type: "Pathology", 
-        order_status: "Done", lis_process_status: "Waiting", // รอผลนาน
-        
+        activity_type: "Pathology", order_status: "Done", lis_process_status: "Waiting",
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
         effective_time: "29 Dec 2025, 15:30:00",
-        order_create_date: "29 Dec 2025, 15:00:00",
-        order_update_date: "29 Dec 2025, 15:35:00",
-        request_date: "29 Dec 2025, 15:35:00",
-
-        order_note: "",
-        parameters: { 
-            items: [{ name: "Biopsy - Small", price: 1200, site: "Skin mass left leg", history: "Growing for 2 months" }] 
-        },
-
-        recorded_by: "Dr. Surg", dvm: "Dr. Surg", department: "102 ศัลยกรรม",
-        last_updated_by: "User Nurse", last_updated_on: "29 Dec 2025, 15:35:00", disable_remark: ""
+        order_create_date: "29 Dec 2025, 15:00:00", order_update_date: "29 Dec 2025, 15:35:00", request_date: "29 Dec 2025, 15:35:00",
+        order_note: "", parameters: { items: [{ name: "Biopsy - Small", price: 1200, site: "Skin mass left leg", history: "Growing 2 months" }] },
+        recorded_by: "Dr. Surg", dvm: "Dr. Surg", department: "102 ศัลยกรรม", last_updated_by: "User Nurse", last_updated_on: "29 Dec 2025, 15:35:00", disable_remark: ""
     },
-
-    // 3.2 Path Pending (Plan)
+    // 4.2 Done (Reported)
     {
-        entry_id: "E-PATH002", order_no: "ORD-PATH002", acc_no: null, 
-        activity_type: "Pathology", 
-        order_status: "Pending", lis_process_status: null,
-        
+        entry_id: "E-PATH002", order_no: "ORD-PATH002", acc_no: "PATH-680020", 
+        activity_type: "Pathology", order_status: "Done", lis_process_status: "Reported",
+        hn: "52000001", pet_name: "ทองดี", owner_name: "คุณสมชาย",
+        effective_time: "25 Dec 2025, 10:00:00",
+        order_create_date: "25 Dec 2025, 09:00:00", order_update_date: "25 Dec 2025, 10:00:00", request_date: "25 Dec 2025, 10:00:00",
+        order_note: "", parameters: { items: [{ name: "Cytology - 2 Sites", price: 700, site: "Ear L/R", history: "Chronic Otitis" }] },
+        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101", last_updated_by: "User Path", last_updated_on: "27 Dec 2025, 14:00:00", disable_remark: ""
+    },
+    // 4.3 Pending (Plan)
+    {
+        entry_id: "E-PATH003", order_no: "ORD-PATH003", acc_no: null, 
+        activity_type: "Pathology", order_status: "Pending", lis_process_status: null,
         hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-
-        effective_time: "05 Jan 2026, 10:00:00", // Plan ผ่าตัดอาทิตย์หน้า
-        order_create_date: "31 Dec 2025, 11:00:00",
-        order_update_date: "31 Dec 2025, 11:00:00",
-        request_date: null,
-
-        order_note: "เตรียมส่งชิ้นเนื้อหลังผ่าตัด",
-        parameters: { 
-            items: [{ name: "Biopsy - Whole Organ", price: 2500, site: "Spleen", history: "Splenic mass suspect Hemangiosarcoma" }] 
-        },
-
-        recorded_by: "Dr. Surg", dvm: "Dr. Surg", department: "102 ศัลยกรรม",
-        last_updated_by: "Dr. Surg", last_updated_on: "31 Dec 2025, 11:00:00", disable_remark: ""
-    }
+        effective_time: "05 Jan 2026, 10:00:00", 
+        order_create_date: "31 Dec 2025, 11:00:00", order_update_date: "31 Dec 2025, 11:00:00", request_date: null,
+        order_note: "เตรียมส่งชิ้นเนื้อหลังผ่าตัด", parameters: { items: [{ name: "Biopsy - Whole Organ", price: 2500, site: "Spleen", history: "Suspect Tumor" }] },
+        recorded_by: "Dr. Surg", dvm: "Dr. Surg", department: "102", last_updated_by: "Dr. Surg", last_updated_on: "31 Dec 2025, 11:00:00", disable_remark: ""
+    },
+    // 4.4 Pending (Plan)
+    {
+        entry_id: "E-PATH004", order_no: "ORD-PATH004", acc_no: null, 
+        activity_type: "Pathology", order_status: "Pending", lis_process_status: null,
+        hn: "52000005", pet_name: "โชคดี", owner_name: "คุณมีชัย",
+        effective_time: "03 Jan 2026, 09:00:00", 
+        order_create_date: "31 Dec 2025, 10:00:00", order_update_date: "31 Dec 2025, 10:00:00", request_date: null,
+        order_note: "Cytology", parameters: { items: [{ name: "Cytology - 1 Site", price: 400, site: "Mass", history: "Lipoma?" }] },
+        recorded_by: "Dr. BBB", dvm: "Dr. BBB", department: "201", last_updated_by: "Dr. BBB", last_updated_on: "31 Dec 2025, 10:00:00", disable_remark: ""
+    },
+    // 4.5 Disable
+    {
+        entry_id: "E-PATH005", order_no: "ORD-PATH005", acc_no: null, 
+        activity_type: "Pathology", order_status: "Disable", lis_process_status: null,
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: "20 Dec 2025, 10:00:00", 
+        order_create_date: "20 Dec 2025, 09:00:00", order_update_date: "20 Dec 2025, 09:10:00", request_date: null,
+        order_note: "Wrong site", parameters: { items: [{ name: "Biopsy - Small", price: 1200, site: "Right Leg", history: "-" }] },
+        recorded_by: "Dr. AAA", dvm: "Dr. AAA", department: "101", last_updated_by: "Dr. AAA", last_updated_on: "20 Dec 2025, 09:10:00", disable_remark: "User Cancel"
+    },
+    // 4.6 - 4.20 : Generated History (15 items)
+    ...Array.from({ length: 15 }, (_, i) => ({
+        entry_id: `E-PATH-HIST-${i}`, order_no: `ORD-PATH-H${i}`, acc_no: `PATH-H${i}`,
+        activity_type: "Pathology", order_status: "Done", lis_process_status: "Reported",
+        hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+        effective_time: `${20 - i} Nov 2025, 11:00:00`,
+        order_create_date: `${20 - i} Nov 2025, 10:00:00`, order_update_date: `${20 - i} Nov 2025, 10:30:00`, request_date: `${20 - i} Nov 2025, 10:30:00`,
+        order_note: "",
+        parameters: { items: [{ name: "Cytology - 1 Site", price: 400, site: "FNA", history: "History text" }] },
+        recorded_by: "Dr. Path", dvm: "Dr. Path", department: "Lab",
+        last_updated_by: "User Path", last_updated_on: `${22 - i} Nov 2025, 15:00:00`, disable_remark: ""
+    }))
 
 ];
-
-// =================================================================
-// END: ฐานข้อมูลกลาง
-// =================================================================
-
 
 // --- (คงไว้) Problem List Modal (Tagging Section - Global Data) ---
 const categoryData = {

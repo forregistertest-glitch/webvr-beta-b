@@ -1,6 +1,33 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 5.2.4 VERSION (Lab Viewer Dashboard & Order Plan System)
+(20 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+สร้างหน้าจอ **Lab Viewer (Dashboard)** เพื่อใช้เป็นศูนย์กลางในการดูรายการสั่งตรวจทั้งหมด (Clinical Lab & Pathology) โดยรองรับการดูสถานะงาน (Pending/Done/Disable), การค้นหาคนไข้, และการจัดการคำสั่งล่วงหน้า (Plan Management) ให้สอดคล้องกับ Workflow ของแพทย์และห้องปฏิบัติการ
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Data Model Overhaul:** ปรับโครงสร้างฐานข้อมูลกลาง (`activityLogData`) ครั้งใหญ่ เพิ่มฟิลด์ `order_status` (Pending, Done, Disable), `lis_process_status`, `patient_info` และ Timestamps ละเอียด พร้อมอัดข้อมูลตัวอย่าง (Mock Data) 90 รายการ เพื่อรองรับการทดสอบระบบที่ซับซ้อน
+2.  **Lab Viewer Interface:** สร้างหน้าจอ Dashboard ใหม่ที่แยก Tab ระหว่าง **Clinical Lab (LIS)** และ **Pathology** พร้อมระบบ Filter กรองสถานะ และ Search Bar ค้นหา HN/ชื่อสัตว์ป่วย
+3.  **Smart Table Logic:** พัฒนาระบบแสดงผลตารางที่:
+    * แสดงข้อมูลคนไข้ (Patient Info) ในตารางรวมได้
+    * ใช้ Sticky Header และ Sticky First Column (Date) ตามมาตรฐานใหม่
+    * แสดง Badge สถานะสีต่าง ๆ (เหลือง=Plan, เขียว=Sent, เทา=Cancel) และสถานะ Lab Process
+4.  **Order Management Actions:** เพิ่มปุ่ม Action สำหรับรายการสถานะ Pending (Plan):
+    * **Edit Plan:** โหลดข้อมูลกลับเข้า Modal เพื่อแก้ไข (Mock Load)
+    * **Cancel Plan:** กดยกเลิกรายการได้ทันที (เปลี่ยนสถานะเป็น Disable) พร้อมบันทึกเวลาและผู้ยกเลิก
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`app-data.js`:** รีเซ็ต `activityLogData` ใหม่ทั้งหมดเป็น 90 รายการ (VS:20, Eye:20, LIS:30, Path:20) คละสถานะและ HN
+2.  **`lab_viewer_content.html`:** สร้าง UI ใหม่ทั้งหมด (Header Controls + Tab Switcher + Table Container แบบ Fixed Height)
+3.  **`app-init.js`:**
+    * เพิ่มฟังก์ชัน `initializeLabViewer()` สำหรับ Render ตาราง, จัดการ Tab Switching, และ Filter Logic
+    * เขียน Logic การแสดงผลแถว (Row Rendering) ให้เป็น Single Line Style ที่อ่านง่าย
+    * อัปเดตฟังก์ชัน `disableOrder()` และ `loadOrderForEdit()` ให้รองรับ Status Logic ใหม่
+4.  **`app-logic.js`:** เชื่อมต่อ Route `lab_viewer_content.html` ให้เรียก `initializeLabViewer()` ทำงานอัตโนมัติ
+
+
 ## BETA 5.1.2 VERSION (Order Lab UI/UX Polish - Radio Buttons & Blue Theme)
 (20 พฤศจิกายน 2025)
 

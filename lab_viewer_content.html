@@ -1,1 +1,93 @@
-<div class="p-4"><h1 class="text-xl font-semibold dark:text-[--color-text-base]">Lab Viewer Module</h1><p class="dark:text-[--color-text-base]">(Module content for Lab Viewer)</p></div>
+<div class="h-full flex flex-col bg-gray-50 dark:bg-[--color-bg-base]">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] shadow-sm flex-shrink-0 gap-4">
+        
+        <div class="flex items-center space-x-4 w-full md:w-auto">
+            <div class="flex bg-gray-100 dark:bg-[--color-bg-secondary] p-1 rounded-lg border border-gray-200 dark:border-[--color-border-base]">
+                <button id="btn-tab-lis" class="px-4 py-1.5 text-sm font-bold rounded-md shadow-sm bg-white text-pink-600 dark:bg-[--color-bg-content] dark:text-pink-400 transition-all flex items-center">
+                    <i data-lucide="test-tube-2" class="w-4 h-4 mr-2"></i> Clinical Lab (LIS)
+                </button>
+                <button id="btn-tab-path" class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base] transition-all flex items-center">
+                    <i data-lucide="microscope" class="w-4 h-4 mr-2"></i> Pathology
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+            
+            <div class="relative">
+                <select id="lab-view-filter-status" class="pl-8 pr-4 py-2 border border-gray-300 dark:border-[--color-border-base] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] appearance-none cursor-pointer">
+                    <option value="All">All Status</option>
+                    <option value="Pending">Pending (Plan)</option>
+                    <option value="Done">Done (Sent)</option>
+                    <option value="Disable">Cancelled</option>
+                </select>
+                <i data-lucide="filter" class="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400"></i>
+            </div>
+
+            <div class="relative">
+                <input type="text" id="lab-view-search" placeholder="Search HN / Name..." class="pl-9 pr-4 py-2 border border-gray-300 dark:border-[--color-border-base] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] w-48">
+                <i data-lucide="search" class="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400"></i>
+            </div>
+
+            <button id="btn-refresh-lab-view" class="p-2 text-gray-500 hover:text-blue-600 dark:text-[--color-text-muted] dark:hover:text-blue-400 transition-colors" title="Refresh Data">
+                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="h-[600px] overflow-hidden relative border-b border-gray-200 dark:border-[--color-border-base]">
+        
+        <div id="view-container-lis" class="h-full overflow-auto w-full absolute inset-0 p-4">
+            <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-sm border border-gray-200 dark:border-[--color-border-base] overflow-hidden min-h-full">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-[var(--color-bg-secondary)] font-semibold text-[var(--color-text-base)] border-b border-[var(--color-border-base)]">
+                        <tr>
+                            <th class="p-3 whitespace-nowrap sticky left-0 z-20 bg-[var(--color-bg-secondary)] shadow-sm border-r border-[var(--color-border-base)]">Date/Time</th>
+                            <th class="p-3 whitespace-nowrap">Order No.</th>
+                            <th class="p-3 whitespace-nowrap">Acc No.</th>
+                            <th class="p-3 whitespace-nowrap">Patient</th> <th class="p-3 whitespace-nowrap">Tests</th>
+                            <th class="p-3 whitespace-nowrap">Note</th>
+                            <th class="p-3 whitespace-nowrap">DVM</th>
+                            <th class="p-3 whitespace-nowrap">Dept</th>
+                            <th class="p-3 whitespace-nowrap">User</th>
+                            <th class="p-3 whitespace-nowrap text-center">Order Status</th>
+                            <th class="p-3 whitespace-nowrap text-center">Lab Status</th>
+                            <th class="p-3 whitespace-nowrap text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-labview-lis" class="divide-y divide-gray-100 dark:divide-[--color-border-base]">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-container-path" class="h-full overflow-auto w-full absolute inset-0 p-4 hidden">
+            <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-sm border border-gray-200 dark:border-[--color-border-base] overflow-hidden min-h-full">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 dark:bg-[--color-bg-secondary] text-xs uppercase text-gray-500 dark:text-[--color-text-muted] font-semibold sticky top-0 z-20 border-b border-gray-200 dark:border-[--color-border-base]">
+                        <tr>
+                            <th class="p-3 w-[12%]">Date/Time (Eff.)</th>
+                            <th class="p-3 w-[10%]">Order No.</th>
+                            <th class="p-3 w-[10%]">Acc No.</th>
+                            <th class="p-3 w-[15%]">Patient (HN)</th>
+                            <th class="p-3 w-[20%]">Item / Site / History</th>
+                            <th class="p-3 w-[10%] text-center">Order Status</th>
+                            <th class="p-3 w-[10%] text-center">Path Status</th>
+                            <th class="p-3 w-[8%] text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-labview-path" class="divide-y divide-gray-100 dark:divide-[--color-border-base]">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="p-2 bg-white dark:bg-[--color-bg-content] border-t border-gray-200 dark:border-[--color-border-base] text-[10px] text-gray-400 dark:text-[--color-text-muted] flex space-x-4 justify-center">
+        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-yellow-400 mr-1"></span> Pending (Plan)</div>
+        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span> Done (Sent)</div>
+        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-gray-400 mr-1"></span> Cancelled</div>
+    </div>
+</div>
