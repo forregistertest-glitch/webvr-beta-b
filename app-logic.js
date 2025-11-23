@@ -1,14 +1,14 @@
 // This is app-logic.js (BETA 4.0 - Final Step 10 - Eye Exam Table Logic Update)
 
-// ***** START: EYE EXAM HISTORY FUNCTIONS (MODIFIED) *****
+// This is app-logic.js (Final Update for Eye Exam Table Layout)
+
 function renderEyeExamHistoryTable(data) {
     const tableBody = document.getElementById('eyeHistoryTableBody');
     if (!tableBody) return;
     tableBody.innerHTML = '';
     
     if (data.length === 0) {
-        // (Table has 21 columns now)
-        tableBody.innerHTML = `<tr><td colspan="21" class="p-4 text-center text-[var(--color-text-muted)]">No eye exam history found.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="25" class="p-4 text-center text-[var(--color-text-muted)]">No eye exam history found.</td></tr>`;
         return;
     }
 
@@ -16,38 +16,69 @@ function renderEyeExamHistoryTable(data) {
         const row = document.createElement('tr');
         row.classList.add('hover:bg-gray-50', 'dark:hover:bg-[--color-bg-secondary]/50');
         
-        // (MODIFIED) เปลี่ยน N/A เป็น '' และใช้ eyeexam.png
         const imageUrl = item.imageUrl 
             ? `<img src="${item.imageUrl}" alt="Exam" class="history-thumbnail" data-full-src="${item.imageUrl}">`
-            : ''; 
-            
-        row.innerHTML = `
-            <td class="p-3 sticky left-0 bg-white dark:bg-[var(--color-bg-content)] text-[var(--color-text-base)]">${item.datetime}</td>
-            
-            <td class="p-3 text-[var(--color-text-base)]">${item.plr_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.plr_os || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.palpebral_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.palpebral_os || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.dazzle_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.dazzle_os || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.menace_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.menace_os || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.stt_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.stt_os || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.fluorescein_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.fluorescein_os || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.iop_od || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.iop_os || ''}</td>
-            <td class="p-3">${imageUrl}</td>
-            
-            <td class="p-3 text-[var(--color-text-base)]">${item.dvm || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.department || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.recorded_by || ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.recorded_on ? item.recorded_on.split(',')[0] : ''}</td>
-            <td class="p-3 text-[var(--color-text-base)]">${item.last_updated_on ? item.last_updated_on.split(',')[0] : ''}</td>
+            : '<span class="text-gray-300 text-xs">-</span>'; 
 
-            <td class="p-3">
-                <button class="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)]" title="View/Edit">
+        const createTime = item.recorded_on ? item.recorded_on.split(',')[1] : '-';
+        const updateTime = item.last_updated_on ? item.last_updated_on.split(',')[1] : '-';
+
+        // Status Badge
+        let statusBadge = '';
+        if (item.order_status === 'Done') statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 border border-green-200">Done</span>`;
+        else if (item.order_status === 'Pending') statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">Plan</span>`;
+        else statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">Cancel</span>`;
+
+        // Note handling (item.parameters.Note is mapped to item.note in app-init usually, but here check mapping)
+        // In app-init.js showEye() mapping: imageUrl uses parameters.Note. 
+        // Let's assume Note is passed directly or inside parameters.
+        // Based on Step 1 app-data.js generator: Note is in parameters.
+        // Based on Step 3.2 app-init.js mapping: we need to ensure 'note' and 'order_note' are available.
+        // app-init.js showEye() mapped: ... parameters: getEyeData() ... 
+        // Wait, app-init.js showEye() maps data for THIS function. Let's check that mapping.
+        // It maps: ... imageUrl: (entry.parameters.Note)...
+        // I will use item.order_note (from entry) and item.note (from parameters.Note)
+        
+        // Correction: In app-init.js showEye(), we didn't explicitly map 'order_note' or 'note' text to a property named 'note' for display, 
+        // we mostly used it for Image logic. I will assume the data passed here has access to it.
+        // Let's use optional chaining on the object passed.
+        // Actually, let's update the mapping in app-init.js briefly to be sure.
+        
+        // (Self-correction: To be safe, I will use item.note (from parameters) and item.order_note)
+        
+        row.innerHTML = `
+            <td class="p-3 sticky left-0 bg-white dark:bg-[var(--color-bg-content)] text-[var(--color-text-base)] shadow-sm border-r border-gray-100 dark:border-[var(--color-border-base)] whitespace-nowrap">
+                ${item.datetime}
+            </td>
+            
+            <td class="p-3 text-[var(--color-text-base)]">${item.plr_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.plr_os || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.palpebral_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.palpebral_os || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.dazzle_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.dazzle_os || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.menace_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.menace_os || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.stt_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.stt_os || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.fluorescein_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.fluorescein_os || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.iop_od || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)]">${item.iop_os || '-'}</td>
+            <td class="p-3 text-center">${imageUrl}</td>
+            
+            <td class="text-[var(--color-text-muted)] p-3 whitespace-nowrap text-xs truncate max-w-[100px]" title="${item.note||''}">${item.note||'-'}</td>
+            <td class="text-[var(--color-text-muted)] p-3 whitespace-nowrap text-xs truncate max-w-[100px]" title="${item.order_note||''}">${item.order_note||'-'}</td>
+            <td class="p-3 text-[var(--color-text-base)] text-xs whitespace-nowrap">${item.dvm || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)] text-xs whitespace-nowrap">${item.department || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)] text-xs whitespace-nowrap">${item.recorded_by || '-'}</td>
+            <td class="p-3 text-[var(--color-text-base)] text-xs text-gray-500 whitespace-nowrap">${createTime}</td>
+            <td class="p-3 text-[var(--color-text-base)] text-xs whitespace-nowrap">${item.last_updated_by || '-'}</td>
+            <td class="p-3 text-center text-xs text-gray-500 whitespace-nowrap">${updateTime}</td>
+            <td class="p-3 text-center">${statusBadge}</td>
+            
+            <td class="p-3 text-center">
+                <button class="p-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)] transition-colors" title="View/Edit">
                     <i data-lucide="more-vertical" class="w-4 h-4"></i>
                 </button>
             </td>
@@ -55,6 +86,7 @@ function renderEyeExamHistoryTable(data) {
 
         tableBody.appendChild(row);
     });
+    
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
@@ -98,7 +130,7 @@ async function loadModuleContent(contentFile) {
         return; 
     }
 
-    // --- Block 2: Initializing Scripts for the Content ---
+// --- Block 2: Initializing Scripts for the Content ---
     try {
         if (contentFile === 'assessment_content.html') {
             initializeAssessmentScripts(); 
@@ -108,15 +140,19 @@ async function loadModuleContent(contentFile) {
             initializeExtDocAddNewPage();
         } else if (contentFile === 'order_pe_content.html') {
             initializeOrderPEScripts();
-        }
-        else if (contentFile === 'order_lis_content.html') {
+        } else if (contentFile === 'order_lis_content.html') {
             initializeLisScripts(); 
         } else if (contentFile === 'order_path_content.html') {
             initializePathologyScripts(); 
         } else if (contentFile === 'lab_viewer_content.html') {
-        // [NEW] Trigger Lab Viewer Logic
-        if (typeof initializeLabViewer === 'function') {
-            initializeLabViewer();
+            if (typeof initializeLabViewer === 'function') initializeLabViewer();
+        } else if (contentFile === 'lab_dashboard_content.html') { 
+            // [CORRECTED] Check for Dashboard Init
+            if (typeof initializeLabDashboard === 'function') {
+                console.log("Calling initializeLabDashboard()..."); // Debug Log
+                initializeLabDashboard();
+            } else {
+                console.error("initializeLabDashboard function NOT FOUND");
             }
         }
         

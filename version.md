@@ -1,6 +1,70 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 5.7 VERSION (LAB Dashboard Isolation & Refactor)
+(23 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+ปรับปรุงหน้า LAB Dashboard แยกจากระบบหลัก (Standalone Module) ให้สมบูรณ์ตามความต้องการล่าสุด ทั้งด้าน Layout, Pagination และ Functional Filter
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Enhanced Header Layout:**
+    * ย้ายกลุ่ม Date Control (Title, Go to Today, Date Picker) ไปอยู่ **ด้านขวา** ของบรรทัดแรก เพื่อความสมดุล
+    * เปลี่ยนสถานะข้อความ "Today" เป็น "Current Today" (สีจาง/Inactive) เพื่อลดความสับสน
+2.  **Advanced Filters:**
+    * เปลี่ยน Type Toggle จาก 2 ปุ่มเป็น **3 ปุ่ม (All / Clinical Lab / Pathology)** โดยตั้งค่า Default เป็น **All**
+    * เขียน Logic ใหม่ให้ปุ่มกรองข้อมูลในตารางได้จริงตามประเภทงาน
+3.  **Pagination Upgrade:**
+    * ปรับจำนวนรายการต่อหน้าเป็น **50 รายการ** (Showing 1-50 of 462)
+    * ปรับสีข้อความ Pagination ให้เป็นสีเทาปกติ (นำตัวหนาออก) เพื่อความสบายตา
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`lab_dashboard_content.html`:**
+    * Re-structure HTML ส่วน Header ใหม่ (ย้าย Div Date Controls)
+    * เพิ่มปุ่ม Toggle Type ชุดใหม่ (3 ปุ่ม)
+2.  **`lab-dashboard-init.js`:**
+    * อัปเดตตัวแปร `itemsPerPage = 50`
+    * เพิ่มตัวแปร State `currentTypeFilter` และ Logic การกรองข้อมูล 2 ชั้น (Status + Type)
+    * ปรับแก้การ Render HTML ของ Pagination Info ให้เรียบง่าย
+
+## BETA 5.6 VERSION (Order Plan System & Data Structure Refactor)
+(23 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+ปรับเปลี่ยนโครงสร้างพื้นฐานของข้อมูล (Data Structure) ให้เป็นระบบ **Order-Based** เพื่อรองรับ Workflow การทำงานแบบ "วางแผนล่วงหน้า" (Plan/Pending) แยกออกจาก "การตรวจจริง" (Done/Result) และเปลี่ยนหน้าจอสั่งตรวจร่างกาย (Order PE) ให้เป็นรูปแบบ **Dashboard** ที่ใช้งานง่าย พร้อมระบบจัดการสถานะและประวัติที่ละเอียดแม่นยำ
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Data Structure Refactor (Central Log):**
+    * **Order vs Action:** แยกฟิลด์ `order_no` (เลขที่ใบสั่ง/Plan) ออกจาก `acc_no` (เลขที่รับตรวจ/Billing) อย่างชัดเจน
+    * **Detailed Timestamps:** เพิ่มการเก็บเวลา 4 มิติ: `order_create_date` (เวลาสั่ง), `target_time` (เวลานัดหมายทำ), `effective_time` (เวลาที่ทำจริง), และ `last_updated_on` (เวลาแก้ไขล่าสุด)
+    * **User Meta:** เพิ่มการเก็บ `recorded_by` และ `last_updated_by` แยกกัน
+    * **Smart Generator:** เขียน Script สร้าง Mock Data อัตโนมัติ 120+ รายการ ครอบคลุม Vital Signs, Eye Exam, LIS, Pathology โดยมีการคละสถานะ (Done, Pending, Disable) และวันที่ย้อนหลังอย่างสมจริง
+2.  **Order PE Dashboard:**
+    * เปลี่ยนหน้าจอ `Order PE` จากฟอร์มเดิม เป็น **Dashboard** รวมการ์ดสั่งงาน (Vital Signs, Eye Exam, Neuro, Ortho)
+    * **Vital Signs:** เพิ่มปุ่ม "Order Plan" สำหรับสั่งงานล่วงหน้า
+    * **Eye Exam:** เพิ่มปุ่ม "Open Module" สำหรับเข้าหน้าบันทึกผล และแสดงสถานะ History+
+3.  **Advanced Order Modal System:**
+    * **New Order Plan Modal:** สร้าง Modal กลางสำหรับสั่งงานล่วงหน้า (ระบุ Target Date/Time, Target Department, Note) ใช้ร่วมกันระหว่าง VS และ Eye Exam
+    * **Eye Exam Integration:** ปรับ Footer ของ Eye Exam Modal ให้มี 2 ปุ่มเลือกสถานะ:
+        * **Save as Plan:** เปิด Order Plan Modal เพื่อสั่งล่วงหน้า (Status: Pending)
+        * **Confirm & Done:** บันทึกผลและสร้าง Acc No. ทันที (Status: Done)
+    * เพิ่มฟิลด์ Note, Effective Time, และ Record Meta ในหน้าบันทึกผล Eye Exam
+4.  **Enhanced History & Lab Viewer:**
+    * ปรับปรุงตาราง **Vital Signs History**, **Eye Exam History**, และ **Lab View** ให้แสดงคอลัมน์ User (Record/Update) และ Time (Create/Update/Effective) ครบถ้วน
+    * **Lab View:** เพิ่มปุ่ม Action Menu (3 จุด) พร้อม Logic ป้องกันการกด Disable (กดได้เฉพาะสถานะ Waiting)
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`app-data.js`:** เขียนใหม่ทั้งหมด ใช้ `generateActivityLog()` สร้าง Data object ที่ซับซ้อนรองรับ Schema ใหม่
+2.  **`order_pe_content.html`:** รื้อโครงสร้าง HTML ใหม่เป็น Grid Dashboard พร้อมปุ่ม Action แบบใหม่
+3.  **`index.html`:**
+    * เพิ่ม `<div id="order-plan-modal">` สำหรับ Generic Plan Input
+    * แก้ไข `<div id="eye-exam-modal">` เพิ่ม Input Fields และปุ่ม Footer คู่
+4.  **`app-init.js`:**
+    * เพิ่มฟังก์ชัน `initializeOrderPlanLogic()` จัดการ Modal สั่งงาน
+    * อัปเดต Logic การบันทึกของ Eye Exam และ Vital Signs ให้รองรับการสร้าง Data Packet แบบใหม่
+    * ปรับฟังก์ชัน Render Table (`renderVsHistoryTable`, `renderLabViewTable`, etc.) ให้ Map ข้อมูล Timestamps และ User ได้ถูกต้อง
+5.  **`order-pe-init.js`:** เชื่อมต่อปุ่มบน Dashboard เข้ากับ Global Modal Functions (`window.openOrderPlanModal`, `window.openEyeExamModal`)
+
 ## BETA 5.2.4 VERSION (Lab Viewer Dashboard & Order Plan System)
 (20 พฤศจิกายน 2025)
 

@@ -194,7 +194,11 @@
                     </div>
                 </div>
 
-                <a href="#" class="px-3 py-2 text-gray-700 dark:text-[--color-text-base] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">List of order</a>
+                <!-- CHANGED: Link to new LAB Dashboard -->
+                <a href="#" class="emr-tab px-3 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded font-bold flex items-center" data-target="lab_dashboard_content.html">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 mr-1.5"></i>
+                    LAB Dashboard
+                </a>
 
                 <div class="relative group" x-data="{ open: false }">
                     <button @click="open = !open" @keydown.escape.window="open = false" class="flex items-center px-3 py-2 text-blue-600 dark:text-[--color-primary-500] hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded">
@@ -569,14 +573,9 @@
                                 <thead class="bg-[var(--color-bg-secondary)]">
                                     <tr>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime">
-                                            <div class="flex items-center">
-                                                Date/Time (Eff.)
-                                                <span class="sort-icon desc">
-                                                    <i data-lucide="arrow-down" class="w-4 h-4"></i>
-                                                </span>
-                                            </div>
+                                            <div class="flex items-center">Date/Time (Eff.) <span class="sort-icon desc"><i data-lucide="arrow-down" class="w-4 h-4"></i></span></div>
                                         </th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="temp">Temp (°F)</th>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="temp">Temp</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="rr">RR</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="hr">HR</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="bp">BP</th>
@@ -592,15 +591,17 @@
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="cyanosis">Cyanosis</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="seizure">Seizure</th>
                                         <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="arrest">Arrest</th>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="note">Note</th>
                                         
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Note</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Order Note</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">DVM</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">Dept</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">User Record</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">Create Time</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">User Update</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">Update Time</th>
-                                        
-                                        <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Actions</th>
+                                        <th scope="col" class="text-center text-[var(--color-text-base)]">Status</th>
+                                        <th scope="col" class="text-center font-semibold text-[var(--color-text-base)]">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="historyTableBody" class="divide-y divide-[var(--color-border-base)] bg-[var(--color-bg-content)]">
@@ -876,46 +877,38 @@
                             <table id="eyeHistoryTable" class="min-w-full text-sm">
                                 <thead class="bg-[var(--color-bg-secondary)]">
                                     <tr>
-                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime" style="min-width: 160px;">
-                                            <div class="flex items-center">
-                                                Date/Time (Eff.) 
-                                                <span class="sort-icon desc"><i data-lucide="arrow-down" class="w-4 h-4 ml-1"></i></span>
-                                            </div>
+                                        <th scope="col" class="history-sort-header text-left text-[var(--color-text-base)]" data-sort="datetime" style="min-width: 140px;">
+                                            <div class="flex items-center">Date/Time (Eff.) <span class="sort-icon desc"><i data-lucide="arrow-down" class="w-4 h-4 ml-1"></i></span></div>
                                         </th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">PLR<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">PLR<span class="eye-header-sub">(OS)</span></th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Palp<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Palp<span class="eye-header-sub">(OS)</span></th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Dazzle<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Dazzle<span class="eye-header-sub">(OS)</span></th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Menace<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Menace<span class="eye-header-sub">(OS)</span></th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">STT<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">STT<span class="eye-header-sub">(OS)</span></th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Fluoro<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">Fluoro<span class="eye-header-sub">(OS)</span></th>
-                                        
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">IOP<span class="eye-header-sub">(OD)</span></th>
                                         <th scope="col" class="eye-header-multiline text-[var(--color-text-base)]">IOP<span class="eye-header-sub">(OS)</span></th>
+                                        <th scope="col" class="text-center font-semibold text-[var(--color-text-base)]" style="min-width: 60px;">Image</th>
                                         
-                                        <th scope="col" class="text-center font-semibold text-[var(--color-text-base)]" style="min-width: 80px; vertical-align: middle;">Image</th>
-                                        
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Note</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Order Note</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">DVM</th>
                                         <th scope="col" class="text-left text-[var(--color-text-base)]">Dept</th>
-                                        <th scope="col" class="text-left text-[var(--color-text-base)]">User</th>
-                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Create</th>
-                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Update</th>
-                                        <th scope="col" class="text-left font-semibold text-[var(--color-text-base)]">Actions</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">User Record</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Create Time</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">User Update</th>
+                                        <th scope="col" class="text-left text-[var(--color-text-base)]">Update Time</th>
+                                        <th scope="col" class="text-center text-[var(--color-text-base)]">Status</th>
+                                        <th scope="col" class="text-center font-semibold text-[var(--color-text-base)]">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="eyeHistoryTableBody" class="divide-y divide-[var(--color-border-base)] bg-[var(--color-bg-content)]">
-                                    </tbody>
+                                <tbody id="eyeHistoryTableBody" class="divide-y divide-[var(--color-border-base)] bg-[var(--color-bg-content)]"></tbody>
                             </table>
                         </div>
                     </div>
@@ -932,70 +925,28 @@
                                 <div class="font-semibold text-center dark:text-[--color-text-base]">OS (Left Eye)</div>
                                 
                                 <label class="form-label justify-self-end">Pupillary light reflex (PLR)</label>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / - / Sluggish</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                    <option value="Sluggish">Sluggish</option>
-                                </select>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / - / Sluggish</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                    <option value="Sluggish">Sluggish</option>
-                                </select>
+                                <select id="eye-plr-od" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option><option value="Sluggish">Sluggish</option></select>
+                                <select id="eye-plr-os" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option><option value="Sluggish">Sluggish</option></select>
 
                                 <label class="form-label justify-self-end">Palpebral Reflex</label>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / -</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                </select>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / -</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                </select>
+                                <select id="eye-palp-od" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option></select>
+                                <select id="eye-palp-os" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option></select>
 
                                 <label class="form-label justify-self-end">Dazzle Reflex</label>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / -</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                </select>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / -</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                </select>
+                                <select id="eye-dazzle-od" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option></select>
+                                <select id="eye-dazzle-os" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option></select>
 
                                 <label class="form-label justify-self-end">Menace Response</label>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / -</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                </select>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">+ / -</option>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                </select>
+                                <select id="eye-menace-od" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option></select>
+                                <select id="eye-menace-os" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="+">+</option><option value="-">-</option></select>
 
                                 <label class="form-label justify-self-end">Schirmer Tear Test (mm/min)</label>
                                 <input type="text" id="eye_stt_od" data-numpad="true" class="form-input" placeholder="e.g. 15" readonly>
                                 <input type="text" id="eye_stt_os" data-numpad="true" class="form-input" placeholder="e.g. 15" readonly>
 
                                 <label class="form-label justify-self-end">Fluorescein Stain</label>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">Positive / Negative</option>
-                                    <option value="Positive">Positive</option>
-                                    <option value="Negative">Negative</option>
-                                </select>
-                                <select class="form-input form-select">
-                                    <option value="" selected disabled class="form-select-placeholder">Positive / Negative</option>
-                                    <option value="Positive">Positive</option>
-                                    <option value="Negative">Negative</option>
-                                </select>
+                                <select id="eye-fluoro-od" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="Positive">Positive</option><option value="Negative">Negative</option></select>
+                                <select id="eye-fluoro-os" class="form-input form-select"><option value="" selected disabled class="form-select-placeholder">Select</option><option value="Positive">Positive</option><option value="Negative">Negative</option></select>
 
                                 <label class="form-label justify-self-end">Intraocular Pressure (mmHg)</label>
                                 <input type="text" id="eye_iop_od" data-numpad="true" class="form-input" placeholder="e.g. 18" readonly>
@@ -1008,12 +959,49 @@
                                 <i data-lucide="image" class="w-6 h-6 mr-3 text-indigo-600"></i>
                                 Eye Diagrams
                             </h2>
-                            <p class="text-sm text-[var(--color-text-muted)] mb-4">Click button to open drawing tool for annotation.</p>
-                            
                             <div class="text-center">
                                 <button id="open-drawing-tool" class="bg-indigo-100 hover:bg-indigo-200 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] text-indigo-700 dark:text-indigo-400 font-semibold py-3 px-6 rounded-lg">
                                     Open Eye Diagram (Demo)
                                 </button>
+                            </div>
+                        </section>
+
+                        <section class="p-6 rounded-lg border border-[var(--color-border-base)] bg-[var(--color-bg-content)] shadow-sm">
+                            <h2 class="text-xl font-semibold mb-5 flex items-center text-[var(--color-text-base)]">
+                                <i data-lucide="file-pen-line" class="w-6 h-6 mr-3 text-indigo-600"></i>
+                                Additional Information
+                            </h2>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="eye-note" class="form-label">Note (บันทึกเพิ่มเติม)</label>
+                                    <textarea id="eye-note" rows="2" class="form-input" placeholder="พิมพ์ข้อความ..."></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="eye-effective-date" class="form-label">Effective Date</label>
+                                        <input type="date" id="eye-effective-date" class="form-input">
+                                    </div>
+                                    <div>
+                                        <label for="eye-effective-time" class="form-label">Effective Time</label>
+                                        <input type="time" id="eye-effective-time" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="eye-dvm" class="form-label">DVM</label>
+                                        <select id="eye-dvm" class="form-input form-select">
+                                            <option value="Dr. Eye" selected>Dr. Eye</option>
+                                            <option value="Dr. AAA">Dr. AAA</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="eye-dept" class="form-label">Department</label>
+                                        <select id="eye-dept" class="form-input form-select">
+                                            <option value="301 คลินิกพิเศษ" selected>301 คลินิกพิเศษ</option>
+                                            <option value="101 อายุรกรรม">101 อายุรกรรม</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -1024,10 +1012,16 @@
                 <button id="close-eye-popup-cancel" class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-[var(--color-border-base)] dark:hover:bg-[var(--color-border-base)] text-gray-700 dark:text-[var(--color-text-base)] text-sm font-medium">
                     Close
                 </button>
-                <button class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium">
-                    <i data-lucide="save" class="w-4 h-4"></i>
-                    <span>Save Eye Exam</span>
-                </button>
+                <div class="flex space-x-3">
+                    <button id="btn-save-eye-plan" class="flex items-center space-x-1.5 px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm">
+                        <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                        <span>Save as Plan</span>
+                    </button>
+                    <button id="btn-confirm-eye-done" class="flex items-center space-x-1.5 px-6 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors text-sm font-medium shadow-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>Confirm & Done</span>
+                    </button>
+                </div>
             </footer>
         </div>
     </div>
@@ -1324,17 +1318,12 @@
     <script>
         lucide.createIcons();
     </script> 
-
-    <script src="app-data.js"></script>
-    
+<script src="app-data.js"></script>
     <script src="app-helpers.js"></script>
     <script src="app-drawing.js"></script>
     <script src="app-charts.js"></script>
-    
     <script src="app-logic.js"></script>
-    
     <script src="app-init.js"></script>
-    
     <script src="app.js"></script> 
 
     <script src="extdoc-data.js"></script>
@@ -1342,6 +1331,9 @@
     <script src="extdoc-init.js"></script>
     <script src="extdoc-addnew-init.js"></script>
     <script src="order-pe-init.js"></script>
+    <!-- NEW: LAB Dashboard Scripts (Mockup) -->
+    <script src="lab-dashboard-data.js"></script>
+    <script src="lab-dashboard-init.js"></script>
 
     <div class="fixed bottom-4 right-4 z-50 flex items-center space-x-3">
 
@@ -1359,10 +1351,6 @@
                 <i data-lucide="activity" class="w-5 h-5"></i> 
             </button>
             
-            <button id="open-eye-popup-fab" class="fab-btn bg-indigo-600 hover:bg-indigo-700 text-white" title="Eye Exam">
-                <i data-lucide="eye" class="w-5 h-5"></i>
-            </button>
-
             <button id="open-lis-popup-fab" class="fab-btn bg-pink-600 hover:bg-pink-700 text-white" title="LIS Request">
                 <i data-lucide="test-tube-diagonal" class="w-5 h-5"></i>
             </button>
@@ -1371,6 +1359,7 @@
                 <i data-lucide="microscope" class="w-5 h-5"></i>
             </button>
         </div>
+
         <div class="flex items-center space-x-3">
             
             <button id="menu-toggle-btn" class="fab-btn bg-orange-500 hover:bg-orange-600 text-white" title="Open Actions Menu">
@@ -1393,5 +1382,58 @@
         </div>
     </div>
     
+    <div id="order-plan-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[110] hidden">
+        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-md w-full p-6 relative">
+            <button id="close-order-plan-x" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-[--color-text-base]">
+                <span id="order-plan-title">Create Order Plan</span>
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted] mb-1">Date/Time Plan</label>
+                    <div class="flex gap-2">
+                        <input type="date" id="plan-target-date" class="w-1/2 form-input text-sm">
+                        <input type="time" id="plan-target-time" class="w-1/2 form-input text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted] mb-1">Order Note / Instruction</label>
+                    <textarea id="plan-order-note" rows="3" class="form-input text-sm" placeholder="ระบุรายละเอียดคำสั่ง..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted] mb-1">Target DVM</label>
+                        <select id="plan-target-dvm" class="form-select text-sm">
+                            <option value="" selected>Any DVM</option>
+                            <option value="Dr. AAA">Dr. AAA</option>
+                            <option value="Dr. BBB">Dr. BBB</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted] mb-1">Target Department</label>
+                        <select id="plan-target-dept" class="form-select text-sm">
+                            <option value="101 อายุรกรรม" selected>101 อายุรกรรม</option>
+                            <option value="201 ฉุกเฉิน">201 ฉุกเฉิน</option>
+                            <option value="301 คลินิกพิเศษ">301 คลินิกพิเศษ</option>
+                            <option value="IPD">IPD</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-100 dark:border-[--color-border-base]">
+                <button id="btn-cancel-plan" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] text-sm font-medium transition-colors">Cancel</button>
+                <button id="btn-confirm-plan" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm transition-all flex items-center active:scale-95">
+                    <i data-lucide="calendar-plus" class="w-4 h-4 mr-1.5"></i> Save Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
     </body>
 </html>

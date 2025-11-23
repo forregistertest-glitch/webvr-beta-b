@@ -5,6 +5,8 @@ let globalLisCart = [];
 let globalPathCart = [];
 
 function initializeApp() {
+
+    initializeOrderPlanLogic();
     
     // 1. เริ่มต้นระบบพื้นฐาน
     if (typeof initializeTabSwitching === 'function') initializeTabSwitching();
@@ -186,11 +188,14 @@ function initializeApp() {
                 datetime: entry.effective_time.split(',')[0],
                 plr_od: entry.parameters.plr_od, plr_os: entry.parameters.plr_os, palpebral_od: entry.parameters.palpebral_od, palpebral_os: entry.parameters.palpebral_os, dazzle_od: entry.parameters.dazzle_od, dazzle_os: entry.parameters.dazzle_os, menace_od: entry.parameters.menace_od, menace_os: entry.parameters.menace_os, stt_od: entry.parameters.stt_od, stt_os: entry.parameters.stt_os, iop_od: entry.parameters.iop_od, iop_os: entry.parameters.iop_os, fluorescein_od: entry.parameters.fluorescein_od, fluorescein_os: entry.parameters.fluorescein_os,
                 imageUrl: (entry.parameters.Note) ? 'eyeexam.png' : null,
-                dvm: entry.dvm, department: entry.department, recorded_by: entry.recorded_by, recorded_on: entry.order_create_date, last_updated_on: entry.last_updated_on
+                dvm: entry.dvm, department: entry.department, recorded_by: entry.recorded_by, recorded_on: entry.order_create_date, last_updated_by: entry.last_updated_by, last_updated_on: entry.last_updated_on
             }));
             if (typeof renderEyeExamHistoryTable === 'function') renderEyeExamHistoryTable(mappedData);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         };
+
+        window.openEyeExamModal = showEye;
+
         const hideEye = () => eyeModal.classList.add('hidden');
 
         if(openBtn) openBtn.addEventListener('click', showEye);
@@ -215,6 +220,84 @@ function initializeApp() {
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             });
         });
+        // ... (ภายใน if (eyeModal) ...)
+// ... (ต่อจาก tabLinks.forEach เดิม) ...
+
+        // >>> REVISED EYE EXAM LOGIC START (Beta 5.6 Step 4) <<<
+        const btnSavePlan = document.getElementById('btn-save-eye-plan');
+        const btnConfirmDone = document.getElementById('btn-confirm-eye-done');
+        
+        // Init Default Time for Eye Modal inputs when opening
+        if(openBtn) {
+            openBtn.addEventListener('click', () => {
+                const eyeDate = document.getElementById('eye-effective-date');
+                const eyeTime = document.getElementById('eye-effective-time');
+                if(eyeDate && eyeTime) {
+                    const now = new Date();
+                    eyeDate.value = now.toISOString().split('T')[0];
+                    eyeTime.value = now.toTimeString().slice(0,5);
+                }
+            });
+        }
+
+        // Logic for "Save as Plan" -> Open Generic Plan Modal
+        if(btnSavePlan) {
+            btnSavePlan.onclick = () => {
+                if (typeof window.openOrderPlanModal === 'function') {
+                    window.openOrderPlanModal('Eye Exam', 'Plan: Eye Examination');
+                } else {
+                    console.error("Order Plan function not found");
+                }
+            };
+        }
+        
+        // Logic for "Confirm & Done" -> Save Immediately
+        if(btnConfirmDone) {
+            btnConfirmDone.onclick = () => {
+                // Gather Data form Inputs
+                const effDate = document.getElementById('eye-effective-date')?.value;
+                const effTime = document.getElementById('eye-effective-time')?.value;
+                const note = document.getElementById('eye-note')?.value;
+                const dvm = document.getElementById('eye-dvm')?.value;
+                const dept = document.getElementById('eye-dept')?.value;
+
+                if (!effDate || !effTime) return alert("Please select Effective Date/Time.");
+
+                const now = new Date();
+                const accNo = `EYE-${Date.now().toString().slice(-6)}`;
+                const effectiveStr = formatKAHISDateTime(new Date(`${effDate}T${effTime}`));
+                
+                const newEntry = {
+                    entry_id: `E-EYE-${Date.now()}`,
+                    order_no: `ORD-EYE-${Date.now().toString().slice(-6)}`,
+                    acc_no: accNo,
+                    activity_type: "Eye Exam",
+                    order_status: "Done",
+                    lis_process_status: null,
+                    hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+                    order_create_date: formatKAHISDateTime(now),
+                    target_time: null,
+                    effective_time: effectiveStr,
+                    order_note: "", 
+                    parameters: {
+                        plr_od: document.getElementById('eye-plr-od')?.value || '',
+                        plr_os: document.getElementById('eye-plr-os')?.value || '',
+                        iop_od: document.getElementById('eye-iop-od')?.value || '',
+                        iop_os: document.getElementById('eye-iop-os')?.value || '',
+                        Note: note || "Exam findings recorded."
+                    },
+                    recorded_by: "User (Login)", dvm: dvm || "Dr. Eye", department: dept || "301",
+                    last_updated_by: "User (Login)", last_updated_on: formatKAHISDateTime(now), disable_remark: ""
+                };
+
+                activityLogData.unshift(newEntry);
+                alert(`Eye Exam Confirmed (Done)!\nAcc No: ${accNo}`);
+                
+                if(typeof renderEyeExamHistoryTable === 'function') showEye(); // Refresh history
+                hideEye();
+            };
+        }
+        // >>> REVISED EYE EXAM LOGIC END <<<
     }
 
     // 8. LIS Modal Logic (Updated for Beta 5.2.2 - Use labServiceCatalog)
@@ -518,13 +601,17 @@ function initializeApp() {
         });
     }
 
-    // 10. Helper Render VS History
+// 10. Helper Render VS History (Final Layout)
     const vsTableBody = document.getElementById('historyTableBody');
     const vsNoMsg = document.getElementById('noHistoryMessage');
+    
     function renderVsHistoryTable(data) {
         if(!vsTableBody) return;
         vsTableBody.innerHTML = '';
-        if(data.length === 0) {
+        
+        const vsData = activityLogData.filter(item => item.activity_type === "Vital Signs" && item.order_status === "Done");
+        
+        if(vsData.length === 0) {
             if(vsNoMsg) vsNoMsg.classList.remove('hidden');
             vsTableBody.parentNode.classList.add('hidden');
             return;
@@ -532,19 +619,60 @@ function initializeApp() {
         if(vsNoMsg) vsNoMsg.classList.add('hidden');
         vsTableBody.parentNode.classList.remove('hidden');
 
-        data.forEach(item => {
+        vsData.sort((a, b) => new Date(b.effective_time) - new Date(a.effective_time));
+
+        vsData.forEach(item => {
+            const effTime = item.effective_time || '-';
+            const createTime = item.order_create_date ? item.order_create_date.split(',')[1] : '-';
+            const updateTime = item.last_updated_on ? item.last_updated_on.split(',')[1] : '-';
+            const p = item.parameters || {};
+
+            // Status Badge
+            let statusBadge = '';
+            if (item.order_status === 'Done') statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 border border-green-200">Done</span>`;
+            else if (item.order_status === 'Pending') statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">Plan</span>`;
+            else statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">Cancel</span>`;
+
             const row = document.createElement('tr');
             row.className = "hover:bg-gray-50 dark:hover:bg-[var(--color-bg-secondary)]";
             row.innerHTML = `
-                <td class="sticky left-0 bg-white dark:bg-[var(--color-bg-content)] text-[var(--color-text-base)] p-3">${item.datetime}</td>
-                <td class="text-[var(--color-text-base)] p-3">${item.temp||''}</td><td class="text-[var(--color-text-base)] p-3">${item.rr||''}</td><td class="text-[var(--color-text-base)] p-3">${item.hr||''}</td><td class="text-[var(--color-text-base)] p-3">${item.bp||''}</td><td class="text-[var(--color-text-base)] p-3">${item.pulse||''}</td><td class="text-[var(--color-text-base)] p-3">${item.crt||''}</td><td class="text-[var(--color-text-base)] p-3">${item.fbs||''}</td><td class="text-[var(--color-text-base)] p-3">${item.mucous||''}</td><td class="text-[var(--color-text-base)] p-3">${item.lung||''}</td><td class="text-[var(--color-text-base)] p-3">${item.heart||''}</td><td class="text-[var(--color-text-base)] p-3">${item.pulse_quality||''}</td><td class="text-[var(--color-text-base)] p-3">${item.loc||''}</td><td class="text-[var(--color-text-base)] p-3">${item.pain||''}</td>
-                <td class="text-center p-3">${item.cyanosis?'Yes':'No'}</td><td class="text-center p-3">${item.seizure?'Yes':'No'}</td><td class="text-center p-3">${item.arrest?'Yes':'No'}</td>
-                <td class="text-[var(--color-text-muted)] p-3" title="${item.note||''}">${(item.note && item.note.length>10)?item.note.substring(0,10)+'...':item.note||''}</td>
-                <td class="text-[var(--color-text-base)] p-3">${item.dvm||''}</td><td class="text-[var(--color-text-base)] p-3">${item.department||''}</td><td class="text-[var(--color-text-base)] p-3">${item.recorded_by||''}</td><td class="text-[var(--color-text-base)] p-3">${item.recorded_on?item.recorded_on.split(',')[0]:''}</td><td class="text-[var(--color-text-base)] p-3">${item.last_updated_on?item.last_updated_on.split(',')[0]:''}</td>
-                <td class="p-3"><button class="text-[var(--color-text-muted)] hover:text-[var(--color-primary-500)]"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+                <td class="sticky left-0 bg-white dark:bg-[var(--color-bg-content)] text-[var(--color-text-base)] p-3 shadow-sm font-semibold whitespace-nowrap border-r border-gray-100">
+                    ${effTime}
+                </td>
+                <td class="text-[var(--color-text-base)] p-3">${p.Temp||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.RR||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.HR||''}</td>
+                <td class="text-[var(--color-text-base)] p-3 font-medium text-blue-600">${p.BP||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.Pulse||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.CRT||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.FBS||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.MM||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.Lung||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.Heart||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.Pulse_Quality||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.LOC||''}</td>
+                <td class="text-[var(--color-text-base)] p-3">${p.Pain||''}</td>
+                <td class="text-center p-3">${p.Cyanosis==='Yes'?'<span class="text-red-500 font-bold">Y</span>':'-'}</td>
+                <td class="text-center p-3">${p.Seizure==='Yes'?'<span class="text-red-500 font-bold">Y</span>':'-'}</td>
+                <td class="text-center p-3">${p.Arrest==='Yes'?'<span class="text-red-500 font-bold">Y</span>':'-'}</td>
+                
+                <td class="text-[var(--color-text-muted)] p-3 whitespace-nowrap text-xs truncate max-w-[100px]" title="${p.Note||''}">${p.Note||'-'}</td>
+                <td class="text-[var(--color-text-muted)] p-3 whitespace-nowrap text-xs truncate max-w-[100px]" title="${item.order_note||''}">${item.order_note||'-'}</td>
+                <td class="text-[var(--color-text-base)] p-3 whitespace-nowrap text-xs">${item.dvm||''}</td>
+                <td class="text-[var(--color-text-base)] p-3 whitespace-nowrap text-xs">${item.department||''}</td>
+                <td class="text-[var(--color-text-base)] p-3 whitespace-nowrap text-xs">${item.recorded_by||''}</td>
+                <td class="text-[var(--color-text-base)] p-3 whitespace-nowrap text-xs text-gray-500">${createTime}</td>
+                <td class="text-[var(--color-text-base)] p-3 whitespace-nowrap text-xs text-gray-500">${item.last_updated_by||'-'}</td>
+                <td class="text-[var(--color-text-base)] p-3 whitespace-nowrap text-xs text-gray-500">${updateTime}</td>
+                <td class="p-3 text-center">${statusBadge}</td>
+                <td class="p-3 text-center">
+                    <button class="text-gray-400 hover:text-blue-600"><i data-lucide="file-edit" class="w-4 h-4"></i></button>
+                </td>
             `;
             vsTableBody.appendChild(row);
         });
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     // 11. Helper Render LIS History
@@ -670,7 +798,7 @@ function initializeVitalSignsSaveLogic() {
     });
 }
 
-// --- UNIVERSAL LAB VIEWER LOGIC (BETA 5.2.2) ---
+// --- UNIVERSAL LAB VIEWER LOGIC (BETA 5.6 Revised 3 - Final) ---
 function initializeLabViewer() {
     const lisTableBody = document.getElementById('tbody-labview-lis');
     const pathTableBody = document.getElementById('tbody-labview-path');
@@ -687,17 +815,13 @@ function initializeLabViewer() {
     // 1. Tab Switching Logic
     function switchTab(activeType) {
         if (activeType === 'LIS') {
-            // UI Activation
             btnTabLis.className = "px-4 py-1.5 text-sm font-bold rounded-md shadow-sm bg-white text-pink-600 dark:bg-[--color-bg-content] dark:text-pink-400 transition-all flex items-center";
             btnTabPath.className = "px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base] transition-all flex items-center";
-            // View Visibility
             viewLis.classList.remove('hidden');
             viewPath.classList.add('hidden');
         } else {
-            // UI Activation
             btnTabPath.className = "px-4 py-1.5 text-sm font-bold rounded-md shadow-sm bg-white text-fuchsia-600 dark:bg-[--color-bg-content] dark:text-fuchsia-400 transition-all flex items-center";
             btnTabLis.className = "px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base] transition-all flex items-center";
-            // View Visibility
             viewPath.classList.remove('hidden');
             viewLis.classList.add('hidden');
         }
@@ -718,159 +842,155 @@ function initializeLabViewer() {
             data = data.filter(item => item.order_status === filterStatus.value);
         }
         
-        // Search Filter (HN or Pet Name)
+        // Search Filter
         if (searchInput && searchInput.value.trim() !== "") {
             const term = searchInput.value.toLowerCase().trim();
             data = data.filter(item => 
                 (item.hn && item.hn.toLowerCase().includes(term)) || 
                 (item.pet_name && item.pet_name.toLowerCase().includes(term)) ||
-                (item.order_no && item.order_no.toLowerCase().includes(term))
+                (item.order_no && item.order_no.toLowerCase().includes(term)) ||
+                (item.acc_no && item.acc_no.toLowerCase().includes(term))
             );
         }
 
-        // Sort: Newest Effective Time First
-        data.sort((a, b) => new Date(b.effective_time) - new Date(a.effective_time));
+        // Sort
+        data.sort((a, b) => new Date(b.order_create_date) - new Date(a.order_create_date));
 
-        // Clear Tables
         lisTableBody.innerHTML = '';
         pathTableBody.innerHTML = '';
 
         if (data.length === 0) {
-            const noDataHtml = `<tr><td colspan="8" class="p-8 text-center text-gray-400 dark:text-[--color-text-muted]">No orders found matching criteria.</td></tr>`;
-            lisTableBody.innerHTML = noDataHtml;
-            pathTableBody.innerHTML = noDataHtml;
+            const noData = `<tr><td colspan="15" class="p-8 text-center text-gray-400 italic">No orders found.</td></tr>`;
+            lisTableBody.innerHTML = noData;
+            pathTableBody.innerHTML = noData;
             return;
         }
 
         data.forEach(item => {
-            // --- Helper: Status Badges ---
+            // --- Badges ---
             const getStatusBadge = (status) => {
-                switch(status) {
-                    case 'Pending': return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200"><span class="w-1.5 h-1.5 mr-1.5 bg-yellow-500 rounded-full"></span>Plan</span>`;
-                    case 'Done': return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200"><span class="w-1.5 h-1.5 mr-1.5 bg-green-500 rounded-full"></span>Sent</span>`;
-                    case 'Disable': return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">Cancel</span>`;
-                    default: return status;
-                }
+                if(status === 'Pending') return `<span class="px-2 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">Plan</span>`;
+                if(status === 'Done') return `<span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-800 border border-green-200">Sent</span>`;
+                return `<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">Cancel</span>`;
             };
             
             const getProcessBadge = (status) => {
-                if (!status) return `<span class="text-gray-300 text-xs">-</span>`;
-                switch(status) {
-                    case 'Waiting': return `<span class="text-xs text-gray-500 flex justify-center items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i>Wait</span>`;
-                    case 'Accepted': return `<span class="text-xs text-blue-600 font-medium flex justify-center items-center"><i data-lucide="check" class="w-3 h-3 mr-1"></i>Accept</span>`;
-                    case 'Completed': 
-                    case 'Reported': return `<span class="text-xs text-green-600 font-bold flex justify-center items-center"><i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i>Report</span>`;
-                    default: return status;
-                }
+                if (!status) return `<span class="text-gray-300">-</span>`;
+                if(status === 'Waiting') return `<span class="text-xs text-gray-500 font-medium"><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>Wait</span>`;
+                if(status === 'Accepted') return `<span class="text-xs text-blue-600 font-medium"><i data-lucide="check" class="w-3 h-3 inline mr-1"></i>Accept</span>`;
+                if(status === 'Approved') return `<span class="text-xs text-purple-600 font-medium"><i data-lucide="user-check" class="w-3 h-3 inline mr-1"></i>Approve</span>`;
+                if(status === 'Completed') return `<span class="text-xs text-green-600 font-medium"><i data-lucide="check-circle" class="w-3 h-3 inline mr-1"></i>Complete</span>`;
+                if(status === 'Reported') return `<span class="text-xs text-green-700 font-bold"><i data-lucide="file-check" class="w-3 h-3 inline mr-1"></i>Report</span>`;
+                if(status === 'Cancel') return `<span class="text-xs text-red-600 font-bold"><i data-lucide="x-circle" class="w-3 h-3 inline mr-1"></i>Cancel</span>`;
+                return status;
             };
 
-            // --- ส่วนที่แก้ไข: LIS & Path Table Rendering (Beta 5.2.2 Styling) ---
-            
-            // Helper: Action Buttons (Defined here to be used in both blocks)
-            let actions = '';
-            if (item.order_status === 'Pending') {
-                actions = `
-                    <div class="flex justify-center space-x-1">
-                        <button onclick="loadOrderForEdit('${item.entry_id}', '${item.activity_type}')" class="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="Edit Plan"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                        <button onclick="disableOrder('${item.entry_id}')" class="p-1 text-red-600 hover:bg-red-100 rounded transition-colors" title="Cancel Plan"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>`;
-            } else if (item.order_status === 'Done') {
-                actions = `
-                    <div class="flex justify-center">
-                        <button class="p-1 text-gray-400 hover:text-gray-600 transition-colors" title="View Details"><i data-lucide="eye" class="w-4 h-4"></i></button>
-                    </div>`;
-            } else {
-                 actions = `<div class="text-center text-xs text-gray-300">-</div>`;
-            }
+            // --- 3-Dot Action Menu Logic ---
+            const canDisable = (item.lis_process_status === 'Waiting');
+            const disableClass = canDisable ? 'text-red-600 hover:bg-red-50 cursor-pointer' : 'text-gray-300 cursor-not-allowed';
+            const disableClick = canDisable ? `onclick="disableOrder('${item.entry_id}')"` : ''; 
 
-            // BLOCK 1: CLINICAL LAB (LIS) - Style match with History Table
+            const actionMenu = `
+                <div class="relative inline-block text-left group">
+                    <button type="button" class="p-1 text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                    </button>
+                    <div class="hidden group-hover:block absolute right-0 mt-0 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                        <div class="py-1">
+                            <a href="#" class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-100">View Detail</a>
+                            <a href="#" class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-100">Print Label</a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="#" ${disableClick} class="block px-4 py-2 text-xs ${disableClass}">Disable Order</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // --- Data Mapping ---
+            const dateEff = item.effective_time ? item.effective_time.split(',')[0] : '-';
+            const timeEff = item.effective_time ? item.effective_time.split(',')[1] : '-';
+            const createTime = item.order_create_date ? item.order_create_date.split(',')[1] : '-';
+            const updateTime = item.last_updated_on ? item.last_updated_on.split(',')[1] : '-';
+            
+            const rowClass = item.order_status === 'Disable' ? 'bg-gray-50 opacity-70' : 'hover:bg-gray-50';
+            const textStyle = item.order_status === 'Disable' ? 'line-through text-gray-400' : 'text-gray-700 dark:text-[--color-text-base]';
+
+            // --- LIS ROW ---
             if (item.activity_type === "LIS") {
                 const tests = item.parameters.tests ? item.parameters.tests.join(', ') : '-';
-                const note = item.order_note || '-';
                 
-                // Row Styling (Single Line, Sticky Date)
-                const rowClass = item.order_status === 'Disable' ? 'opacity-60 bg-gray-50 dark:bg-gray-800/30' : 'hover:bg-gray-50 dark:hover:bg-[var(--color-bg-secondary)]';
-                const textStyle = item.order_status === 'Disable' ? 'line-through text-gray-400' : 'text-[var(--color-text-base)]';
-                
-                const rowHtml = `
-                    <tr class="${rowClass} border-b border-gray-100 dark:border-[var(--color-border-base)] transition-colors">
-                        <td class="p-3 whitespace-nowrap sticky left-0 bg-white dark:bg-[var(--color-bg-content)] text-[var(--color-text-base)] shadow-sm border-r border-gray-100 dark:border-[var(--color-border-base)]">
-                            ${item.effective_time.split(',')[0]} <span class="text-xs text-gray-400 ml-1">${item.effective_time.split(',')[1]}</span>
+                const row = `
+                    <tr class="${rowClass} border-b border-gray-100 dark:border-[var(--color-border-base)]">
+                        <td class="p-3 sticky left-0 bg-white dark:bg-[var(--color-bg-content)] shadow-sm border-r border-gray-100 text-xs">
+                            <div class="font-bold">${dateEff}</div><div class="text-gray-400">${timeEff}</div>
                         </td>
-                        
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)] font-mono text-xs">${item.order_no}</td>
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)] font-mono text-xs ${item.acc_no ? 'text-blue-600 dark:text-blue-400' : 'text-gray-300'}">${item.acc_no || '-'}</td>
-                        
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)]">
-                            <div class="font-bold text-xs">${item.pet_name}</div>
+                        <td class="p-3 font-mono text-xs text-gray-500">${item.order_no}</td>
+                        <td class="p-3 font-mono text-xs font-bold text-blue-600">${item.acc_no || '-'}</td>
+                        <td class="p-3 text-xs">
+                            <div class="font-bold">${item.pet_name}</div>
                             <div class="text-[10px] text-gray-500">HN:${item.hn}</div>
                         </td>
-                        
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)] text-xs font-medium">${tests}</td>
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-muted)] text-xs max-w-[150px] truncate" title="${note}">${note}</td>
-                        
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)] text-xs">${item.dvm}</td>
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)] text-xs">${item.department}</td>
-                        <td class="p-3 whitespace-nowrap text-[var(--color-text-base)] text-xs">${item.recorded_by}</td>
-                        
-                        <td class="p-3 whitespace-nowrap text-center">${getStatusBadge(item.order_status)}</td>
-                        <td class="p-3 whitespace-nowrap text-center">${getProcessBadge(item.lis_process_status)}</td>
-                        
-                        <td class="p-3 whitespace-nowrap text-center">${actions}</td>
+                        <td class="p-3 text-xs ${textStyle} font-medium">${tests}</td>
+                        <td class="p-3 text-xs text-gray-500 truncate max-w-[150px]" title="${item.order_note}">${item.order_note}</td>
+                        <td class="p-3 text-xs">${item.dvm}</td>
+                        <td class="p-3 text-xs">${item.department}</td>
+                        <td class="p-3 text-xs">${item.recorded_by}</td>
+                        <td class="p-3 text-xs text-gray-500">${createTime}</td>
+                        <td class="p-3 text-xs text-gray-500">${item.last_updated_by || '-'}</td>
+                        <td class="p-3 text-xs text-gray-500">${updateTime}</td>
+                        <td class="p-3 text-center">${getStatusBadge(item.order_status)}</td>
+                        <td class="p-3 text-center">${getProcessBadge(item.lis_process_status)}</td>
+                        <td class="p-3 text-center sticky right-0 bg-white dark:bg-[var(--color-bg-content)] border-l border-gray-100 z-20">${actionMenu}</td>
                     </tr>
                 `;
-                lisTableBody.insertAdjacentHTML('beforeend', rowHtml);
-
-            // BLOCK 2: PATHOLOGY (Keep flex height for multiple items)
-            } else if (item.activity_type === "Pathology") {
-                const rowClass = item.order_status === 'Disable' ? 'opacity-60 bg-gray-50 dark:bg-gray-800/30' : 'hover:bg-gray-50 dark:hover:bg-[var(--color-bg-secondary)]';
-                const textStyle = item.order_status === 'Disable' ? 'line-through text-gray-400' : 'text-[var(--color-text-base)]';
-
-                // Re-construct columns for Path (Flexible height)
-                const colDateTime = `
-                <td class="p-3 align-top border-r border-gray-100 dark:border-[var(--color-border-base)] bg-white/50 dark:bg-transparent">
-                    <div class="font-medium text-xs ${textStyle}">${item.effective_time.split(',')[0]}</div>
-                    <div class="text-[10px] text-gray-500 dark:text-[var(--color-text-muted)]">${item.effective_time.split(',')[1]}</div>
-                </td>`;
-                const colOrderNo = `<td class="p-3 align-top font-mono text-[11px] text-gray-500 dark:text-[var(--color-text-muted)]">${item.order_no}</td>`;
-                const colAccNo = `<td class="p-3 align-top font-mono text-[11px] font-medium ${item.acc_no ? 'text-blue-600 dark:text-blue-400' : 'text-gray-300'}">${item.acc_no || '-'}</td>`;
-                const colPatient = `
-                <td class="p-3 align-top">
-                    <div class="text-xs font-bold ${textStyle}">${item.pet_name}</div>
-                    <div class="text-[10px] text-gray-500 dark:text-[var(--color-text-muted)] flex items-center mt-0.5">
-                        <i data-lucide="paw-print" class="w-3 h-3 mr-1 opacity-70"></i> ${item.hn}
-                    </div>
-                </td>`;
-                const colStatus = `<td class="p-3 align-middle text-center">${getStatusBadge(item.order_status)}</td>`;
-                const colLabStatus = `<td class="p-3 align-middle text-center">${getProcessBadge(item.lis_process_status)}</td>`;
-                const colAction = `<td class="p-3 align-middle">${actions}</td>`;
-
-                const itemsList = item.parameters.items ? item.parameters.items.map(i => `<div class="mb-1 pb-1 border-b border-dashed border-gray-200 dark:border-gray-700 last:border-0 last:mb-0"><span class="font-semibold">${i.name}</span><div class="text-[10px] text-gray-500 dark:text-gray-400">Site: ${i.site}</div></div>`).join('') : '-';
-                const note = item.order_note ? `<div class="mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 text-[10px] text-orange-600 dark:text-orange-400 italic"><i data-lucide="sticky-note" class="w-3 h-3 inline mr-0.5"></i>${item.order_note}</div>` : '';
-                const colDetails = `
-                    <td class="p-3 align-top">
-                        <div class="text-xs ${textStyle}">${itemsList}</div>
-                        ${note}
-                    </td>`;
+                lisTableBody.insertAdjacentHTML('beforeend', row);
+            }
+            
+            // --- PATHOLOGY ROW ---
+            else if (item.activity_type === "Pathology") {
+                const itemsHtml = item.parameters.items ? item.parameters.items.map(i => `<div>• ${i.name} <span class="text-gray-400">(${i.site})</span></div>`).join('') : '-';
                 
-                const rowHtml = `<tr class="${rowClass} border-b border-gray-100 dark:border-[var(--color-border-base)] transition-colors">${colDateTime}${colOrderNo}${colAccNo}${colPatient}${colDetails}${colStatus}${colLabStatus}${colAction}</tr>`;
-                pathTableBody.insertAdjacentHTML('beforeend', rowHtml);
+                const row = `
+                    <tr class="${rowClass} border-b border-gray-100 dark:border-[var(--color-border-base)]">
+                        <td class="p-3 sticky left-0 bg-white dark:bg-[var(--color-bg-content)] shadow-sm border-r border-gray-100 text-xs">
+                            <div class="font-bold">${dateEff}</div><div class="text-gray-400">${timeEff}</div>
+                        </td>
+                        <td class="p-3 font-mono text-xs text-gray-500">${item.order_no}</td>
+                        <td class="p-3 font-mono text-xs font-bold text-blue-600">${item.acc_no || '-'}</td>
+                        <td class="p-3 text-xs">
+                            <div class="font-bold">${item.pet_name}</div>
+                            <div class="text-[10px] text-gray-500">HN:${item.hn}</div>
+                        </td>
+                        <td class="p-3 text-xs ${textStyle}">${itemsHtml}</td>
+                        <td class="p-3 text-xs text-gray-500 truncate max-w-[150px]">${item.order_note}</td>
+                        <td class="p-3 text-xs">${item.dvm}</td>
+                        <td class="p-3 text-xs">${item.department}</td>
+                        <td class="p-3 text-xs">${item.recorded_by}</td>
+                        <td class="p-3 text-xs text-gray-500">${createTime}</td>
+                        <td class="p-3 text-xs text-gray-500">${item.last_updated_by || '-'}</td>
+                        <td class="p-3 text-xs text-gray-500">${updateTime}</td>
+                        <td class="p-3 text-center">${getStatusBadge(item.order_status)}</td>
+                        <td class="p-3 text-center">${getProcessBadge(item.lis_process_status)}</td>
+                        <td class="p-3 text-center sticky right-0 bg-white dark:bg-[var(--color-bg-content)] border-l border-gray-100 z-20">${actionMenu}</td>
+                    </tr>
+                `;
+                pathTableBody.insertAdjacentHTML('beforeend', row);
             }
         });
         
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // Events
-    if (filterStatus) filterStatus.addEventListener('change', renderLabViewTable);
-    if (searchInput) searchInput.addEventListener('keyup', renderLabViewTable);
-    if (btnRefresh) btnRefresh.addEventListener('click', () => {
-        const icon = btnRefresh.querySelector('i');
-        icon.classList.add('animate-spin');
-        setTimeout(() => { icon.classList.remove('animate-spin'); renderLabViewTable(); }, 500);
+    if(filterStatus) filterStatus.addEventListener('change', renderLabViewTable);
+    if(searchInput) searchInput.addEventListener('keyup', renderLabViewTable);
+    if(btnRefresh) btnRefresh.addEventListener('click', () => {
+        btnRefresh.querySelector('i').classList.add('animate-spin');
+        setTimeout(() => { 
+            renderLabViewTable(); 
+            btnRefresh.querySelector('i').classList.remove('animate-spin'); 
+        }, 500);
     });
 
-    // Init
     renderLabViewTable();
 }
 
@@ -1339,4 +1459,94 @@ function showSuccessModal(accNo, cartItems, total, extraDetails = {}) {
     }
     
     if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// --- GLOBAL: ORDER PLAN LOGIC (BETA 5.6 Revised 3 - Final) ---
+function initializeOrderPlanLogic() {
+    const modal = document.getElementById('order-plan-modal');
+    if (!modal) return;
+
+    const titleEl = document.getElementById('order-plan-title');
+    const dateInput = document.getElementById('plan-target-date');
+    const timeInput = document.getElementById('plan-target-time');
+    const noteInput = document.getElementById('plan-order-note');
+    const deptInput = document.getElementById('plan-target-dept'); // Target Dept
+    const dvmInput = document.getElementById('plan-target-dvm'); // Target DVM
+    
+    const btnCancel = document.getElementById('btn-cancel-plan');
+    const btnClose = document.getElementById('close-order-plan-x');
+    const btnConfirm = document.getElementById('btn-confirm-plan');
+
+    let currentType = "";
+
+    // Global function to open modal
+    window.openOrderPlanModal = (type, title) => {
+        currentType = type;
+        if (titleEl) titleEl.innerText = title || `Create Order: ${type}`;
+        
+        // Default to next hour
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0);
+        
+        if(dateInput) dateInput.value = now.toISOString().split('T')[0];
+        if(timeInput) timeInput.value = now.toTimeString().slice(0,5);
+        if(noteInput) noteInput.value = "";
+        
+        modal.classList.remove('hidden');
+    };
+
+    const closeModal = () => modal.classList.add('hidden');
+
+    if (btnConfirm) {
+        btnConfirm.onclick = () => { // Use onclick to prevent multiple listeners
+            if (!dateInput.value || !timeInput.value) return alert("Please select Date/Time Plan.");
+            
+            const now = new Date();
+            const targetStr = formatKAHISDateTime(new Date(`${dateInput.value}T${timeInput.value}`));
+            // Order No format: ORD-VS-XXXXXX
+            const prefix = currentType.replace(/\s/g, '').substring(0,3).toUpperCase();
+            const orderNo = `ORD-${prefix}-${Date.now().toString().slice(-6)}`;
+
+            const newEntry = {
+                entry_id: `E-PLAN-${Date.now()}`,
+                order_no: orderNo,
+                acc_no: null, // Plan has no Acc No
+                activity_type: currentType,
+                order_status: "Pending",
+                lis_process_status: null,
+                hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+                order_create_date: formatKAHISDateTime(now),
+                target_time: targetStr,
+                effective_time: null,
+                order_note: noteInput.value || "-",
+                parameters: {},
+                recorded_by: "User (Login)", 
+                dvm: dvmInput ? dvmInput.value : "Any", 
+                department: deptInput ? deptInput.value : "IPD", 
+                last_updated_by: "User (Login)", last_updated_on: formatKAHISDateTime(now), disable_remark: ""
+            };
+
+            activityLogData.unshift(newEntry);
+            alert(`Order Plan Saved!\nOrder No: ${orderNo}\nStatus: Pending\nTarget: ${targetStr}`);
+            
+            // Refresh Lab Viewer if active
+            const activeTab = document.querySelector('.emr-tab.tab-active');
+            if (activeTab && activeTab.dataset.target === 'lab_viewer_content.html') {
+                 if(typeof initializeLabViewer === 'function') initializeLabViewer(); 
+            }
+
+            closeModal();
+            
+            // Close parent modal if needed (Eye Exam)
+            const eyeModal = document.getElementById('eye-exam-modal');
+            if (eyeModal && !eyeModal.classList.contains('hidden')) {
+                eyeModal.classList.add('hidden');
+            }
+        };
+    }
+
+    if(btnCancel) btnCancel.onclick = closeModal;
+    if(btnClose) btnClose.onclick = closeModal;
+    modal.onclick = (e) => { if(e.target === modal) closeModal(); };
 }

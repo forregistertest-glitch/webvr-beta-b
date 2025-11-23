@@ -1,0 +1,120 @@
+<div class="h-full flex flex-col bg-gray-50 dark:bg-[--color-bg-base]">
+    
+    <div class="flex flex-col gap-4 p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] shadow-sm flex-shrink-0">
+        
+        <div class="flex justify-between items-center">
+            <h1 class="text-lg font-bold text-gray-700 dark:text-[--color-text-base] flex items-center">
+                <i data-lucide="layout-dashboard" class="w-6 h-6 mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                LAB Dashboard
+            </h1>
+            
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-medium text-gray-400 dark:text-[--color-text-muted] cursor-default select-none">Current Today</span>
+                
+                <button id="btn-go-today" class="bg-green-600 hover:bg-green-700 dark:bg-[--color-green-600] dark:hover:bg-[--color-green-700] text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm">
+                    Go to Today
+                </button>
+                
+                <div class="relative">
+                    <button id="btn-open-calendar" class="bg-blue-600 hover:bg-blue-700 dark:bg-[--color-primary-600] dark:hover:bg-[--color-primary-700] text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center transition-colors shadow-sm">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 mr-1.5"></i> Date Picker
+                    </button>
+                    <input type="date" id="mock-date-picker" class="absolute top-full right-0 opacity-0 w-0 h-0">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <div class="flex items-center space-x-3 w-full md:w-auto">
+                <div class="flex bg-gray-100 dark:bg-[--color-bg-secondary] p-1 rounded-lg border border-gray-200 dark:border-[--color-border-base]">
+                    <button id="toggle-date-coll" class="px-3 py-1 text-xs font-bold rounded shadow-sm bg-white text-indigo-600 dark:bg-[--color-bg-content] dark:text-indigo-400 transition-all">
+                        Collection Date
+                    </button>
+                    <button id="toggle-date-ord" class="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base] transition-all">
+                        Order Date
+                    </button>
+                </div>
+
+                <div class="flex bg-gray-100 dark:bg-[--color-bg-secondary] p-1 rounded-lg border border-gray-200 dark:border-[--color-border-base]">
+                    <button id="toggle-type-all" class="px-3 py-1 text-xs font-bold rounded shadow-sm bg-white text-indigo-600 dark:bg-[--color-bg-content] dark:text-indigo-400 transition-all">
+                        All
+                    </button>
+                    <button id="toggle-type-lis" class="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base] transition-all">
+                        Clinical Lab
+                    </button>
+                    <button id="toggle-type-path" class="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base] transition-all">
+                        Pathology
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+                
+                <div id="lab-dash-page-info" class="text-xs text-gray-500 dark:text-[--color-text-muted] mr-2 hidden md:block">
+                    </div>
+                
+                <div class="flex space-x-1 mr-2">
+                    <button id="btn-page-prev" class="p-1.5 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-page-next" class="p-1.5 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="relative">
+                    <select id="lab-dash-filter-status" class="pl-8 pr-4 py-1.5 border border-gray-300 dark:border-[--color-border-base] rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] appearance-none cursor-pointer">
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Done">Done</option>
+                        <option value="Disable">Cancelled</option>
+                    </select>
+                    <i data-lucide="filter" class="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400"></i>
+                </div>
+
+                <div class="relative">
+                    <input type="text" id="lab-dash-search" placeholder="Search..." class="pl-8 pr-4 py-1.5 border border-gray-300 dark:border-[--color-border-base] rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] w-40 md:w-56">
+                    <i data-lucide="search" class="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400"></i>
+                </div>
+
+                <button id="btn-refresh-lab-dash" class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-[--color-text-muted] dark:hover:text-indigo-400 transition-colors border border-gray-200 dark:border-[--color-border-base] rounded-lg bg-white dark:bg-[--color-bg-secondary]" title="Refresh">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="h-[600px] overflow-hidden relative border-b border-gray-200 dark:border-[--color-border-base]">
+        <div id="view-container-dash" class="h-full overflow-auto w-full absolute inset-0 p-0">
+            <table class="w-full text-sm text-left border-collapse" style="min-width: 1800px;">
+                <thead class="bg-[var(--color-bg-secondary)] font-semibold text-[var(--color-text-base)] border-b border-[var(--color-border-base)] sticky top-0 z-30 shadow-sm">
+                    <tr>
+                        <th class="p-3 whitespace-nowrap sticky left-0 z-40 bg-[var(--color-bg-secondary)] border-r border-[var(--color-border-base)] shadow-sm w-32 text-xs">Date/Time (Collected)</th>
+                        <th class="p-3 whitespace-nowrap w-32 text-xs">Order No.</th>
+                        <th class="p-3 whitespace-nowrap w-32 text-xs">Acc No.</th>
+                        <th class="p-3 whitespace-nowrap w-48 text-xs">Patient</th>
+                        <th class="p-3 whitespace-nowrap w-64 text-xs">Tests / Detail</th>
+                        <th class="p-3 whitespace-nowrap w-48 text-xs">Note</th>
+                        <th class="p-3 whitespace-nowrap w-48 text-xs">Order Note</th>
+                        <th class="p-3 whitespace-nowrap w-24 text-xs">DVM</th>
+                        <th class="p-3 whitespace-nowrap w-24 text-xs">Dept</th>
+                        <th class="p-3 whitespace-nowrap w-32 text-xs text-gray-500">User Record</th>
+                        <th class="p-3 whitespace-nowrap w-24 text-xs text-gray-500">Create Time</th>
+                        <th class="p-3 whitespace-nowrap w-32 text-xs text-gray-500">User Update</th>
+                        <th class="p-3 whitespace-nowrap w-24 text-xs text-gray-500">Update Time</th>
+                        <th class="p-3 whitespace-nowrap text-center w-24 text-xs">Order Status</th>
+                        <th class="p-3 whitespace-nowrap text-center w-24 text-xs">Lab Status</th>
+                        <th class="p-3 whitespace-nowrap text-center w-16 sticky right-0 bg-[var(--color-bg-secondary)] z-30 border-l border-[var(--color-border-base)] text-xs">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-lab-dash" class="divide-y divide-gray-100 dark:divide-[--color-border-base] bg-white dark:bg-[--color-bg-content]">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="p-2 text-center text-[10px] text-gray-400 bg-gray-50 dark:bg-[--color-bg-base] dark:text-[--color-text-muted]">
+        Showing Today's records only (Mockup Data)
+    </div>
+</div>
