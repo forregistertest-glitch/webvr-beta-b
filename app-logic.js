@@ -138,6 +138,9 @@ async function loadModuleContent(contentFile) {
             initializeExtDocScripts();
         } else if (contentFile === 'extdoc_page_addnew.html') {
             initializeExtDocAddNewPage();
+        } else if (contentFile === 'sys_exam_content.html') {
+            // เรียกฟังก์ชัน Init ของ Sys Exam (จาก sys-exam-init.js)
+            if (typeof initializeSysExam === 'function') initializeSysExam();
         } else if (contentFile === 'order_pe_content.html') {
             initializeOrderPEScripts();
         } else if (contentFile === 'order_lis_content.html') {

@@ -1,6 +1,34 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 5.8 VERSION (Systematic Examination Module Overhaul)
+(23 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+ปรับปรุงหน้าจอ **Systematic Examination** ใหม่ทั้งหมด โดยแยกไฟล์ออกมาเป็น Standalone Module (HTML/Data/Init) เพื่อให้จัดการง่าย และปรับ UI ให้สอดคล้องกับ Assessment Module ทั้งในส่วนของ Layout, Color Theme และ Interaction โดยเน้นการใช้งานแบบ Split View (Navigation/Content) ในส่วน Editor
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Module Isolation:**
+    * แยกไฟล์ใหม่ 3 ไฟล์: `sys_exam_content.html` (UI), `sys-exam-data.js` (Mock Data 3,200 items), และ `sys-exam-init.js` (Logic)
+    * เชื่อมต่อเข้ากับระบบหลัก (`index.html`, `app-logic.js`) อย่างสมบูรณ์
+2.  **Top Section (History & Read-only):**
+    * **Layout:** ใช้ Grid 1:2 (History ซ้าย, Read-only ขวา) เหมือน Assessment Module
+    * **Height Consistency:** Fix ความสูงทั้งตาราง History และกล่อง Read-only ไว้ที่ **280px** เท่ากัน
+    * **Read-only Styling:** แสดงข้อมูลสรุปในกล่องเดียว เรียงรายการผิดปกติ (**[Remarkable]**) ขึ้นก่อน พร้อมไฮไลท์พื้นหลัง **สีส้มอ่อน (`bg-orange-50`)** และมีปุ่ม Copy (Sparkle Effect) เพียงปุ่มเดียว
+3.  **Bottom Section (Editor):**
+    * **Split Layout:** ใช้โครงสร้าง **ซ้าย (Navigation Menu)** / **ขวา (Scrollable Content)** ความสูง **600px**
+    * **Navigation:** เมนูหัวข้อ 1-17 ทางซ้าย (ชิดซ้าย) กดแล้วเลื่อน (Smooth Scroll) ไปยังบล็อกเนื้อหาทางขวาได้อย่างแม่นยำ
+    * **Content Blocks:** ดีไซน์ใหม่แบบ **Card Style** (หัวข้อเทา/ตัวกล่องขาว/ขอบมน) พร้อม Textarea สูง **150px**
+    * **Eye Exam Integration:** เพิ่มปุ่มไอคอนดวงตา (Circular Indigo Button) ในบล็อก Eye (วางชิดซ้าย Checkbox) เพื่อเรียก Modal ตรวจตา
+    * **Clean Up:** นำส่วน Pain Score และ BCS ออกตาม Requirement
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`sys_exam_content.html`:** สร้าง UI ใหม่ทั้งหมด โดยใช้ Utility Classes ของ Tailwind เพื่อจัดการ Layout แบบ Flex/Grid และ Scrollbar
+2.  **`sys-exam-init.js`:**
+    * เพิ่ม Logic `scrollTo` โดยใช้ `offsetTop` เพื่อความแม่นยำในการเลื่อนหากล่องเนื้อหาในเฟรมขวา
+    * เชื่อมต่อ Global Functions: `copyAndSparkle` (สำหรับปุ่ม Copy) และ `window.openEyeExamModal` (สำหรับปุ่มตรวจตา)
+3.  **`sys-exam-data.js`:** สร้าง IIFE เพื่อ Generate Mock Data ประวัติการตรวจย้อนหลัง
+
 ## BETA 5.7 VERSION (LAB Dashboard Isolation & Refactor)
 (23 พฤศจิกายน 2025)
 
