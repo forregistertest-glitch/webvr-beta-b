@@ -994,8 +994,8 @@ function initializeLabViewer() {
     renderLabViewTable();
 }
 
-// --- ORDER LOGIC: LIS ---
-function initializeLisScripts() {
+// --- ORDER LOGIC: LAB (Renamed from LIS) ---
+function initializeLabScripts() {
     const categoryList = document.getElementById('lis-category-list');
     const itemList = document.getElementById('lis-item-list');
     const currentCatName = document.getElementById('lis-current-cat-name');

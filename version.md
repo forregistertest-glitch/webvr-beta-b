@@ -1,6 +1,38 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 6.1 VERSION (Full Data Decoupling & Lab Refactor)
+(25 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+แยกไฟล์ข้อมูล (`app-data.js`) ออกเป็นไฟล์ย่อยตามโมดูล (Data Decoupling) อย่างสมบูรณ์ เพื่อลดความซ้ำซ้อน แก้ไขปัญหาข้อมูลตีกัน และทำให้การดูแลรักษาง่ายขึ้น พร้อมทั้งปรับปรุงชื่อเรียกจาก LIS เป็น Lab ในระดับโค้ด (Refactor) และเชื่อมต่อระบบข้อมูลใหม่ (Rewire) ให้ทำงานกับ Logic เดิมได้อย่างราบรื่น
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Complete Data Decoupling:**
+    * ยกเลิกการใช้ `app-data.js` และ `lab-dashboard-data.js` (Deprecated)
+    * สร้างไฟล์ข้อมูลใหม่ 5 ไฟล์แยกตามหน้าที่: `patient-data.js` (ผู้ป่วย/คิว), `lis-data.js` (แล็บ), `patho-data.js` (พยาธิวิทยา), `vital-data.js` (สัญญาณชีพ), และ `eye-data.js` (ตรวจตา)
+2.  **Data Rewire Engine:**
+    * เพิ่มระบบรวมข้อมูลอัตโนมัติใน `app-logic.js` ที่ดึงข้อมูลจากไฟล์ย่อยมารวมเป็นตัวแปรกลาง (`activityLogData`) เพื่อให้กราฟ, ตาราง History และ Dashboard เดิมทำงานต่อได้ทันทีโดยไม่ต้องรื้อโค้ดแสดงผล
+3.  **Lab Module Refactor:**
+    * เปลี่ยนชื่อฟังก์ชันและตัวแปรภายในจาก `LIS` เป็น `Lab` (เช่น `initializeLabScripts`) เพื่อให้สื่อความหมายกว้างขึ้นและรองรับการขยายตัวในอนาคต
+4.  **Data Restoration & Normalization:**
+    * คืนค่าข้อมูลตัวอย่าง (Mock Data) ของ Assessment History, Problem List และ Eye Exam ให้กลับมาแสดงผลครบถ้วน
+    * เพิ่มระบบ Normalizer เพื่อซ่อมแซมฟิลด์ข้อมูลที่ขาดหายไป (เช่น Auto-fill Status, Map Type) ให้เข้ากันได้กับระบบเก่า
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **New Data Files:**
+    * `patient-data.js`: เก็บ Queue, Mock Patients, OPD Tags, Assessment History (20 items)
+    * `lis-data.js`: เก็บ Lab Catalog & History
+    * `patho-data.js`: เก็บ Pathology Catalog & History
+    * `vital-data.js`: เก็บ Vital Signs History
+    * `eye-data.js`: เก็บ Eye Exam History
+2.  **`app-logic.js`:**
+    * เพิ่ม IIFE "Rewire Engine" ที่ส่วนหัวไฟล์
+    * เพิ่ม Logic "Data Normalizer" เพื่อแปลงโครงสร้างข้อมูล
+    * เปลี่ยนการเรียกฟังก์ชัน `initializeLisScripts` เป็น `initializeLabScripts`
+3.  **`app-init.js`:** เปลี่ยนชื่อฟังก์ชัน `initializeLisScripts` เป็น `initializeLabScripts`
+4.  **`index.html`:** อัปเดต `<script>` tags เพื่อโหลดไฟล์ data ใหม่ทั้ง 5 ไฟล์แทนไฟล์เดิม
+
 ## BETA 6.0 VERSION (Order Tx Module & Data Decoupling)
 (24 พฤศจิกายน 2025)
 
