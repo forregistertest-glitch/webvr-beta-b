@@ -1,65 +1,92 @@
 <div class="h-full flex flex-col bg-gray-50 dark:bg-[--color-bg-base]">
     
-    <div class="p-4 flex justify-between items-center">
-        <h1 class="text-xl font-semibold text-gray-700 dark:text-[--color-text-base]">Systematic Examination Module</h1>
+    <div class="p-4 flex justify-between items-center flex-shrink-0">
+        <h1 class="text-xl font-semibold text-gray-700 dark:text-[--color-text-base]">Subjective & Systematic Examination</h1>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
+    <div class="flex-1 overflow-y-auto">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> 
-            
-            <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow border border-gray-200 dark:border-[--color-border-base] overflow-hidden md:col-span-1">
-                <div class="p-3 border-b dark:border-[--color-border-base]">
-                    <h2 class="font-semibold text-md dark:text-[--color-text-base]">History</h2>
-                </div>
-                <div class="overflow-y-auto" style="height: 280px;">
-                    <table class="w-full text-left history-table" id="sys-exam-history-table">
-                        <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-[--color-bg-secondary]">
-                            <tr class="border-b dark:border-[--color-border-base]">
-                                <th class="p-3 font-semibold dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] sort-active cursor-pointer" data-sort="datetime">
-                                    Date/Time <i data-lucide="arrow-up-down" class="sort-icon inline-block w-3 h-3 ml-1"></i>
-                                </th>
-                                <th class="p-3 font-semibold dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] cursor-pointer" data-sort="dvm">DVM</th>
-                                <th class="p-3 font-semibold dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] cursor-pointer" data-sort="department">Dept</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sys-exam-history-body" class="divide-y divide-gray-200 dark:divide-[--color-border-base] dark:text-[--color-text-base]"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow border border-gray-200 dark:border-[--color-border-base] p-4 space-y-3 md:col-span-2">
-                <div class="flex justify-between items-center">
-                    <div class="text-xs text-gray-500 dark:text-[--color-text-muted]">Last Update: 31 Dec 2025, 23:55 by User DVM</div>
-                </div>
-                <div>
-                    <div class="flex items-center space-x-2 mb-1">
-                        <label class="font-semibold text-gray-700 dark:text-[--color-text-base]">Systemic Examination</label>
-                        <button id="copy-sys-exam-btn" class="text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
-                        </button>
+        <div class="px-4 pb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> 
+                
+                <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow border border-gray-200 dark:border-[--color-border-base] overflow-hidden md:col-span-1">
+                    <div class="p-3 border-b dark:border-[--color-border-base]">
+                        <h2 class="font-semibold text-md dark:text-[--color-text-base]">History</h2>
                     </div>
-                    <div id="sys-exam-read-only-content" class="border rounded-lg p-3 h-[280px] bg-gray-50 dark:bg-[--color-bg-secondary] text-gray-600 dark:text-[--color-text-muted] overflow-y-auto mt-1 text-xs dark:border-[--color-border-base] space-y-1">
-                        <div class="px-2 py-1.5 rounded bg-orange-50 dark:bg-orange-900/10 border border-transparent dark:border-orange-900/20">
-                            <span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Thorax [Remarkable]:</span>
-                            <span>Found crackles sound at right lung area, suspect Pneumonia. Additionally, harsh lung sounds were detected in the caudal lobes.</span>
+                    <div class="overflow-y-auto" style="height: 280px;">
+                        <table class="w-full text-left history-table" id="sys-exam-history-table">
+                            <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-[--color-bg-secondary]">
+                                <tr class="border-b dark:border-[--color-border-base]">
+                                    <th class="p-3 font-semibold dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] sort-active cursor-pointer" data-sort="datetime">
+                                        Date/Time <i data-lucide="arrow-up-down" class="sort-icon inline-block w-3 h-3 ml-1"></i>
+                                    </th>
+                                    <th class="p-3 font-semibold dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] cursor-pointer" data-sort="dvm">DVM</th>
+                                    <th class="p-3 font-semibold dark:bg-[--color-bg-secondary] dark:text-[--color-text-base] cursor-pointer" data-sort="department">Dept</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sys-exam-history-body" class="divide-y divide-gray-200 dark:divide-[--color-border-base] dark:text-[--color-text-base]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow border border-gray-200 dark:border-[--color-border-base] p-4 space-y-3 md:col-span-2">
+                    <div class="flex justify-between items-center">
+                        <div class="text-xs text-gray-500 dark:text-[--color-text-muted]">Last Update: 31 Dec 2025, 23:55 by User DVM</div>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2 mb-1">
+                            <label class="font-semibold text-gray-700 dark:text-[--color-text-base]">Systemic Examination</label>
+                            <button id="copy-sys-exam-btn" class="text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
                         </div>
-                        <div class="px-2 py-1.5 rounded bg-orange-50 dark:bg-orange-900/10 border border-transparent dark:border-orange-900/20">
-                            <span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Urological [Remarkable]:</span>
-                            <span>Palpable bladder stone approx 2cm.<br>The bladder wall feels thickened.<br>Owner reports pollakiuria.</span>
+                        <div id="sys-exam-read-only-content" class="border rounded-lg p-3 h-[280px] bg-gray-50 dark:bg-[--color-bg-secondary] text-gray-600 dark:text-[--color-text-muted] overflow-y-auto mt-1 text-xs dark:border-[--color-border-base] space-y-1">
+                            
+                            <div class="px-2 py-1.5 rounded bg-orange-50 dark:bg-orange-900/10 border border-transparent dark:border-orange-900/20">
+                                <span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Thorax [Remarkable]:</span>
+                                <span>Found crackles sound at right lung area, suspect Pneumonia. Additionally, harsh lung sounds were detected in the caudal lobes.</span>
+                            </div>
+                            <div class="px-2 py-1.5 rounded bg-orange-50 dark:bg-orange-900/10 border border-transparent dark:border-orange-900/20">
+                                <span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Urological [Remarkable]:</span>
+                                <span class="whitespace-pre-line"> Palpable bladder stone approx 2cm.
+The bladder wall feels thickened.
+Owner reports pollakiuria.</span>
+                            </div>
+
+                            <div class="px-2 py-1">
+                                <span class="font-semibold text-gray-700 dark:text-[--color-text-base]">History Taking:</span>
+                                <span class="whitespace-pre-line text-gray-500 dark:text-[--color-text-muted]"> Chief Complaint: Anorexia and Lethargy for 2 days.
+History of Present Illness:
+- Owner noticed the cat hiding under the bed.
+- Refused to eat wet food yesterday.
+- Vomited clear liquid once this morning.
+- Normal urination, but no defecation for 24 hours.</span>
+                            </div>
+
+                            <div class="px-2 py-1">
+                                <span class="font-semibold text-gray-700 dark:text-[--color-text-base]">History Medication & Food:</span>
+                                <span class="whitespace-pre-line text-gray-500 dark:text-[--color-text-muted]"> Current Medications:
+- Revolution Plus (Topical) - Last applied 15/11/2025.
+- Antinol 1 cap daily.
+
+Diet:
+- Hill's Science Diet k/d (Dry).
+- Treat: Churu 1 stick/day.</span>
+                            </div>
+
+                            <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Note:</span> General check up.</div>
+                            <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Appearance:</span> Bright, Alert.</div>
+                            <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Abdomen:</span> Soft.</div>
+                            <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Heart:</span> Normal.</div>
+                            <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Hydration:</span> Adequate.</div>
                         </div>
-                        <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Note:</span> General check up.</div>
-                        <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Appearance:</span> Bright, Alert.</div>
-                        <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Abdomen:</span> Soft.</div>
-                        <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Heart:</span> Normal.</div>
-                        <div class="px-2 py-0.5"><span class="font-semibold text-gray-700 dark:text-[--color-text-base]">Hydration:</span> Adequate.</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="p-4 flex justify-between items-center mt-4">
-            <h1 class="text-xl font-semibold text-gray-700 dark:text-[--color-text-base]">Systematic Examination Module Editor</h1>
+        <div class="px-4 pt-2 pb-2 flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-700 dark:text-[--color-text-base]">Subjective & Systematic Exam Editor</h1>
             <div class="flex items-center space-x-2">
                 <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm">Go to Today</button>
                 <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center">
@@ -68,391 +95,461 @@
             </div>
         </div>
 
-        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow border border-gray-200 dark:border-[--color-border-base] overflow-hidden">
-            
-            <div class="flex flex-wrap border-b border-gray-200 dark:border-[--color-border-base] px-2 sm:px-4 items-start bg-white dark:bg-[--color-bg-content]">
-                 <button class="py-3 px-3 sm:px-4 text-left text-blue-600 dark:text-[--color-primary-500] border-b-2 border-blue-600 dark:border-[--color-primary-500]">
-                    <span class="text-sm font-semibold">DVM AAA</span>
-                    <span class="block text-xs font-normal text-blue-600 dark:text-[--color-primary-500]">(user ตรงกับ login, vet = active)</span>
-                </button>
-                <button class="py-3 px-3 sm:px-4 text-left text-gray-700 hover:text-gray-900 dark:text-[--color-text-base] dark:hover:text-[--color-text-base]">
-                    <span class="text-sm font-medium">DVM BBB</span>
-                    <span class="block text-xs font-normal text-gray-700 dark:text-[--color-text-base]">201 อายุรกรรมทั่วไปนอกเวลา</span>
-                </button>
-            </div>
-
-            <div class="p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content]">
-                 <div class="flex flex-col sm:flex-row justify-between sm:items-center space-y-2 sm:space-y-0">
-                     <div class="text-sm">
-                        <span class="text-green-700 dark:text-[--color-green-600] font-semibold">For 31 Dec 2025</span>
-                        <span class="text-gray-600 dark:text-[--color-text-muted]"> (DVM ต้องเป็นของตนเองเท่านั้นเลือกไม่ได้)...</span>
-                    </div>
-                     <div class="text-xs text-gray-500 dark:text-[--color-text-muted] flex-shrink-0 sm:ml-4 text-left sm:text-right">
-                        Last Update : 31 Dec 2025, 23:55 by User DVM
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex flex-col md:flex-row h-[500px] bg-gray-50 dark:bg-[--color-bg-base]"> 
+        <div class="px-4 pb-4">
+            <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow border border-gray-200 dark:border-[--color-border-base] overflow-hidden">
                 
-                <div class="w-full md:w-1/4 lg:w-1/5 border-r border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] flex flex-col">
-                    <div class="p-3 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                        Topics
-                    </div>
-                    <div class="overflow-y-auto flex-1 p-2 space-y-1 flex flex-col items-start" id="sys-exam-nav-list">
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors active" data-target="block-note">1. Note</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-appearance">2. Appearance</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-hydration">3. Hydration</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-abdomen">4. Abdomen</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-heart">5. Heart (Cardio)</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-thorax">6. Thorax</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-eye">7. Eye (Ophthalmological)</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-ear">8. Ear</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-nose">9. Nose</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-oral">10. Oral/Dental</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-musculo">11. Musculoskeletal</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-neuro">12. Neurological</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-derma">13. Dermatological</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-gyne">14. Gynecological</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-uro">15. Urological</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-onco">16. Oncological</button>
-                        <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-lymph">17. Lymph nodes</button>
+                <div class="flex flex-wrap border-b border-gray-200 dark:border-[--color-border-base] px-2 sm:px-4 items-start">
+                     <button class="py-3 px-3 sm:px-4 text-left text-blue-600 dark:text-[--color-primary-500] border-b-2 border-blue-600 dark:border-[--color-primary-500]">
+                        <span class="text-sm font-semibold">DVM AAA</span>
+                        <span class="block text-xs font-normal text-blue-600 dark:text-[--color-primary-500]">(user ตรงกับ login, vet = active)</span>
+                    </button>
+                    <button class="py-3 px-3 sm:px-4 text-left text-gray-700 hover:text-gray-900 dark:text-[--color-text-base] dark:hover:text-[--color-text-base]">
+                        <span class="text-sm font-medium">DVM AAA</span>
+                        <span class="block text-xs font-normal text-gray-700 dark:text-[--color-text-base]">201 อายุรกรรมทั่วไปนอกเวลา</span>
+                         <span class="block text-xs font-normal text-transparent">&nbsp;</span>
+                    </button>
+                     <button class="py-3 px-3 sm:px-4 text-left text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                        <span class="text-sm font-medium">DVM BBB</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-[--color-text-muted]">101 อายุรกรรมทั่วไปในเวลา</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-[--color-text-muted]">(user ไม่ตรงกับ login, No vet = inactive)</span>
+                    </button>
+                    <button class="py-3 px-3 sm:px-4 text-left text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                        <span class="text-sm font-medium">DVM BBB</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-[--color-text-muted]">201 อายุรกรรมทั่วไปนอกเวลา</span>
+                         <span class="block text-xs font-normal text-transparent">&nbsp;</span>
+                    </button>
+                     <button class="py-3 px-3 sm:px-4 text-left text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                        <span class="text-sm font-medium">DVM CCC</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-[--color-text-muted]">101 อายุรกรรมทั่วไปนอกเวลา</span>
+                         <span class="block text-xs font-normal text-transparent">&nbsp;</span>
+                    </button>
+                     <button class="py-3 px-3 sm:px-4 text-left text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                        <span class="text-sm font-medium">DVM DDD</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-[--color-text-muted]">101 อายุรกรรมทั่วไปนอกเวลา</span>
+                         <span class="block text-xs font-normal text-transparent">&nbsp;</span>
+                    </button>
+                     <button class="py-3 px-3 sm:px-4 text-left text-gray-500 hover:text-gray-700 dark:text-[--color-text-muted] dark:hover:text-[--color-text-base]">
+                        <span class="text-sm font-medium">DVM EEE</span>
+                        <span class="block text-xs font-normal text-gray-500 dark:text-[--color-text-muted]">101 อายุรกรรมทั่วไปนอกเวลา</span>
+                         <span class="block text-xs font-normal text-transparent">&nbsp;</span>
+                    </button>
+                </div>
+
+                <div class="p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content]">
+                     <div class="flex flex-col sm:flex-row justify-between sm:items-center space-y-2 sm:space-y-0">
+                         <div class="text-sm">
+                            <span class="text-green-700 dark:text-[--color-green-600] font-semibold">For 31 Dec 2025</span>
+                            <span class="text-gray-600 dark:text-[--color-text-muted]"> (DVM ต้องเป็นของตนเองเท่านั้นเลือกไม่ได้)...</span>
+                        </div>
+                         <div class="text-xs text-gray-500 dark:text-[--color-text-muted] flex-shrink-0 sm:ml-4 text-left sm:text-right">
+                            Last Update : 31 Dec 2025, 23:55 by User DVM
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth relative" id="sys-exam-content-container">
+                <div class="flex flex-col md:flex-row h-[500px] bg-gray-50 dark:bg-[--color-bg-base]"> 
                     
-                    <div id="block-note" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            1. Note
+                    <div class="w-full md:w-1/4 lg:w-1/5 border-r border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] flex flex-col">
+                        <div class="p-3 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                            Topics
                         </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="block-appearance" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            2. Appearance
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">With in normal limit.</textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                            </div>
+                        <div class="overflow-y-auto flex-1 p-2 space-y-1 flex flex-col items-start" id="sys-exam-nav-list">
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors active" data-target="block-history-taking">1. History Taking</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-history-med">2. History Medication and Food given</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-note">3. Note</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-appearance">4. Appearance</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-hydration">5. Hydration</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-abdomen">6. Abdomen</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-heart">7. Heart (Cardio)</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-thorax">8. Thorax</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-eye">9. Eye (Ophthalmological)</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-ear">10. Ear</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-nose">11. Nose</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-oral">12. Oral/Dental</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-musculo">13. Musculoskeletal</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-neuro">14. Neurological</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-derma">15. Dermatological</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-gyne">16. Gynecological</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-uro">17. Urological</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-onco">18. Oncological</button>
+                            <button class="sys-nav-btn w-full text-left px-3 py-2 rounded text-sm text-gray-700 dark:text-[--color-text-base] hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors" data-target="block-lymph">19. Lymph nodes</button>
                         </div>
                     </div>
 
-                    <div id="block-hydration" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            3. Hydration
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth relative" id="sys-exam-content-container">
+                        
+                        <div id="block-history-taking" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                1. History Taking
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="block-abdomen" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            4. Abdomen
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="block-heart" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            5. Heart (Cardiological)
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="block-thorax" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            6. Thorax
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="block-eye" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            7. Eye (Ophthalmological)
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <div class="flex items-center">
-                                    <button id="btn-open-eye-exam" class="w-7 h-7 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center mr-3 shadow-sm transition-all active:scale-90 group relative" title="Eye Examination">
-                                        <i data-lucide="eye" class="w-4 h-4"></i>
-                                    </button>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">Chief Complaint: Anorexia and Lethargy for 2 days.
+History of Present Illness:
+- Owner noticed the cat hiding under the bed.
+- Refused to eat wet food yesterday.
+- Vomited clear liquid once this morning.
+- Normal urination, but no defecation for 24 hours.</textarea>
+                                <div class="flex justify-end items-center mt-2">
                                     <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
                                         <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
                                     </label>
                                 </div>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-ear" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            8. Ear
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-history-med" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                2. History Medication and Food given
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">Current Medications:
+- Revolution Plus (Topical) - Last applied 15/11/2025.
+- Antinol 1 cap daily.
+
+Diet:
+- Hill's Science Diet k/d (Dry).
+- Treat: Churu 1 stick/day.</textarea>
+                                <div class="flex justify-end items-center mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-nose" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            9. Nose
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-note" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                3. Note
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">General check up.</textarea>
+                                <div class="flex justify-end items-center mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-oral" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            10. Oral and Dental
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-appearance" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                4. Appearance
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">Bright, Alert.</textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-musculo" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            11. Musculoskeletal
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-hydration" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                5. Hydration
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">Adequate.</textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-neuro" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            12. Neurological
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-abdomen" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                6. Abdomen
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">Soft.</textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-derma" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            13. Dermatological
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-heart" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                7. Heart (Cardiological)
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none">Normal.</textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-gyne" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            14. Gynecological
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-thorax" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                8. Thorax
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-uro" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            15. Urological
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-eye" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                9. Eye (Ophthalmological)
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <div class="flex items-center">
+                                        <button id="btn-open-eye-exam" class="w-7 h-7 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center mr-3 shadow-sm transition-all active:scale-90 group relative" title="Eye Examination">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                        <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                            <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                        </label>
+                                    </div>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-onco" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            16. Oncological
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-ear" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                10. Ear
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="block-lymph" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
-                        <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
-                            17. Lymph nodes
-                        </div>
-                        <div class="p-4">
-                            <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
-                            <div class="flex justify-end items-center gap-3 mt-2">
-                                <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
-                                    <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
-                                </label>
-                                <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
-                                    <option value="" selected disabled>Select Guideline</option>
-                                    <option value="1">Option A</option>
-                                </select>
-                                <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <div id="block-nose" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                11. Nose
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                        <div id="block-oral" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                12. Oral and Dental
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-musculo" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                13. Musculoskeletal
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-neuro" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                14. Neurological
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-derma" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                15. Dermatological
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-gyne" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                16. Gynecological
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-uro" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                17. Urological
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-onco" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                18. Oncological
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="block-lymph" class="bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm overflow-hidden">
+                            <div class="px-4 py-2 bg-gray-50 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm text-gray-700 dark:text-[--color-text-base]">
+                                19. Lymph nodes
+                            </div>
+                            <div class="p-3">
+                                <textarea class="w-full border border-gray-300 dark:border-[--color-border-base] rounded p-3 text-sm h-[120px] resize-y dark:bg-[--color-bg-base] dark:text-[--color-text-base] focus:ring-1 focus:ring-blue-500 outline-none"></textarea>
+                                <div class="flex justify-end items-center gap-3 mt-2">
+                                    <label class="flex items-center text-sm text-gray-600 dark:text-[--color-text-muted] cursor-pointer">
+                                        <input type="checkbox" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Remarkable
+                                    </label>
+                                    <select class="border border-gray-300 dark:border-[--color-border-base] rounded px-2 py-1 text-sm bg-white dark:bg-[--color-bg-secondary] outline-none w-40 sys-exam-select" required>
+                                        <option value="" selected disabled>Select Guideline</option>
+                                        <option value="1">Option A</option>
+                                    </select>
+                                    <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="mt-4 p-4 border-t border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] flex justify-end items-center gap-2 rounded-lg shadow-sm">
-            <label class="text-sm font-semibold text-gray-700 dark:text-[--color-text-base]">Department</label>
-            <select class="sys-exam-select h-9 w-48" required><option value="" selected disabled>Select Dept</option><option value="1">101</option></select>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-sm">SAVE Sys Examination</button>
+            <div class="mt-4 flex justify-end items-center gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-[--color-text-base]">Department</label>
+                <select class="sys-exam-select h-9 w-48" required><option value="" selected disabled>Select Dept</option><option value="1">101</option></select>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-sm">SAVE Sys Examination</button>
+            </div>
+
         </div>
 
     </div>

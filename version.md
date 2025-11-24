@@ -1,6 +1,38 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 5.9 VERSION (Subjective Integration & UI Standardization)
+(24 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+รวมการทำงานของโมดูล **Subjective** และ **Systematic Examination** เข้าด้วยกันเป็นหน้าจอเดียว (S&S) เพื่อลดความซ้ำซ้อน และปรับปรุง UI/UX ของแถบเมนูหลัก (Navigation Bar) และหน้าจอ Editor ให้มีความละเอียด สวยงาม และมีโครงสร้าง (Spacing/Layout) ที่เท่ากันเป๊ะกับโมดูล Assessment (Pixel Perfect Consistency)
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Module Integration (S&S):**
+    * **Unified Module:** รวม Subjective เข้ากับ Systematic Exam ภายใต้ชื่อใหม่ **"Subjective & Systematic Exam"**
+    * **New Topics:** เพิ่มหัวข้อใหม่ 2 รายการในส่วนบนสุดของ Editor: **1. History Taking** และ **2. History Medication and Food given**
+    * **Renumbering:** เลื่อนลำดับหัวข้อเดิมลงไป (Note เริ่มที่ 3, Appearance เริ่มที่ 4, ...)
+2.  **Navigation Bar Overhaul:**
+    * **Layout & Typography:** ปรับแถบเมนูทั้งหมดเป็น **ตัวหนา (`font-bold`)**, ขนาดเล็ก **(`text-xs`)**, และจัดตำแหน่ง **ชิดขอบบน** เท่ากันทุกปุ่ม
+    * **Multi-line Support:** รองรับชื่อเมนู 2 บรรทัด (เช่น Patient Dashboard, Order Clinical Lab) โดยจัด Layout ให้สวยงามสมดุล
+    * **Menu Reorganization:** ลบแท็บ Subjective เดิมทิ้ง และจัดลำดับ/เปลี่ยนชื่อแท็บใหม่ตาม Workflow (Dashboard -> S&S -> Obj -> Assess -> Plan -> Orders...)
+3.  **UI Standardization (Assessment Clone):**
+    * **Editor Layout:** ปรับระยะห่าง (`space-y-3`), ขอบ (`p-4`), และขนาดบล็อก (`p-3`) ของหน้า S&S ให้ **"แน่นและกระชับ"** เท่ากับหน้า Assessment เป๊ะๆ
+    * **Header & Tabs:** คัดลอกส่วนหัว Editor และแถบ **DVM Tabs (7 ปุ่ม)** จาก Assessment มาใช้ เพื่อให้ตำแหน่งปุ่ม Date Picker และสถานะหมอเหมือนกัน 100%
+4.  **Smart Read-only View:**
+    * **Logic การเรียงลำดับใหม่:** แสดงผลตามลำดับความสำคัญ: **[Remarkable]** (บนสุด) -> **History** (กลาง) -> **Normal Items** (ล่างสุด)
+    * **Formatting:** รองรับการแสดงผลแบบเว้นบรรทัด (`whitespace-pre-line`) สำหรับข้อมูล History ที่ยาว
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`index.html`:** รื้อโครงสร้าง `<nav>` ใหม่ทั้งหมด เปลี่ยน Class เป็น `items-start`, `text-xs`, `font-bold` และปรับชื่อ Tab
+2.  **`sys_exam_content.html`:**
+    * แก้ไข Title หลักและ Title ของ Editor
+    * เพิ่ม Block HTML สำหรับ History Taking และ Medication
+    * Refactor โครงสร้าง Container ฝั่งขวา (Editor) โดยลด Padding/Gap ให้ตรงกับ Assessment
+    * แทนที่ส่วน DVM Tabs ด้วยโค้ดชุดเต็ม (Full Set)
+    * ปรับแก้ส่วน Read-only Content ให้รองรับ Logic การเรียงลำดับใหม่
+3.  **`subj_content.html`:** ลบไฟล์ทิ้ง (Deprecated) เนื่องจากรวมฟังก์ชันไปไว้ใน `sys_exam_content.html` แล้ว
+
 ## BETA 5.8 VERSION (Systematic Examination Module Overhaul)
 (23 พฤศจิกายน 2025)
 

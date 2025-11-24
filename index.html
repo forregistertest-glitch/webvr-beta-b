@@ -194,7 +194,6 @@
                     </div>
                 </div>
 
-                <!-- CHANGED: Link to new LAB Dashboard -->
                 <a href="#" class="emr-tab px-3 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-[--color-bg-secondary] rounded font-bold flex items-center" data-target="lab_dashboard_content.html">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 mr-1.5"></i>
                     LAB Dashboard
@@ -270,24 +269,45 @@
 
     <nav class="bg-white dark:bg-[--color-bg-content] shadow-sm -mt-px dark:border-b dark:border-[--color-border-base] sticky top-[56px] z-40">
         <div class="max-w-full mx-auto">
-            <div class="flex space-x-1 overflow-x-auto px-2 py-1">
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="quick_view_content.html">Dashboard</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="subj_content.html">Subjective</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="obj_content.html">Objective</a>
-                <a href="#" class="tab-active emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="assessment_content.html">Assessment</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="plan_content.html">Plan</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="sys_exam_content.html">Systemic Exam</a>
-                
-                <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div> <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="order_pe_content.html">Order PE</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="order_tx_content.html">Order TX</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="order_lis_content.html">Order Lab</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="order_path_content.html">Order Pathology</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="order_rx_content.html">Order RX</a>
+            <div class="flex items-start space-x-1 overflow-x-auto px-2 py-1">
+            <a href="#" class="tab-inactive emr-tab px-2 py-1 text-xs font-bold text-center leading-tight flex flex-col justify-start items-center h-full min-h-[40px]" data-target="quick_view_content.html">
+                <span>Patient</span>
+                <span>Dashboard</span>
+            </a>
 
-                <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div> <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="lab_viewer_content.html">LAB Results</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="pets_note_content.html">Pet's Note</a>
-                <a href="#" class="tab-inactive emr-tab px-3 py-2 text-sm whitespace-nowrap" data-target="ext_doc_content.html">Ext Docs</a>
-            </div>
+            <a href="#" class="tab-inactive emr-tab px-2 py-1 text-xs font-bold text-center leading-tight flex flex-col justify-start items-center h-full min-h-[40px]" data-target="sys_exam_content.html">
+                <span>Subjective+</span>
+                <span>Systematic Exam</span>
+            </a>
+
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="obj_content.html">Objective</a>
+            <a href="#" class="tab-active emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="assessment_content.html">Assessment</a>
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="plan_content.html">Plan</a>
+            
+            <div class="w-px h-8 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div> 
+            
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="order_pe_content.html">Order PE</a>
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="order_tx_content.html">Order Tx</a>
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="order_rx_content.html">Order Rx</a>
+            
+            <a href="#" class="tab-inactive emr-tab px-2 py-1 text-xs font-bold text-center leading-tight flex flex-col justify-start items-center h-full min-h-[40px]" data-target="order_lis_content.html">
+                <span>Order</span>
+                <span>Clinical Lab</span>
+            </a>
+            <a href="#" class="tab-inactive emr-tab px-2 py-1 text-xs font-bold text-center leading-tight flex flex-col justify-start items-center h-full min-h-[40px]" data-target="order_path_content.html">
+                <span>Order</span>
+                <span>Pathology</span>
+            </a>
+
+            <div class="w-px h-8 bg-gray-300 dark:bg-gray-600 self-center mx-1"></div> 
+            
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="lab_viewer_content.html">Lab view</a>
+            <a href="#" class="tab-inactive emr-tab px-3 py-1 text-xs font-bold text-center flex flex-col justify-start items-center h-full" data-target="pets_note_content.html">Pet's Note</a>
+            <a href="#" class="tab-inactive emr-tab px-2 py-1 text-xs font-bold text-center leading-tight flex flex-col justify-start items-center h-full min-h-[40px]" data-target="ext_doc_content.html">
+                <span>External</span>
+                <span>Documents</span>
+            </a>
+        </div>
         </div>
     </nav>
 
@@ -1333,7 +1353,6 @@
     <script src="order-pe-init.js"></script>
     <script src="sys-exam-data.js"></script>
     <script src="sys-exam-init.js"></script>
-    <!-- NEW: LAB Dashboard Scripts (Mockup) -->
     <script src="lab-dashboard-data.js"></script>
     <script src="lab-dashboard-init.js"></script>
 
