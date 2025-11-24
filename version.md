@@ -1,6 +1,34 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 6.0 VERSION (Order Tx Module & Data Decoupling)
+(24 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+สร้างโมดูล **Order Tx (Treatment)** สำหรับสั่งยาและหัตถการ โดยแยกฐานข้อมูล (Data Decoupling) ออกจาก Lab อย่างสมบูรณ์ เพื่อรองรับการจัดการรายการจำนวนมากและหน่วยนับที่หลากหลาย พร้อมทั้งปรับปรุง UX ของการกรอกจำนวน (Numpad Integration) และจัด Layout ให้เป็นมาตรฐานเดียวกับโมดูลอื่นๆ
+
+### สิ่งที่อัพเดท (Updates)
+1.  **New Order Tx Module:**
+    * สร้างหน้าจอ `order_tx_content.html` โดยใช้ธีม **สีฟ้า (Blue Theme)** ให้สอดคล้องกับ Vital Signs
+    * ออกแบบ Layout แบบ 3 คอลัมน์ (Categories : Items : Cart) สัดส่วน **3:4:5**
+2.  **Data Decoupling & Expansion:**
+    * สร้างไฟล์ `tx-data.js` แยกต่างหาก เพื่อเก็บข้อมูล Medication, Procedures, และ Medical Equipment
+    * ขยายฐานข้อมูลตัวอย่างเป็น **20 รายการต่อหมวด** พร้อมระบุหน่วยนับละเอียด (Tab, Vial, Set, Pcs, Time)
+3.  **Advanced Cart Experience:**
+    * **Inline Layout:** ปรับการแสดงผลในตะกร้าให้ ชื่อรายการ, ช่องกรอกจำนวน, และหน่วยนับ อยู่ในบรรทัดเดียวกัน เพื่อความกระชับ
+    * **Numpad Integration:** เปลี่ยนช่องกรอกจำนวน (Quantity) ให้เป็นแบบ Read-only ที่เมื่อคลิกจะเรียก **Numpad Modal** ขึ้นมาแทนการพิมพ์แป้นพิมพ์ปกติ
+    * **Default State:** ตั้งค่าเริ่มต้นของจำนวนเป็น "ว่าง" เพื่อบังคับให้ผู้ใช้ระบุจำนวน
+4.  **Layout Standardization:**
+    * ปรับ Grid Layout ของหน้า **Order Clinical Lab (`order_lis_content.html`)** ให้มีสัดส่วน **3:4:5** เท่ากับ Order Tx และ Pathology เพื่อความเป็นระเบียบ (Pixel Perfect)
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`order_tx_content.html` (New):** สร้างไฟล์ UI ใหม่ โดย Clone โครงสร้างจาก Order Lab แต่เปลี่ยน ID Prefix เป็น `tx-` และปรับธีมสี
+2.  **`tx-data.js` (New):** สร้างไฟล์เก็บ Mock Data แยก โดยใช้ตัวแปร `txServiceCatalog`
+3.  **`order-tx-init.js` (New):** สร้าง Controller Logic ที่รองรับการคำนวณราคาแบบ Real-time และ Sync กับ Numpad
+4.  **`index.html`:** เพิ่ม Script tags สำหรับโหลด `tx-data.js` และ `order-tx-init.js`
+5.  **`app-logic.js`:** เพิ่ม Routing Logic สำหรับ `order_tx_content.html`
+6.  **`order_lis_content.html`:** แก้ไข CSS Grid Column Spans (5->4, 4->5) ให้ตรงตามมาตรฐานใหม่
+
 ## BETA 5.9 VERSION (Subjective Integration & UI Standardization)
 (24 พฤศจิกายน 2025)
 

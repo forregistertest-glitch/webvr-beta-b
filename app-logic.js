@@ -143,6 +143,8 @@ async function loadModuleContent(contentFile) {
             if (typeof initializeSysExam === 'function') initializeSysExam();
         } else if (contentFile === 'order_pe_content.html') {
             initializeOrderPEScripts();
+        } else if (contentFile === 'order_tx_content.html') {
+            if (typeof initializeOrderTxScripts === 'function') initializeOrderTxScripts();
         } else if (contentFile === 'order_lis_content.html') {
             initializeLisScripts(); 
         } else if (contentFile === 'order_path_content.html') {
