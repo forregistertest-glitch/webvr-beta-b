@@ -1579,73 +1579,277 @@ function loadOrderForEdit(entryId, type) {
     }
 }
 
-// --- 3. SUCCESS MODAL (Updated Beta 6.9) ---
+// --- 3. SUCCESS MODAL & PRINT SLIP (Updated Beta 6.10) ---
+
+// 3.1 Global Slip Generator Function
+window.generateRxSlip = function(data) {
+    // data: { orderNo, accNo, items, total, dvm, dept, orderNote, pharmacyNote, user }
+    
+    // Open new tab
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return alert("Pop-up blocked! Please allow pop-ups.");
+
+    // Date Format
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    const printMeta = `Printed: ${dateStr} ${timeStr} by ${data.user || 'User Login'}`;
+
+    // Generate Items HTML
+    const itemsHtml = data.items.map(item => {
+        const qty = item.qty || 1;
+        const unit = item.unit || item.used_unit || '';
+        const price = item.price || 0;
+        const lineTotal = (price * qty).toLocaleString();
+        
+        // Label formatting
+        const labelHtml = item.label 
+            ? `<div style="font-size: 10px; color: #444; font-style: italic; margin-top: 2px; line-height: 1.2;">${item.label.replace(/\n/g, '<br>')}</div>` 
+            : '';
+
+        return `
+        <tr style="border-bottom: 1px dashed #eee;">
+            <td style="padding: 4px 0; vertical-align: top;">
+                <div style="font-weight: bold;">${item.name}</div>
+                <div style="font-size: 10px; color: #555;">${item.qty} ${unit} x ${price}</div>
+                ${labelHtml}
+            </td>
+            <td style="padding: 4px 0; text-align: right; vertical-align: top;">${lineTotal}</td>
+        </tr>`;
+    }).join('');
+
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Rx Slip - ${data.orderNo}</title>
+            <style>
+                /* Reset & Page Setup */
+                @page { size: auto; margin: 0mm; }
+                body {
+                    font-family: 'Sarabun', 'Courier New', sans-serif; /* ใช้ Font ที่อ่านง่าย */
+                    margin: 0 auto;
+                    padding: 10px; /* ระยะขอบรอบด้าน */
+                    width: 70mm; /* กำหนดความกว้างเนื้อหา (เผื่อขอบ 5mm ซ้ายขวาจาก 80mm) */
+                    font-size: 12px;
+                    line-height: 1.3;
+                    color: #000;
+                }
+                
+                /* Header */
+                .header { text-align: center; margin-bottom: 10px; }
+                .title { font-weight: bold; font-size: 16px; margin-bottom: 2px; }
+                .subtitle { font-size: 11px; margin-bottom: 2px; }
+                .meta { font-size: 9px; color: #555; margin-top: 4px; }
+                
+                .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+                
+                /* Info Section */
+                .info-section { font-size: 11px; margin-bottom: 8px; }
+                .info-row { display: flex; justify-content: space-between; }
+                .info-left { font-weight: bold; margin-right: 5px; white-space: nowrap; }
+                .info-right { text-align: right; word-break: break-word; }
+
+                /* Note Section */
+                .note-section { 
+                    font-size: 11px; 
+                    background-color: #f9f9f9; 
+                    padding: 5px; 
+                    border-radius: 4px; 
+                    border: 1px solid #eee;
+                    margin-bottom: 10px;
+                }
+                .note-label { font-weight: bold; display: block; font-size: 10px; color: #555; }
+                .note-val { display: block; margin-bottom: 4px; font-style: italic; }
+
+                /* Table */
+                table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }
+                
+                /* Total */
+                .total-section { 
+                    font-weight: bold; 
+                    font-size: 16px; 
+                    display: flex; 
+                    justify-content: space-between; 
+                    margin-top: 10px; 
+                    padding-top: 5px;
+                    border-top: 1px solid #000;
+                }
+                
+                /* Screen Only (Hide on Print) */
+                @media print {
+                    .no-print { display: none; }
+                }
+                .btn-print {
+                    display: block;
+                    width: 100%;
+                    padding: 10px;
+                    background: #22c55e;
+                    color: white;
+                    text-align: center;
+                    border: none;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    margin-bottom: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <button class="btn-print no-print" onclick="window.print()">Click to Print</button>
+
+            <div class="header">
+                <div class="title">Order Rx (ใบสั่งยานำกลับ)</div>
+                <div class="subtitle">Kasetsart University Veterinary Teaching Hospital</div>
+                <div class="meta">${printMeta}</div>
+            </div>
+            
+            <div class="divider"></div>
+
+            <div class="info-section">
+                <div class="info-row"><span class="info-left">Order:</span><span class="info-right">${data.orderNo || '-'}</span></div>
+                <div class="info-row"><span class="info-left">Acc:</span><span class="info-right">${data.accNo || '-'}</span></div>
+                <div class="info-row"><span class="info-left">HN:</span><span class="info-right">52039575</span></div>
+                <div class="info-row"><span class="info-left">Patient:</span><span class="info-right">คุณส้มจี๊ด(จี๊ดจ๊าด)</span></div>
+                <div class="info-row"><span class="info-left">Vet:</span><span class="info-right">${data.dvm || '-'} (${data.dept || '-'})</span></div>
+            </div>
+
+            ${ (data.orderNote || data.pharmacyNote) ? `
+            <div class="note-section">
+                ${data.orderNote ? `<div><span class="note-label">Order Note:</span><span class="note-val">${data.orderNote}</span></div>` : ''}
+                ${data.pharmacyNote ? `<div><span class="note-label">Pharmacy Note:</span><span class="note-val">${data.pharmacyNote}</span></div>` : ''}
+            </div>` : '' }
+
+            <div class="divider"></div>
+
+            <table>
+                ${itemsHtml}
+            </table>
+
+            <div class="divider"></div>
+
+            <div class="total-section">
+                <span>Total</span>
+                <span>${data.total}.-</span>
+            </div>
+
+            <div class="divider"></div>
+            <div style="text-align: center; font-size: 9px; color: #888; margin-top: 5px;">End of Slip</div>
+
+            <script>
+                // Auto Print when loaded
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+}
+
+// 3.2 Show Success Modal (Updated Beta 6.12.3 - Fixed Color for Beige Theme)
 function showSuccessModal(accNo, cartItems, total, extraDetails = {}) {
     let modal = document.getElementById('order-success-modal');
     if (modal) modal.remove(); 
 
     const div = document.createElement('div');
     
-    // Badges Logic
+    // Badges
     let priorityBadge = '';
-    if (extraDetails && extraDetails.priority === 'STAT') priorityBadge = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white shadow-sm">STAT</span>`;
-    else if (extraDetails && extraDetails.priority) priorityBadge = `<span class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-700 dark:text-gray-300">Routine</span>`;
+    if (extraDetails && extraDetails.priority === 'STAT') priorityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-600 text-white shadow-sm">STAT</span>`;
+    else if (extraDetails && extraDetails.priority) priorityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-600 text-white">Routine</span>`;
 
-    const fastingBadge = (extraDetails && extraDetails.fasting) ? `<span class="ml-2 px-2 py-0.5 rounded text-xs font-bold bg-orange-500 text-white shadow-sm">Fasted</span>` : '';
+    const optionBadge = (extraDetails.info) ? `<span class="ml-1 px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500 text-white shadow-sm">${extraDetails.info}</span>` : '';
     
-    // Info: Order No & Record Meta
-    const orderNoHtml = extraDetails.orderNo ? `<div class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-1">Order No: ${extraDetails.orderNo}</div>` : '';
+    // Info: Order No (Gray)
+    const orderNoHtml = extraDetails.orderNo ? `<span class="text-gray-300 mx-2">|</span><span class="font-mono text-gray-500">${extraDetails.orderNo}</span>` : '';
     
+    // Meta Info (DVM/Dept) - Always Black text (Fixed for Beige Theme)
     const metaHtml = (extraDetails.dvm || extraDetails.dept) ? 
-        `<div class="mt-2 text-[11px] text-gray-600 dark:text-gray-300 flex items-center justify-center gap-3 bg-gray-50 dark:bg-gray-800/50 py-1 px-3 rounded-lg border border-gray-100 dark:border-gray-700">
-            <span class="flex items-center"><i data-lucide="user" class="w-3 h-3 mr-1 text-gray-400"></i>${extraDetails.dvm || '-'}</span>
+        `<div class="mt-1 text-[11px] text-black flex items-center justify-center gap-2 bg-white py-0.5 px-3 rounded-full border border-gray-300 inline-flex">
+            <span class="flex items-center text-black"><i data-lucide="user" class="w-3 h-3 mr-1 text-gray-500"></i>${extraDetails.dvm || '-'}</span>
             <span class="text-gray-300">|</span>
-            <span class="flex items-center"><i data-lucide="building-2" class="w-3 h-3 mr-1 text-gray-400"></i>${extraDetails.dept || '-'}</span>
+            <span class="flex items-center text-black"><i data-lucide="building-2" class="w-3 h-3 mr-1 text-gray-500"></i>${extraDetails.dept || '-'}</span>
          </div>` : '';
 
-    // Beta 6.9: Notes Display
+    // Notes Style (Fixed Colors)
+    // Label: Gray-600 (สีเดิมของ value)
+    // Value: Black (เข้มกว่าเดิม)
+    const noteContainerClass = "mt-1 w-full text-left bg-white border border-gray-300 p-2 rounded text-xs";
+    const labelClass = "text-[10px] font-bold text-gray-600 uppercase block mb-0.5";
+    const textClass = "text-black font-medium leading-snug";
+
     const pharmNoteHtml = extraDetails.pharmacyNote ? 
-        `<div class="mt-2 w-full text-left bg-orange-50 dark:bg-orange-900/20 p-2 rounded border border-orange-100 dark:border-orange-800/30">
-            <span class="text-[10px] font-bold text-orange-700 dark:text-orange-400 uppercase">Pharmacy Note:</span>
-            <div class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">${extraDetails.pharmacyNote}</div>
+        `<div class="${noteContainerClass}">
+            <span class="${labelClass}">Pharmacy Note:</span>
+            <div class="${textClass}">${extraDetails.pharmacyNote}</div>
          </div>` : '';
 
     const orderNoteHtml = extraDetails.orderNote ? 
-        `<div class="mt-1 w-full text-left bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700">
-            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Order Note:</span>
-            <div class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">${extraDetails.orderNote}</div>
+        `<div class="${noteContainerClass}">
+            <span class="${labelClass}">Order Note:</span>
+            <div class="${textClass}">${extraDetails.orderNote}</div>
          </div>` : '';
 
     div.innerHTML = `
-        <div id="order-success-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[150] backdrop-blur-sm">
-            <div class="bg-white dark:bg-[--color-bg-content] rounded-xl shadow-2xl p-0 max-w-md w-full flex flex-col overflow-hidden border border-gray-200 dark:border-[--color-border-base] animate-fade-in-up" style="max-height: 90vh;">
-                <div class="p-6 text-center bg-green-50 dark:bg-green-900/10 border-b border-green-100 dark:border-green-900/20 overflow-y-auto flex-shrink-0">
-                    <div class="w-16 h-16 bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner"><i data-lucide="check" class="w-8 h-8"></i></div>
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-[--color-text-base]">Order Confirmed!</h3>
-                    
-                    <div class="mt-3 flex flex-col items-center w-full">
-                        <div class="inline-block px-3 py-1 bg-white dark:bg-[--color-bg-base] rounded border border-green-200 dark:border-green-800 text-sm font-mono font-bold text-green-700 dark:text-green-400 shadow-sm">
-                            Acc No: ${accNo}
+        <div id="order-success-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[150] backdrop-blur-sm">
+            <div class="bg-white dark:bg-[--color-bg-content] rounded-xl shadow-2xl p-0 max-w-md w-full flex flex-col overflow-hidden border border-gray-200 dark:border-[--color-border-base] animate-fade-in-up relative" style="max-height: 90vh;">
+                
+                <button onclick="document.getElementById('order-success-modal').remove()" class="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 transition-colors z-50">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+
+                <div class="p-3 bg-white dark:bg-[--color-bg-content] border-b border-gray-100 dark:border-gray-700 flex-shrink-0 shadow-sm z-10">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <div class="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                            <i data-lucide="check" class="w-4 h-4"></i>
                         </div>
-                        ${orderNoHtml}
-                        <div class="flex justify-center items-center mt-2 gap-2">${priorityBadge}${fastingBadge}</div>
+                        <h3 class="text-base font-bold text-gray-800 dark:text-[--color-text-base]">Order Confirmed!</h3>
+                    </div>
+                    
+                    <div class="flex flex-col items-center w-full text-xs">
+                        <div class="flex items-center mb-1.5">
+                            <span class="font-mono font-bold text-black text-sm">${accNo}</span>
+                            ${orderNoHtml}
+                        </div>
+                        
+                        <div class="flex justify-center items-center gap-1 mb-1.5">${priorityBadge}${optionBadge}</div>
+
                         ${metaHtml}
-                        ${pharmNoteHtml}
-                        ${orderNoteHtml}
+                        
+                        <div class="w-full space-y-1 mt-1.5">
+                            ${pharmNoteHtml}
+                            ${orderNoteHtml}
+                        </div>
                     </div>
                 </div>
-                <div class="p-4 bg-gray-50 dark:bg-[--color-bg-secondary] flex-1 overflow-y-auto min-h-0">
-                    <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2 px-2">Order Summary</h4>
-                    <ul id="modal-item-list" class="space-y-2 text-sm"></ul>
-                </div>
-                <div class="p-4 border-t border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] flex-shrink-0">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-gray-600 dark:text-[--color-text-muted] font-medium">Total Amount</span>
-                        <span class="text-xl font-bold text-blue-600 dark:text-blue-400">${total}.-</span>
+
+                <div class="p-0 bg-gray-50 dark:bg-[--color-bg-secondary] flex-1 overflow-y-auto min-h-0">
+                    <div class="p-2 px-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wide sticky top-0 bg-gray-50 dark:bg-[--color-bg-secondary] z-10 border-b border-gray-100 dark:border-gray-700 flex justify-between">
+                        <span>Items</span>
+                        <span>${cartItems ? cartItems.length : 0}</span>
                     </div>
-                    <div class="flex space-x-3">
-                        <button onclick="document.getElementById('order-success-modal').remove()" class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-[--color-border-base] dark:hover:bg-gray-600 text-gray-700 dark:text-[--color-text-base] rounded-lg font-semibold text-sm transition-colors">Close</button>
-                        <button id="btn-print-modal" class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm flex items-center justify-center shadow-lg shadow-blue-600/20 transition-all active:scale-95"><i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print Label</button>
+                    <ul id="modal-item-list" class="space-y-0 text-sm divide-y divide-gray-100 dark:divide-gray-700"></ul>
+                </div>
+
+                <div class="p-3 border-t border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] flex-shrink-0">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-gray-600 dark:text-[--color-text-muted] font-medium text-sm">Total Amount</span>
+                        <span class="text-lg font-bold text-blue-600 dark:text-blue-400">${total}.-</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="btn-print-slip" class="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-xs flex items-center justify-center shadow-sm transition-all active:scale-95">
+                            <i data-lucide="scroll-text" class="w-4 h-4 mr-2"></i> Print Slip
+                        </button>
+                        <button id="btn-print-modal" class="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs flex items-center justify-center shadow-sm transition-all active:scale-95">
+                            <i data-lucide="tags" class="w-4 h-4 mr-2"></i> Print Label
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1659,31 +1863,28 @@ function showSuccessModal(accNo, cartItems, total, extraDetails = {}) {
     if (cartItems && cartItems.length > 0) {
         cartItems.forEach(item => {
             const li = document.createElement('li');
-            li.className = "bg-white dark:bg-[--color-bg-content] p-3 rounded border border-gray-200 dark:border-[--color-border-base] shadow-sm flex justify-between items-start gap-3";
+            li.className = "bg-white dark:bg-[--color-bg-content] p-3 flex justify-between items-start gap-3 hover:bg-gray-50 transition-colors";
             
-            // Container Badge
             let details = '';
             if (item.container && item.container !== '-') {
-                details = `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white ml-2" title="Container">${item.container}</span>`;
+                details = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-gray-100 text-gray-500 border border-gray-200 ml-2">${item.container}</span>`;
             }
             
-            // Sub-details (Label / Site)
             let subText = '';
             if (item.label) {
                 const formattedLabel = item.label.replace(/\n/g, '<br>');
-                subText = `<div class="text-[10px] text-orange-700 dark:text-orange-400 mt-1 break-words border-l-2 border-orange-200 pl-2 leading-relaxed">${formattedLabel}</div>`;
+                subText = `<div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight">${formattedLabel}</div>`;
             } else if (item.site) {
-                subText = `<div class="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 mt-1 font-medium">Site: ${item.site}</div>`;
+                subText = `<div class="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 mt-0.5">Site: ${item.site}</div>`;
             }
 
-            // Price & Unit
             const qtyVal = item.qty ? parseFloat(item.qty) : 1;
             const lineTotal = (item.price * qtyVal).toLocaleString();
             const unitText = item.used_unit || item.unit || '';
 
             li.innerHTML = `
                 <div class="flex-1 min-w-0">
-                    <div class="flex flex-wrap items-center gap-1 mb-1">
+                    <div class="flex flex-wrap items-center gap-1">
                         <span class="font-bold text-xs text-gray-800 dark:text-[--color-text-base]">${item.name}</span>
                         ${details}
                     </div>
@@ -1692,23 +1893,39 @@ function showSuccessModal(accNo, cartItems, total, extraDetails = {}) {
                 
                 <div class="text-right flex flex-col items-end flex-shrink-0 ml-2">
                     <span class="font-bold text-xs text-gray-800 dark:text-[--color-text-base]">${lineTotal}</span>
-                    <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 whitespace-nowrap">
-                        x${qtyVal} ${unitText}
+                    <div class="text-[10px] text-gray-400 mt-0.5 whitespace-nowrap">
+                        ${qtyVal} ${unitText}
                     </div>
                 </div>
             `;
             listContainer.appendChild(li);
         });
     } else {
-        listContainer.innerHTML = '<li class="text-center text-gray-400 italic">No items</li>';
+        listContainer.innerHTML = '<li class="p-4 text-center text-gray-400 italic text-xs">No items</li>';
     }
     
-    // Bind Print Button (Beta 6.9 Logic)
+    // Bind Print Slip
+    const btnPrintSlip = document.getElementById('btn-print-slip');
+    if(btnPrintSlip) {
+        btnPrintSlip.onclick = () => {
+            window.generateRxSlip({
+                orderNo: extraDetails.orderNo,
+                accNo: accNo,
+                items: cartItems,
+                total: total,
+                dvm: extraDetails.dvm,
+                dept: extraDetails.dept,
+                orderNote: extraDetails.orderNote,
+                pharmacyNote: extraDetails.pharmacyNote,
+                user: "User (Login)"
+            });
+        };
+    }
+
+    // Bind Print Label
     const printBtn = document.getElementById('btn-print-modal');
     if(printBtn) {
         printBtn.onclick = () => {
-            document.getElementById('order-success-modal').remove(); // Close success modal
-            // Call Global Function from order-rx-init.js
             if (typeof window.openRxPrintModal === 'function') {
                 window.openRxPrintModal(cartItems); 
             } else {

@@ -1,6 +1,52 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 6.12 VERSION (Success Modal UI Polish & Print System Stabilization)
+(26 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+ปรับปรุงดีไซน์ของ **Success Modal** ให้มีความสะอาดตา (Clean Look) อ่านง่ายในทุกธีมสี (Light/Beige) และแก้ไขระบบ **Print Slip** ให้ทำงานได้รวดเร็วและแม่นยำโดยไม่ต้องพึ่งพา Library ภายนอก
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Native Print Slip System:**
+    * เปลี่ยนระบบพิมพ์ Slip จาก `html2pdf` เป็น **Native Window Print** (เปิด Tab ใหม่ -> เขียน HTML -> สั่ง Print ทันที) เพื่อแก้ปัญหาหน้าขาวและเพิ่มความคมชัด
+    * จัด Layout ใบเสร็จขนาด **80mm** (Fit Width) พร้อมแสดงรายการยา, Drug Label, ราคา, และหมายเหตุ (Order/Pharmacy Note) ครบถ้วน
+2.  **Success Modal Redesign (Clean Theme):**
+    * **Compact Header:** ลดขนาดพื้นที่ส่วนหัว Modal ให้กระชับ เพื่อเพิ่มพื้นที่แสดงรายการยา
+    * **Typography Refinement:** เปลี่ยนสีตัวอักษร Acc No, Meta Data, และ Notes เป็น **สีดำ/เทาเข้ม (Pure Black/Gray)** ทั้งหมด (ยกเลิก Tag สีเขียว) เพื่อแก้ปัญหามองไม่เห็นใน Dark Mode (Beige Theme)
+    * **Action Buttons:** ปรับปุ่ม Footer เป็นคู่ **Print Slip (เขียว)** และ **Print Label (น้ำเงิน)** พร้อมไอคอนใหม่ (`scroll-text`, `tags`)
+3.  **Order Rx Enhancements:**
+    * เพิ่มตัวเลือก **Priority** (Routine/STAT) และ **Option** (High Alert) ในหน้าสั่งยา
+    * เชื่อมต่อข้อมูล Priority/Option ให้แสดงผลใน Success Modal (Badge) และส่งต่อไปยัง Database
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`app-init.js`:**
+    * เขียนใหม่ฟังก์ชัน `window.generateRxSlip` ใช้เทคนิค `window.open` + `document.write` + CSS `@page { size: auto; margin: 0mm; }`
+    * ปรับปรุงโค้ด HTML ใน `showSuccessModal` ตัด Tailwind Class ที่ซับซ้อนออก และใช้ CSS Inline/Basic Classes เน้นความอ่านง่าย (`text-black`, `bg-white`, `border-gray-300`)
+2.  **`order_rx_content.html`:** เพิ่ม Radio Button (Priority) และ Checkbox (High Alert)
+3.  **`order-rx-init.js`:** อัปเดต Logic การ Submit และ Re-med ให้รองรับ Field ใหม่ และปุ่ม Print Slip
+
+---
+
+## BETA 6.10 - 6.11 VERSION (Print Slip Feature & Rx Logic Upgrade)
+(26 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+เพิ่มความสามารถในการออกเอกสาร **ใบรายการยา (Rx Slip)** สำหรับห้องยาและผู้ป่วย และปรับปรุง UX ของการสั่งยาให้รองรับเคสเร่งด่วน (STAT) หรือยาความเสี่ยงสูง (High Alert)
+
+### สิ่งที่อัพเดท (Updates)
+1.  **Print Slip Feature:**
+    * เพิ่มปุ่ม **Print Slip** ในหน้า Success Modal (แทนปุ่ม Close เดิม)
+    * เพิ่มปุ่ม **Slip** ในตารางประวัติการสั่งยา (Re-med)
+    * Slip ระบุวันที่พิมพ์ (Printed Date/Time) และ User ที่สั่งพิมพ์
+2.  **Order Logic Upgrade:**
+    * เพิ่มการเก็บข้อมูล **Order Note** และ **Pharmacy Note** แยกกันชัดเจน
+    * ปรับปรุงโครงสร้างข้อมูล `activityLogData` ให้บันทึกค่า Priority และ High Alert Status
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **`app-init.js`:** เพิ่ม Global Function สำหรับสร้าง Slip
+2.  **`order-rx-init.js`:** แก้ไข `renderReMedTable` เพิ่มปุ่ม Action แบบ Split (Slip/Label)
+
 ## BETA 6.2 - 6.9 VERSION (Full Order Rx Module & System Standardization)
 (26 พฤศจิกายน 2025)
 

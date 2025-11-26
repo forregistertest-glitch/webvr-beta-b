@@ -332,11 +332,15 @@ function initializeOrderRxScripts() {
     function handleRxSubmission(actionType) {
         if (globalRxCart.length === 0) return alert("Rx List is empty.");
         
+        // Capture Inputs
         const pharmacyNote = inputPharmacyNote ? inputPharmacyNote.value.trim() : "";
         const orderNoteText = inputOrderNote ? inputOrderNote.value.trim() : "";
-        
         const dvmValue = selectRxDvm ? selectRxDvm.value : "";
         const deptValue = selectRxDept ? selectRxDept.value : "";
+        
+        // New Inputs (Beta 6.11)
+        const priority = document.querySelector('input[name="rx_priority"]:checked')?.value || 'Routine';
+        const isHighAlert = document.getElementById('rx-high-alert')?.checked || false;
 
         const now = new Date();
         const orderNo = `ORD-RX${now.getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`;
@@ -371,7 +375,9 @@ function initializeOrderRxScripts() {
                 items: globalRxCart.map(i => ({ 
                     id: i.id, name: i.name, qty: i.qty, unit: i.used_unit, label: i.label, container: i.container, price: i.price
                 })), 
-                pharmacy_note: pharmacyNote 
+                pharmacy_note: pharmacyNote,
+                priority: priority, 
+                high_alert: isHighAlert 
             },
             recorded_by: "User (Login)", 
             dvm: dvmValue || "Dr. Login", 
@@ -384,15 +390,15 @@ function initializeOrderRxScripts() {
 
         if (actionType === 'send') {
             if (typeof showSuccessModal === 'function') {
-                // Pass extra notes to Modal
+                // Pass updated details to Modal
                 showSuccessModal(accNo, globalRxCart, totalPriceEl.innerText.split('/')[1].trim(), { 
                     orderNo: orderNo,
                     dvm: dvmValue,
                     dept: deptValue,
-                    priority: "Routine",
-                    info: "Sent to Pharmacy",
-                    pharmacyNote: pharmacyNote, // New
-                    orderNote: orderNoteText // New
+                    priority: priority, 
+                    info: isHighAlert ? "High Alert" : "", 
+                    pharmacyNote: pharmacyNote,
+                    orderNote: orderNoteText
                 });
             } else {
                 alert(`Order Rx Confirmed!\nAcc No: ${accNo}`);
@@ -408,6 +414,12 @@ function initializeOrderRxScripts() {
         if(inputOrderNote) inputOrderNote.value = "";
         selectedInfoBox.classList.add('hidden');
         btnAddToCart.disabled = true;
+        
+        // Reset New Inputs
+        const routineRadio = document.getElementById('rx-prio-routine');
+        if(routineRadio) routineRadio.checked = true;
+        const alertCheck = document.getElementById('rx-high-alert');
+        if(alertCheck) alertCheck.checked = false;
     }
 
     // --- 7. Print Modal Logic (New) ---
@@ -491,10 +503,11 @@ function initializeOrderRxScripts() {
             else statusBadge = `<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-700 dark:text-gray-300">${order.status_display}</span>`;
 
             const canSelect = true; 
-            
-            // Button Styling: Select (Green), Print (Blue - Only if Done)
-            const canPrint = (order.status === 'Done' && order.acc_no);
+            const canPrint = (order.status === 'Done' && order.acc_no); 
+            const canSlip = (order.status === 'Done');
+
             const printBtnClass = canPrint ? "bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200" : "bg-gray-100 text-gray-400 cursor-not-allowed";
+            const slipBtnClass = canSlip ? "bg-green-100 text-green-700 hover:bg-green-200 border border-green-200" : "bg-gray-100 text-gray-400 cursor-not-allowed";
 
             row.innerHTML = `
                 <td class="p-3 text-xs text-gray-700 dark:text-[--color-text-base] whitespace-nowrap align-top">${order.datetime_effective}</td>
@@ -511,23 +524,48 @@ function initializeOrderRxScripts() {
                         <button class="px-3 py-1 rounded text-xs font-bold transition-all bg-orange-500 hover:bg-orange-600 text-white shadow-sm btn-select-remed">
                             Select
                         </button>
-                        <button class="px-3 py-1 rounded text-xs font-bold transition-all ${printBtnClass} btn-print-remed" ${!canPrint ? 'disabled' : ''}>
-                            <i data-lucide="printer" class="w-3 h-3 inline"></i> Print
-                        </button>
+                        <div class="flex gap-1 justify-center">
+                            <button class="flex-1 px-2 py-1 rounded text-xs font-bold transition-all ${slipBtnClass} btn-slip-remed" ${!canSlip ? 'disabled' : ''} title="Print Slip">
+                                <i data-lucide="scroll-text" class="w-3 h-3 inline"></i> Slip
+                            </button>
+                            <button class="flex-1 px-2 py-1 rounded text-xs font-bold transition-all ${printBtnClass} btn-print-remed" ${!canPrint ? 'disabled' : ''} title="Print Drug Label">
+                                <i data-lucide="tags" class="w-3 h-3 inline"></i> Label
+                            </button>
+                        </div>
                     </div>
                 </td>
             `;
             
-            // Bind Select
             row.querySelector('.btn-select-remed').onclick = () => selectReMedOrder(order);
             
-            // Bind Print
             if (canPrint) {
                 row.querySelector('.btn-print-remed').onclick = () => openRxPrintModal(order.items);
             }
 
+            if (canSlip) {
+                row.querySelector('.btn-slip-remed').onclick = () => {
+                    if(typeof window.generateRxSlip === 'function') {
+                        window.generateRxSlip({
+                            orderNo: order.order_no,
+                            accNo: order.acc_no,
+                            items: order.items,
+                            total: order.total_price,
+                            dvm: order.dvm,
+                            dept: order.department,
+                            orderNote: order.order_note,
+                            pharmacyNote: order.pharmacy_note,
+                            user: "User (History)"
+                        });
+                    } else {
+                        console.error("generateRxSlip function not found.");
+                    }
+                };
+            }
+
             remedTableBody.appendChild(row);
         });
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function selectReMedOrder(order) {
