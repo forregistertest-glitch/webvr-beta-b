@@ -11,15 +11,15 @@
         "CY": {
             name: "Cytology (เซลล์วิทยา)", icon: "microscope",
             items: [
-                { id: "CY01", name: "Cytology - 1 Site", price: 400, req_site: true },
-                { id: "CY02", name: "Cytology - 2 Sites", price: 700, req_site: true }
+                { id: "CY01", name: "Cytology - 1 Site", price: 400, container: "Slide Box", used_unit: "Site", req_site: true },
+                { id: "CY02", name: "Cytology - 2 Sites", price: 700, container: "Slide Box", used_unit: "Site", req_site: true }
             ]
         },
         "SP": {
             name: "Biopsy (ชิ้นเนื้อ)", icon: "file-text",
             items: [
-                { id: "SP-S", name: "Biopsy - Small", price: 1200, req_site: true },
-                { id: "SP-ORG", name: "Biopsy - Whole Organ", price: 2500, req_site: true }
+                { id: "SP-S", name: "Biopsy - Small", price: 1200, container: "Formalin Jar", used_unit: "Piece", req_site: true },
+                { id: "SP-ORG", name: "Biopsy - Whole Organ", price: 2500, container: "Formalin Jar", used_unit: "Organ", req_site: true }
             ]
         }
     };

@@ -11,27 +11,27 @@
         "HEM": {
             name: "Hematology (โลหิตวิทยา)", icon: "droplet",
             items: [
-                { id: "CBC", name: "Complete Blood Count (CBC)", price: 350, container: "Lavender (EDTA)", type: "Panel" },
-                { id: "BLP", name: "Blood Parasite Smear", price: 150, container: "Lavender (EDTA)", type: "Test" },
-                { id: "COAG", name: "Coagulation (PT/APTT)", price: 850, container: "Light Blue", type: "Panel" }
+                { id: "CBC", name: "Complete Blood Count (CBC)", price: 350, container: "Lavender (EDTA)", used_unit: "Test", type: "Panel" },
+                { id: "BLP", name: "Blood Parasite Smear", price: 150, container: "Lavender (EDTA)", used_unit: "Test", type: "Test" },
+                { id: "COAG", name: "Coagulation (PT/APTT)", price: 850, container: "Light Blue", used_unit: "Panel", type: "Panel" }
             ]
         },
         "CHEM": {
             name: "Clinical Chemistry (เคมีคลินิก)", icon: "flask-conical",
             items: [
-                { id: "PREOP", name: "Pre-anesthetic Panel", price: 650, container: "Red/SST", type: "Panel" },
-                { id: "COMP", name: "Comprehensive Panel", price: 1400, container: "Red/SST", type: "Panel" },
-                { id: "RENAL", name: "Renal Panel", price: 500, container: "Red/SST", type: "Panel" },
-                { id: "LIVER", name: "Liver Panel", price: 550, container: "Red/SST", type: "Panel" },
-                { id: "ELEC", name: "Electrolytes", price: 350, container: "Red/SST", type: "Panel" },
-                { id: "GLU", name: "Glucose", price: 100, container: "Grey", type: "Test" }
+                { id: "PREOP", name: "Pre-anesthetic Panel", price: 650, container: "Red/SST", used_unit: "Panel", type: "Panel" },
+                { id: "COMP", name: "Comprehensive Panel", price: 1400, container: "Red/SST", used_unit: "Panel", type: "Panel" },
+                { id: "RENAL", name: "Renal Panel", price: 500, container: "Red/SST", used_unit: "Panel", type: "Panel" },
+                { id: "LIVER", name: "Liver Panel", price: 550, container: "Red/SST", used_unit: "Panel", type: "Panel" },
+                { id: "ELEC", name: "Electrolytes", price: 350, container: "Red/SST", used_unit: "Panel", type: "Panel" },
+                { id: "GLU", name: "Glucose", price: 100, container: "Grey", used_unit: "Test", type: "Test" }
             ]
         },
         "IMM": {
             name: "Immunology (ภูมิคุ้มกัน)", icon: "shield-check",
             items: [
-                { id: "4DX", name: "4Dx Plus Test", price: 950, container: "Lavender", type: "Rapid" },
-                { id: "PARVO", name: "Parvovirus Test", price: 500, container: "Feces", type: "Rapid" }
+                { id: "4DX", name: "4Dx Plus Test", price: 950, container: "Lavender", used_unit: "Test", type: "Rapid" },
+                { id: "PARVO", name: "Parvovirus Test", price: 500, container: "Feces", used_unit: "Test", type: "Rapid" }
             ]
         }
     };

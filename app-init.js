@@ -300,258 +300,7 @@ function initializeApp() {
         // >>> REVISED EYE EXAM LOGIC END <<<
     }
 
-    // 8. LIS Modal Logic (Updated for Beta 5.2.2 - Use labServiceCatalog)
-    const lisModal = document.getElementById('lis-popup-modal');
-    if (lisModal) {
-        // Controls
-        const openBtn = document.getElementById('open-lis-popup-fab');
-        const closeX = document.getElementById('close-lis-popup-x');
-        const closeCancel = document.getElementById('close-lis-popup-cancel');
-        const tabLinks = lisModal.querySelectorAll('.lis-tab-link');
-        const tabContents = lisModal.querySelectorAll('.lis-tab-content');
-        
-        // Form Elements
-        const lisCategoryList = document.getElementById('lis-category-list');
-        const lisCostItemList = document.getElementById('lis-cost-item-list');
-        const lisPreviewList = document.getElementById('lis-preview-list');
-        const lisPreviewPlaceholder = document.getElementById('lis-preview-placeholder');
-        const checkAllLis = document.getElementById('check-all-tests');
-        const btnAddSelected = document.getElementById('btn-add-selected-tests');
-        const lisSelectedTableBody = document.getElementById('lis-selected-table-body');
-        const lisSelectedCount = document.getElementById('lis-selected-count');
-        const lisSaveBtn = document.getElementById('btn-save-lis');
-        
-        // Views
-        const lisFormView = document.getElementById('lis-form-view');
-        const lisSummaryView = document.getElementById('lis-summary-view');
-        const closeSummaryX = document.getElementById('close-lis-summary-x');
-        
-        let currentSelectedRows = [];
-
-        // --- RENDER FUNCTIONS ---
-        const renderLisCategories = () => {
-            if (!lisCategoryList) return;
-            lisCategoryList.innerHTML = '';
-            
-            // ใช้ข้อมูลจริงจาก labServiceCatalog (app-data.js)
-            Object.keys(labServiceCatalog).forEach(key => {
-                const cat = labServiceCatalog[key];
-                const li = document.createElement('li');
-                li.className = "test-list-item flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary] cursor-pointer border-l-4 border-transparent transition-all";
-                li.setAttribute('data-category', key);
-                li.innerHTML = `
-                    <span class="font-medium text-gray-700 dark:text-[--color-text-base]">${cat.name}</span>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-                `;
-                li.addEventListener('click', () => {
-                    // Handle Active State
-                    lisCategoryList.querySelectorAll('li').forEach(i => {
-                        i.classList.remove('bg-pink-50', 'dark:bg-pink-900/20', 'border-pink-500');
-                        i.classList.add('border-transparent');
-                    });
-                    li.classList.remove('border-transparent');
-                    li.classList.add('bg-pink-50', 'dark:bg-pink-900/20', 'border-pink-500');
-                    
-                    renderCostItems(key);
-                });
-                lisCategoryList.appendChild(li);
-            });
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        };
-
-        const renderCostItems = (catKey) => {
-            const cat = labServiceCatalog[catKey];
-            const items = cat ? cat.items : [];
-            
-            lisCostItemList.innerHTML = items.length ? '' : '<li class="p-3 text-center text-gray-500 dark:text-[--color-text-muted]">No items in this category</li>';
-            
-            items.forEach(item => {
-                const containerBadge = item.container ? `<span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded ml-2 border border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">${item.container}</span>` : '';
-                lisCostItemList.innerHTML += `
-                    <li class="checkbox-label hover:bg-gray-50 dark:hover:bg-[var(--color-bg-secondary)] p-2 cursor-pointer border-b border-gray-50 dark:border-gray-800 last:border-0">
-                        <div class="flex items-center w-full">
-                            <input type="checkbox" class="form-checkbox mr-3 text-pink-600 focus:ring-pink-500" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-unit="Test">
-                            <div class="flex-1">
-                                <div class="text-sm text-[var(--color-text-base)] font-medium">${item.name}</div>
-                                <div class="text-xs text-gray-400 dark:text-gray-500 flex items-center mt-0.5">Code: ${item.id} ${containerBadge}</div>
-                            </div>
-                            <div class="text-sm font-bold text-gray-600 dark:text-gray-400">${item.price}</div>
-                        </div>
-                    </li>`;
-            });
-            
-            if(checkAllLis) checkAllLis.checked = false;
-            
-            // Re-attach Listeners for new checkboxes
-            lisCostItemList.querySelectorAll('input').forEach(cb => {
-                cb.addEventListener('change', updatePreview);
-            });
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        };
-
-        const updatePreview = () => {
-            const checked = lisCostItemList.querySelectorAll('input:checked');
-            lisPreviewList.querySelectorAll('p[data-lis-item]').forEach(p => p.remove()); 
-            lisPreviewPlaceholder.classList.remove('hidden');
-            
-            if (checked.length > 0) {
-                lisPreviewPlaceholder.classList.add('hidden');
-                checked.forEach(cb => {
-                    const p = document.createElement('p');
-                    p.className = "text-sm text-gray-700 dark:text-[--color-text-base] flex justify-between items-center py-1 border-b border-dashed border-gray-100 dark:border-gray-700";
-                    p.setAttribute('data-lis-item', cb.dataset.id);
-                    p.innerHTML = `<span>${cb.dataset.name}</span> <span class="text-xs font-bold text-pink-500">${cb.dataset.price}</span>`;
-                    lisPreviewList.insertBefore(p, null); // Append
-                });
-            }
-        };
-
-        const renderSelectedTable = () => {
-            lisSelectedTableBody.innerHTML = currentSelectedRows.length ? '' : '<tr><td colspan="6" class="p-8 text-center text-gray-400 dark:text-[--color-text-muted] italic">No tests added to cart</td></tr>';
-            let total = 0;
-            currentSelectedRows.forEach((row, index) => {
-                total += parseInt(row.price || 0);
-                lisSelectedTableBody.innerHTML += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-[var(--color-bg-secondary)] border-b border-gray-100 dark:border-gray-700 last:border-0">
-                        <td class="p-3 text-[var(--color-text-base)] text-center">${index + 1}</td>
-                        <td class="p-3 text-[var(--color-text-base)] font-medium">${row.name}</td>
-                        <td class="p-3 text-[var(--color-text-base)]">${row.id}</td>
-                        <td class="p-3 text-[var(--color-text-base)] text-center">1</td>
-                        <td class="p-3 text-[var(--color-text-base)] text-center">${row.unit}</td>
-                        <td class="p-3 text-center"><button class="text-gray-400 hover:text-red-500 transition-colors btn-remove-row p-1" data-index="${index}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
-                    </tr>`;
-            });
-            
-            // Update Count/Total
-            lisSelectedCount.innerHTML = `${currentSelectedRows.length} Items <span class="ml-2 text-sm font-normal text-gray-500">(Total: ${total.toLocaleString()}.-)</span>`;
-            
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        };
-
-        // --- MAIN LOGIC ---
-        const showLis = () => {
-            lisModal.classList.remove('hidden');
-            lisFormView.classList.remove('hidden');
-            lisSummaryView.classList.add('hidden');
-            
-            // Init Categories (ดึงจาก App Data)
-            renderLisCategories();
-            
-            // Auto-select first category
-            const firstCat = lisCategoryList.querySelector('li');
-            if(firstCat) firstCat.click();
-
-            // Render History Table
-            const filteredLis = activityLogData.filter(entry => entry.activity_type === "LIS");
-            renderLisHistoryTable(filteredLis);
-            
-            // Reset Tabs
-            tabLinks.forEach(t => { t.classList.remove('tab-active'); t.classList.add('tab-inactive'); });
-            const historyTab = lisModal.querySelector('.lis-tab-link[data-tab="lis-history"]');
-            if(historyTab) { historyTab.classList.remove('tab-inactive'); historyTab.classList.add('tab-active'); }
-            tabContents.forEach(c => c.classList.add('hidden'));
-            const historyContent = lisModal.querySelector('#content-lis-history');
-            if(historyContent) historyContent.classList.remove('hidden');
-            
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        };
-        
-        const hideLis = () => lisModal.classList.add('hidden');
-
-        // --- EVENTS ---
-        if(openBtn) openBtn.addEventListener('click', showLis);
-        if(closeX) closeX.addEventListener('click', hideLis);
-        if(closeCancel) closeCancel.addEventListener('click', hideLis);
-
-        if(checkAllLis) checkAllLis.addEventListener('change', () => {
-            lisCostItemList.querySelectorAll('input').forEach(cb => {
-                cb.checked = checkAllLis.checked;
-            });
-            updatePreview();
-        });
-        
-        if(btnAddSelected) btnAddSelected.addEventListener('click', () => {
-            const checked = lisCostItemList.querySelectorAll('input:checked');
-            if(checked.length === 0) return;
-            
-            checked.forEach(cb => {
-                // Prevent duplicates
-                if(!currentSelectedRows.some(r => r.id === cb.dataset.id)) {
-                    currentSelectedRows.push({ 
-                        id: cb.dataset.id, 
-                        name: cb.dataset.name, 
-                        price: cb.dataset.price, 
-                        unit: cb.dataset.unit 
-                    });
-                }
-                cb.checked = false; // Uncheck after add
-            });
-            if(checkAllLis) checkAllLis.checked = false;
-            updatePreview();
-            renderSelectedTable();
-            
-            // Scroll to bottom
-            const tableContainer = lisSelectedTableBody.parentElement;
-            if(tableContainer) tableContainer.scrollTop = tableContainer.scrollHeight;
-        });
-        
-        if(lisSelectedTableBody) lisSelectedTableBody.addEventListener('click', (e) => {
-            const btn = e.target.closest('.btn-remove-row');
-            if(btn) {
-                currentSelectedRows.splice(btn.dataset.index, 1);
-                renderSelectedTable();
-            }
-        });
-        
-        if(lisSaveBtn) lisSaveBtn.addEventListener('click', () => {
-            if(currentSelectedRows.length === 0) return alert("Please select at least one test.");
-            
-            // Save to Activity Log (Mock)
-            const now = new Date();
-            const newEntry = {
-                entry_id: `E-LAB-NEW-${Date.now()}`,
-                order_no: `ORD-${Date.now()}`,
-                acc_no: `LIS-${Date.now().toString().slice(-6)}`,
-                activity_type: "LIS",
-                order_status: "Done",
-                lis_process_status: "Waiting",
-                hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-                effective_time: formatKAHISDateTime(now),
-                order_create_date: formatKAHISDateTime(now),
-                order_update_date: formatKAHISDateTime(now),
-                request_date: formatKAHISDateTime(now),
-                order_note: document.getElementById('lis-note').value || "",
-                parameters: { 
-                    tests: currentSelectedRows.map(r => r.id), 
-                    note: document.getElementById('lis-note').value || "" 
-                },
-                recorded_by: "User (Login)", dvm: document.getElementById('lis-dvm').value, department: document.getElementById('lis-department').value,
-                last_updated_by: "User (Login)", last_updated_on: formatKAHISDateTime(now)
-            };
-            activityLogData.unshift(newEntry); // Add to top
-
-            lisFormView.classList.add('hidden');
-            lisSummaryView.classList.remove('hidden');
-            
-            // Clear Form
-            currentSelectedRows = [];
-            renderSelectedTable();
-            document.getElementById('lis-note').value = '';
-        });
-        
-        if(closeSummaryX) closeSummaryX.addEventListener('click', hideLis);
-
-        tabLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                tabLinks.forEach(t => { t.classList.remove('tab-active'); t.classList.add('tab-inactive'); });
-                link.classList.remove('tab-inactive'); link.classList.add('tab-active');
-                tabContents.forEach(c => c.classList.add('hidden'));
-                const target = lisModal.querySelector(`#content-${link.dataset.tab}`);
-                if(target) target.classList.remove('hidden');
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            });
-        });
-    }
+    
 
     // 9. Utils (Numpad, Image Viewer)
     const numpadModal = document.getElementById('numpad-modal');
@@ -715,6 +464,272 @@ function initializeApp() {
             lisHistoryBody.appendChild(row);
         });
     }
+}
+
+// --- ORDER LOGIC: LAB (LIS) - Updated Beta 6.2 ---
+function initializeLabScripts() {
+    console.log("Initialize Lab Scripts (Beta 6.2)...");
+    
+    // IDs mapping matching order_lis_content.html
+    const categoryList = document.getElementById('lis-category-list');
+    const itemList = document.getElementById('lis-item-list');
+    const currentCatName = document.getElementById('lis-current-cat-name');
+    const cartBody = document.getElementById('lis-cart-body');
+    const totalPriceEl = document.getElementById('lis-total-price');
+    
+    const btnSavePlan = document.getElementById('btn-save-lis-plan');
+    const btnConfirm = document.getElementById('btn-confirm-lis-order');
+    
+    const inputEffectiveDate = document.getElementById('lis-effective-date');
+    const inputEffectiveTime = document.getElementById('lis-effective-time');
+    const inputNote = document.getElementById('lis-order-note');
+    const checkFasting = document.getElementById('lis-fasting');
+
+    // Views
+    const lisFormView = document.getElementById('lis-form-view');
+    const lisSummaryView = document.getElementById('lis-summary-view');
+    const closeSummaryX = document.getElementById('close-lis-summary-x');
+
+    // Set Default DateTime
+    if (inputEffectiveDate && inputEffectiveTime) {
+        const now = new Date();
+        inputEffectiveDate.value = now.toISOString().split('T')[0];
+        inputEffectiveTime.value = now.toTimeString().slice(0, 5);
+    }
+
+    // 1. Render Categories
+    function renderLisCategories() {
+        if (!categoryList) return;
+        categoryList.innerHTML = '';
+        
+        Object.keys(labServiceCatalog).forEach(key => {
+            const cat = labServiceCatalog[key];
+            const li = document.createElement('li');
+            li.className = "p-3 cursor-pointer hover:bg-pink-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] flex items-center space-x-3 transition-colors last:border-0";
+            li.innerHTML = `
+                <div class="p-2 bg-white dark:bg-[--color-bg-base] rounded-full border border-gray-200 dark:border-[--color-border-base] shadow-sm text-pink-500">
+                    <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                </div>
+                <span class="font-medium text-gray-700 dark:text-[--color-text-base]">${cat.name}</span>
+            `;
+            
+            li.addEventListener('click', () => {
+                // Handle Active State
+                Array.from(categoryList.children).forEach(c => {
+                    c.classList.remove('bg-pink-50', 'dark:bg-pink-900/20', 'border-l-4', 'border-pink-500');
+                    c.classList.add('border-transparent');
+                });
+                li.classList.remove('border-transparent');
+                li.classList.add('bg-pink-50', 'dark:bg-pink-900/20', 'border-l-4', 'border-pink-500');
+                
+                renderLisItems(key);
+            });
+            categoryList.appendChild(li);
+        });
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // 2. Render Items
+    function renderLisItems(catKey) {
+        const cat = labServiceCatalog[catKey];
+        if (!cat) return;
+        
+        if(currentCatName) currentCatName.innerText = cat.name;
+        if(itemList) itemList.innerHTML = '';
+        
+        // Loop to populate items (Duplicate for demo if needed, here 3 times)
+        const loopCount = cat.items.length < 10 ? 3 : 1; 
+        for (let i = 0; i < loopCount; i++) {
+            cat.items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "p-3 bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm hover:shadow-md hover:border-pink-300 cursor-pointer transition-all flex justify-between items-center group mb-2";
+                
+                // Beta 6.2: Container = Gray/White
+                const containerBadge = (item.container && item.container !== '-') 
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white ml-2" title="Container">${item.container}</span>` 
+                    : '';
+                const unitBadge = item.used_unit 
+                    ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 ml-1 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" title="Used Unit">${item.used_unit}</span>` 
+                    : '';
+
+                li.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-center">
+                            <span class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-pink-600 transition-colors text-sm">${item.name}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1.5 flex items-center">
+                            <span class="font-mono text-[10px] text-gray-400 mr-1">${item.id}</span>
+                            ${containerBadge}
+                            ${unitBadge}
+                        </div>
+                    </div>
+                    <div class="text-sm font-bold text-pink-600 dark:text-pink-400 ml-2 whitespace-nowrap">${item.price}.-</div>`;
+                
+                li.addEventListener('click', () => addToLisCart(item));
+                if(itemList) itemList.appendChild(li);
+            });
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // 3. Cart Logic
+    function addToLisCart(item) {
+        if (globalLisCart.find(i => i.id === item.id)) return;
+        // Beta 6.2: Add default qty = 1
+        globalLisCart.push({ ...item, qty: "1" });
+        updateLisCartUI();
+    }
+
+    function updateLisCartUI() {
+        if(!cartBody) return;
+        cartBody.innerHTML = '';
+        let total = 0;
+        
+        if (globalLisCart.length === 0) {
+            cartBody.innerHTML = '<tr><td class="p-4 text-center text-gray-400 text-xs">No items selected</td></tr>';
+            if(totalPriceEl) totalPriceEl.innerText = "0 / 0";
+            return;
+        }
+
+        globalLisCart.forEach((item, index) => {
+            total += item.price;
+            
+            const tr = document.createElement('tr');
+            tr.className = "group hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] last:border-0";
+            
+            // Refined 6.2: Split Layout (Name/Badge Left, Qty/Unit Right) + Black Unit
+            tr.innerHTML = `
+                <td class="p-2 pl-3 align-top w-full">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col mr-2">
+                            <div class="font-semibold text-gray-800 dark:text-[--color-text-base] text-xs">
+                                ${item.name}
+                            </div>
+                            ${(item.container && item.container !== '-') 
+                                ? `<div class="mt-1"><span class="px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white inline-block">${item.container}</span></div>` 
+                                : ''}
+                        </div>
+                        
+                        <div class="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                            <div class="relative">
+                                <input type="text" readonly id="lis-qty-${index}" value="${item.qty}" 
+                                       class="w-12 p-1 text-center text-xs border border-pink-300 rounded focus:ring-1 focus:ring-pink-500 focus:outline-none bg-white dark:bg-[--color-bg-base] dark:border-[--color-border-base] dark:text-[--color-text-base] cursor-default text-gray-500" 
+                                       data-index="${index}">
+                            </div>
+                            <span class="text-xs text-black dark:text-[--color-text-base] font-medium w-8 text-left">${item.used_unit || ''}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="p-2 align-top text-right text-gray-600 dark:text-[--color-text-muted] text-xs font-bold whitespace-nowrap pt-3">
+                    ${item.price}
+                </td>
+                <td class="p-2 align-top text-center w-8 pt-2">
+                    <button class="text-gray-400 hover:text-red-600 transition-colors btn-remove-lis p-1 hover:bg-red-50 rounded" data-index="${index}">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </td>`;
+            cartBody.appendChild(tr);
+        });
+
+        // Refined 6.2: Format "Count / Price"
+        if(totalPriceEl) totalPriceEl.innerText = `${globalLisCart.length} / ${total.toLocaleString()}`;
+        
+        // Bind Remove Buttons
+        document.querySelectorAll('.btn-remove-lis').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                globalLisCart.splice(parseInt(e.currentTarget.dataset.index), 1);
+                updateLisCartUI();
+            });
+        });
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // 4. Submission Logic
+    function handleLisSubmission(actionType) {
+        if (globalLisCart.length === 0) return alert("Please select at least one test.");
+        
+        const now = new Date();
+        const orderNo = `ORD-LAB${now.getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`;
+        let orderStatus, lisStatus, accNo;
+        
+        if (actionType === 'plan') { 
+            orderStatus = "Pending"; lisStatus = null; accNo = null; 
+        } else { 
+            orderStatus = "Done"; lisStatus = "Waiting"; 
+            accNo = `LIS-${now.getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`; 
+        }
+
+        let effectiveStr = formatKAHISDateTime(now);
+        if (inputEffectiveDate && inputEffectiveTime && inputEffectiveDate.value && inputEffectiveTime.value) {
+            const effDateObj = new Date(`${inputEffectiveDate.value}T${inputEffectiveTime.value}`);
+            effectiveStr = formatKAHISDateTime(effDateObj);
+        }
+        
+        const noteText = inputNote ? inputNote.value.trim() : "";
+        const isFasted = checkFasting ? checkFasting.checked : false;
+        const priority = document.querySelector('input[name="lis_priority"]:checked')?.value || 'Routine';
+
+        const newEntry = {
+            entry_id: `E-LAB-NEW-${Date.now()}`,
+            order_no: orderNo,
+            acc_no: accNo,
+            activity_type: "LIS",
+            order_status: orderStatus,
+            lis_process_status: lisStatus,
+            hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+            effective_time: effectiveStr,
+            order_create_date: formatKAHISDateTime(now),
+            order_update_date: formatKAHISDateTime(now),
+            request_date: formatKAHISDateTime(now),
+            order_note: noteText,
+            parameters: { 
+                tests: globalLisCart.map(i => i.id), 
+                full_items: [...globalLisCart], 
+                priority: priority, 
+                fasting: isFasted, 
+                note: noteText 
+            },
+            recorded_by: "User (Login)", dvm: "Dr. Login", department: "101",
+            last_updated_by: "User (Login)", last_updated_on: formatKAHISDateTime(now), 
+            disable_remark: ""
+        };
+
+        activityLogData.unshift(newEntry);
+
+        if (actionType === 'send') {
+            showSuccessModal(accNo, globalLisCart, totalPriceEl.innerText, { priority: priority, fasting: isFasted });
+        } else {
+            alert(`Order Plan Saved!\nOrder No: ${orderNo}\nStatus: Pending`);
+        }
+        
+        // Success Action: Close form
+        if(lisFormView && lisSummaryView) {
+             lisFormView.classList.add('hidden');
+             lisSummaryView.classList.remove('hidden');
+        }
+        
+        globalLisCart = [];
+        updateLisCartUI();
+        if(inputNote) inputNote.value = "";
+        if(checkFasting) checkFasting.checked = false;
+        const routineRadio = document.getElementById('prio-routine');
+        if(routineRadio) routineRadio.checked = true;
+    }
+
+    // 5. Bind Events
+    if (btnSavePlan) btnSavePlan.onclick = (e) => { e.preventDefault(); handleLisSubmission('plan'); };
+    if (btnConfirm) btnConfirm.onclick = (e) => { e.preventDefault(); handleLisSubmission('send'); };
+    if (closeSummaryX) closeSummaryX.addEventListener('click', () => {
+         if(typeof hideLis === 'function') hideLis(); // Helper if available or manual
+         const modal = document.getElementById('lis-popup-modal');
+         if(modal) modal.classList.add('hidden');
+    });
+
+    // --- INITIAL RENDER ---
+    renderLisCategories();
+    updateLisCartUI();
 }
 
 // --- UTILS ---
@@ -994,149 +1009,268 @@ function initializeLabViewer() {
     renderLabViewTable();
 }
 
-// --- ORDER LOGIC: LAB (Renamed from LIS) ---
-function initializeLabScripts() {
-    const categoryList = document.getElementById('lis-category-list');
-    const itemList = document.getElementById('lis-item-list');
-    const currentCatName = document.getElementById('lis-current-cat-name');
-    const cartBody = document.getElementById('lis-cart-body');
-    const totalPriceEl = document.getElementById('lis-total-price');
-    
-    const btnSavePlan = document.getElementById('btn-save-lis-plan');
-    const btnConfirm = document.getElementById('btn-confirm-lis-order');
-    const inputEffectiveDate = document.getElementById('lis-effective-date');
-    const inputEffectiveTime = document.getElementById('lis-effective-time');
-    const inputNote = document.getElementById('lis-order-note');
-    const checkFasting = document.getElementById('lis-fasting');
-
-    if (inputEffectiveDate && inputEffectiveTime) {
-        const now = new Date();
-        inputEffectiveDate.value = now.toISOString().split('T')[0];
-        inputEffectiveTime.value = now.toTimeString().slice(0, 5);
-    }
-
-    function renderLisCategories() {
-        if (!categoryList) return;
-        categoryList.innerHTML = '';
-        Object.keys(labServiceCatalog).forEach(key => {
-            const cat = labServiceCatalog[key];
-            const li = document.createElement('li');
-            li.className = "p-3 cursor-pointer hover:bg-pink-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] flex items-center space-x-3 transition-colors last:border-0";
-            li.innerHTML = `<div class="p-2 bg-white dark:bg-[--color-bg-base] rounded-full border border-gray-200 dark:border-[--color-border-base] shadow-sm text-pink-500"><i data-lucide="${cat.icon}" class="w-4 h-4"></i></div><span class="font-medium text-gray-700 dark:text-[--color-text-base]">${cat.name}</span>`;
-            li.addEventListener('click', () => {
-                Array.from(categoryList.children).forEach(c => c.classList.remove('bg-pink-50', 'dark:bg-pink-900/20', 'border-l-4', 'border-pink-500'));
-                li.classList.add('bg-pink-50', 'dark:bg-pink-900/20', 'border-l-4', 'border-pink-500');
-                renderLisItems(key);
-            });
-            categoryList.appendChild(li);
-        });
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-
-    function renderLisItems(catKey) {
-        const cat = labServiceCatalog[catKey];
-        if (!cat) return;
-        currentCatName.innerText = cat.name;
-        itemList.innerHTML = '';
-        const loopCount = cat.items.length < 10 ? 3 : 1; 
-        for (let i = 0; i < loopCount; i++) {
-            cat.items.forEach(item => {
-                const li = document.createElement('li');
-                li.className = "p-3 bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm hover:shadow-md hover:border-pink-300 cursor-pointer transition-all flex justify-between items-center group mb-2";
-                const containerBadge = item.container ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white text-gray-700 border border-gray-400 ml-2 shadow-sm dark:bg-transparent dark:text-[--color-text-base] dark:border-[--color-text-base]"><i data-lucide="test-tube-2" class="w-3 h-3 mr-1 text-gray-500 dark:text-[--color-text-base]"></i>${item.container}</span>` : '';
-                li.innerHTML = `<div class="flex-1"><div class="flex items-center"><span class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-pink-600">${item.name}</span>${i > 0 ? `<span class="text-[10px] text-gray-400 ml-1">(Copy ${i})</span>` : ''}</div><div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1 flex items-center">LOINC: ${item.loinc} ${containerBadge}</div></div><div class="text-sm font-bold text-pink-600 dark:text-pink-400 ml-2 whitespace-nowrap">${item.price}.-</div>`;
-                li.addEventListener('click', () => addToLisCart(item));
-                itemList.appendChild(li);
-            });
-        }
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-
-    function addToLisCart(item) {
-        if (globalLisCart.find(i => i.id === item.id)) return;
-        globalLisCart.push(item);
-        updateLisCartUI();
-    }
-
-    function updateLisCartUI() {
-        cartBody.innerHTML = '';
-        let total = 0;
-        if (globalLisCart.length === 0) {
-            cartBody.innerHTML = '<tr><td class="p-4 text-center text-gray-400 text-xs">No items selected</td></tr>';
-            totalPriceEl.innerText = "0";
-            return;
-        }
-        globalLisCart.forEach((item, index) => {
-            total += item.price;
-            const containerBadgeCart = item.container ? `<div class="mt-1"><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white text-gray-700 border border-gray-400 dark:bg-transparent dark:text-[--color-text-base] dark:border-[--color-text-base]">${item.container}</span></div>` : '';
-            const tr = document.createElement('tr');
-            tr.className = "group hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] last:border-0";
-            tr.innerHTML = `<td class="p-3 pl-4 align-top"><div class="font-semibold text-gray-800 dark:text-[--color-text-base] text-xs">${item.name}</div>${containerBadgeCart}</td><td class="p-3 text-right align-top text-gray-600 dark:text-[--color-text-muted] text-xs font-bold whitespace-nowrap">${item.price}</td><td class="p-3 text-center align-top w-10"><button class="text-gray-400 hover:text-red-600 transition-colors btn-remove-lis p-1 hover:bg-red-50 rounded" data-index="${index}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>`;
-            cartBody.appendChild(tr);
-        });
-        totalPriceEl.innerText = total.toLocaleString();
-        document.querySelectorAll('.btn-remove-lis').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                globalLisCart.splice(parseInt(e.currentTarget.dataset.index), 1);
-                updateLisCartUI();
-            });
-        });
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-
-    function handleLisSubmission(actionType) {
-        if (globalLisCart.length === 0) return alert("Please select at least one test.");
-        const now = new Date();
-        const orderNo = `ORD-LAB${now.getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`;
-        let orderStatus, lisStatus, accNo;
-        if (actionType === 'plan') { orderStatus = "Pending"; lisStatus = null; accNo = null; } 
-        else { orderStatus = "Done"; lisStatus = "Waiting"; accNo = `LIS-${now.getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`; }
-
-        let effectiveStr = formatKAHISDateTime(now);
-        if (inputEffectiveDate && inputEffectiveTime && inputEffectiveDate.value && inputEffectiveTime.value) {
-            const effDateObj = new Date(`${inputEffectiveDate.value}T${inputEffectiveTime.value}`);
-            effectiveStr = formatKAHISDateTime(effDateObj);
-        }
-        const noteText = inputNote ? inputNote.value.trim() : "";
-        const isFasted = checkFasting ? checkFasting.checked : false;
-        const priority = document.querySelector('input[name="lis_priority"]:checked')?.value || 'Routine';
-
-        const newEntry = {
-            entry_id: `E-LAB${Date.now()}`,
-            order_no: orderNo,
-            acc_no: accNo,
-            activity_type: "LIS",
-            order_status: orderStatus,
-            lis_process_status: lisStatus,
-            hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
-            effective_time: effectiveStr,
-            order_create_date: formatKAHISDateTime(now),
-            order_update_date: formatKAHISDateTime(now),
-            request_date: (actionType === 'send') ? formatKAHISDateTime(now) : null,
-            order_note: noteText,
-            parameters: { tests: globalLisCart.map(i => i.id), full_items: [...globalLisCart], priority: priority, fasting: isFasted, note: noteText },
-            recorded_by: "User (Login)", dvm: "Dr. Login", department: "101",
-            last_updated_by: "User (Login)", last_updated_on: formatKAHISDateTime(now), disable_remark: ""
-        };
-        activityLogData.push(newEntry);
-        if (actionType === 'send') showSuccessModal(accNo, globalLisCart, totalPriceEl.innerText, { priority: priority, fasting: isFasted });
-        else alert(`Order Plan Saved!\nOrder No: ${orderNo}\nStatus: Pending`);
+/// 8. LIS Modal Logic (Updated for Beta 6.2 - Standardized Cart)
+    const lisModal = document.getElementById('lis-popup-modal');
+    if (lisModal) {
+        // Controls
+        const openBtn = document.getElementById('open-lis-popup-fab');
+        const closeX = document.getElementById('close-lis-popup-x');
+        const closeCancel = document.getElementById('close-lis-popup-cancel');
+        const tabLinks = lisModal.querySelectorAll('.lis-tab-link');
+        const tabContents = lisModal.querySelectorAll('.lis-tab-content');
         
-        globalLisCart = [];
-        updateLisCartUI();
-        if(inputNote) inputNote.value = "";
-        if(checkFasting) checkFasting.checked = false;
-        document.getElementById('prio-routine').checked = true;
+        // Form Elements
+        const lisCategoryList = document.getElementById('lis-category-list');
+        const lisItemList = document.getElementById('lis-item-list'); // New ID
+        const currentCatName = document.getElementById('lis-current-cat-name');
+        const cartBody = document.getElementById('lis-cart-body'); // New ID
+        const totalPriceEl = document.getElementById('lis-total-price');
+        const lisSaveBtn = document.getElementById('btn-save-lis');
+        
+        // Inputs
+        const inputEffectiveDate = document.getElementById('lis-effective-date');
+        const inputEffectiveTime = document.getElementById('lis-effective-time');
+        const inputNote = document.getElementById('lis-order-note');
+        const checkFasting = document.getElementById('lis-fasting');
+
+        // Views
+        const lisFormView = document.getElementById('lis-form-view');
+        const lisSummaryView = document.getElementById('lis-summary-view');
+        const closeSummaryX = document.getElementById('close-lis-summary-x');
+
+        if (inputEffectiveDate && inputEffectiveTime) {
+            const now = new Date();
+            inputEffectiveDate.value = now.toISOString().split('T')[0];
+            inputEffectiveTime.value = now.toTimeString().slice(0, 5);
+        }
+
+        // --- RENDER FUNCTIONS ---
+        const renderLisCategories = () => {
+            if (!lisCategoryList) return;
+            lisCategoryList.innerHTML = '';
+            
+            Object.keys(labServiceCatalog).forEach(key => {
+                const cat = labServiceCatalog[key];
+                const li = document.createElement('li');
+                li.className = "p-3 cursor-pointer hover:bg-pink-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] flex items-center space-x-3 transition-colors last:border-0";
+                li.innerHTML = `<div class="p-2 bg-white dark:bg-[--color-bg-base] rounded-full border border-gray-200 dark:border-[--color-border-base] shadow-sm text-pink-500"><i data-lucide="${cat.icon}" class="w-4 h-4"></i></div><span class="font-medium text-gray-700 dark:text-[--color-text-base]">${cat.name}</span>`;
+                li.addEventListener('click', () => {
+                    Array.from(lisCategoryList.children).forEach(c => {
+                        c.classList.remove('bg-pink-50', 'dark:bg-pink-900/20', 'border-l-4', 'border-pink-500');
+                        c.classList.add('border-transparent');
+                    });
+                    li.classList.remove('border-transparent');
+                    li.classList.add('bg-pink-50', 'dark:bg-pink-900/20', 'border-l-4', 'border-pink-500');
+                    renderLisItems(key);
+                });
+                lisCategoryList.appendChild(li);
+            });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        const renderLisItems = (catKey) => {
+            const cat = labServiceCatalog[catKey];
+            if (!cat) return;
+            currentCatName.innerText = cat.name;
+            lisItemList.innerHTML = '';
+            const loopCount = cat.items.length < 10 ? 3 : 1; 
+            for (let i = 0; i < loopCount; i++) {
+                cat.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = "p-3 bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm hover:shadow-md hover:border-pink-300 cursor-pointer transition-all flex justify-between items-center group mb-2";
+                    
+                    // Refined 6.2: Container = Gray/White
+                const containerBadge = (item.container && item.container !== '-') 
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white ml-2" title="Container">${item.container}</span>` 
+                    : '';
+                    const unitBadge = item.used_unit 
+                        ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 ml-1 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" title="Used Unit">${item.used_unit}</span>` 
+                        : '';
+
+                    li.innerHTML = `
+                        <div class="flex-1">
+                            <div class="flex items-center">
+                                <span class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-pink-600 transition-colors text-sm">${item.name}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1.5 flex items-center">
+                                <span class="font-mono text-[10px] text-gray-400 mr-1">${item.id}</span>
+                                ${containerBadge}
+                                ${unitBadge}
+                            </div>
+                        </div>
+                        <div class="text-sm font-bold text-pink-600 dark:text-pink-400 ml-2 whitespace-nowrap">${item.price}.-</div>`;
+                    li.addEventListener('click', () => addToLisCart(item));
+                    lisItemList.appendChild(li);
+                });
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        const addToLisCart = (item) => {
+            if (globalLisCart.find(i => i.id === item.id)) return;
+            // Beta 6.2: Add default qty = 1
+            globalLisCart.push({ ...item, qty: "1" });
+            updateLisCartUI();
+        };
+
+        const updateLisCartUI = () => {
+            cartBody.innerHTML = '';
+            let total = 0;
+            if (globalLisCart.length === 0) {
+                cartBody.innerHTML = '<tr><td class="p-4 text-center text-gray-400 text-xs">No items selected</td></tr>';
+                totalPriceEl.innerText = "0 / 0";
+                return;
+            }
+            globalLisCart.forEach((item, index) => {
+                total += item.price;
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] last:border-0";
+                
+                // Refined 6.2: Split Layout (Name/Badge Left, Qty/Unit Right) + Black Unit
+                tr.innerHTML = `
+                    <td class="p-2 pl-3 align-top w-full">
+                        <div class="flex justify-between items-start">
+                            <div class="flex flex-col mr-2">
+                                <div class="font-semibold text-gray-800 dark:text-[--color-text-base] text-xs">
+                                    ${item.name}
+                                </div>
+                                ${(item.container && item.container !== '-') 
+                                    ? `<div class="mt-1"><span class="px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white inline-block">${item.container}</span></div>` 
+                                    : ''}
+                            </div>
+                            
+                            <div class="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                                <div class="relative">
+                                    <input type="text" readonly id="lis-qty-${index}" value="${item.qty}" 
+                                           class="w-12 p-1 text-center text-xs border border-pink-300 rounded focus:ring-1 focus:ring-pink-500 focus:outline-none bg-white dark:bg-[--color-bg-base] dark:border-[--color-border-base] dark:text-[--color-text-base] cursor-default text-gray-500" 
+                                           data-index="${index}">
+                                </div>
+                                <span class="text-xs text-black dark:text-[--color-text-base] font-medium w-8 text-left">${item.used_unit || ''}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-2 align-top text-right text-gray-600 dark:text-[--color-text-muted] text-xs font-bold whitespace-nowrap pt-3">
+                        ${item.price}
+                    </td>
+                    <td class="p-2 align-top text-center w-8 pt-2">
+                        <button class="text-gray-400 hover:text-red-600 transition-colors btn-remove-lis p-1 hover:bg-red-50 rounded" data-index="${index}">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </td>`;
+                cartBody.appendChild(tr);
+            });
+            // Refined 6.2: Format "Count / Price"
+        totalPriceEl.innerText = `${globalPathCart.length} / ${total.toLocaleString()}`;
+            
+            document.querySelectorAll('.btn-remove-lis').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    globalLisCart.splice(parseInt(e.currentTarget.dataset.index), 1);
+                    updateLisCartUI();
+                });
+            });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        // --- MAIN LOGIC ---
+        const showLis = () => {
+            lisModal.classList.remove('hidden');
+            lisFormView.classList.remove('hidden');
+            lisSummaryView.classList.add('hidden');
+            
+            renderLisCategories();
+            
+            const firstCat = lisCategoryList.querySelector('li');
+            if(firstCat) firstCat.click();
+
+            const filteredLis = activityLogData.filter(entry => entry.activity_type === "LIS");
+            renderLisHistoryTable(filteredLis);
+            
+            tabLinks.forEach(t => { t.classList.remove('tab-active'); t.classList.add('tab-inactive'); });
+            const historyTab = lisModal.querySelector('.lis-tab-link[data-tab="lis-history"]');
+            if(historyTab) { historyTab.classList.remove('tab-inactive'); historyTab.classList.add('tab-active'); }
+            tabContents.forEach(c => c.classList.add('hidden'));
+            const historyContent = lisModal.querySelector('#content-lis-history');
+            if(historyContent) historyContent.classList.remove('hidden');
+            
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+        
+        const hideLis = () => lisModal.classList.add('hidden');
+
+        // --- EVENTS ---
+        if(openBtn) openBtn.addEventListener('click', showLis);
+        if(closeX) closeX.addEventListener('click', hideLis);
+        if(closeCancel) closeCancel.addEventListener('click', hideLis);
+        
+        if(lisSaveBtn) lisSaveBtn.addEventListener('click', () => {
+            if(globalLisCart.length === 0) return alert("Please select at least one test.");
+            
+            const now = new Date();
+            const orderNo = `ORD-LAB${now.getFullYear().toString().slice(-2)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`;
+            const accNo = `LIS-${now.getFullYear().toString().slice(-6)}${(Math.random() * 10000).toFixed(0).padStart(4, '0')}`;
+            
+            let effectiveStr = formatKAHISDateTime(now);
+            if (inputEffectiveDate && inputEffectiveTime && inputEffectiveDate.value && inputEffectiveTime.value) {
+                const effDateObj = new Date(`${inputEffectiveDate.value}T${inputEffectiveTime.value}`);
+                effectiveStr = formatKAHISDateTime(effDateObj);
+            }
+            
+            const noteText = inputNote ? inputNote.value.trim() : "";
+            const isFasted = checkFasting ? checkFasting.checked : false;
+            const priority = document.querySelector('input[name="lis_priority"]:checked')?.value || 'Routine';
+
+            const newEntry = {
+                entry_id: `E-LAB-NEW-${Date.now()}`,
+                order_no: orderNo,
+                acc_no: accNo,
+                activity_type: "LIS",
+                order_status: "Done",
+                lis_process_status: "Waiting",
+                hn: "52039575", pet_name: "คุณส้มจี๊ด(จี๊ดจ๊าด)", owner_name: "คุณพ่อส้มจี๊ด",
+                effective_time: effectiveStr,
+                order_create_date: formatKAHISDateTime(now),
+                order_update_date: formatKAHISDateTime(now),
+                request_date: formatKAHISDateTime(now),
+                order_note: noteText,
+                parameters: { 
+                    tests: globalLisCart.map(i => i.id), 
+                    full_items: [...globalLisCart],
+                    priority: priority,
+                    fasting: isFasted,
+                    note: noteText 
+                },
+                recorded_by: "User (Login)", dvm: document.getElementById('lis-dvm').value, department: document.getElementById('lis-department').value,
+                last_updated_by: "User (Login)", last_updated_on: formatKAHISDateTime(now), disable_remark: ""
+            };
+            activityLogData.unshift(newEntry);
+
+            lisFormView.classList.add('hidden');
+            lisSummaryView.classList.remove('hidden');
+            
+            // Clear
+            globalLisCart = [];
+            updateLisCartUI();
+            if(inputNote) inputNote.value = '';
+            if(checkFasting) checkFasting.checked = false;
+            const routineRadio = document.getElementById('prio-routine');
+            if(routineRadio) routineRadio.checked = true;
+        });
+        
+        if(closeSummaryX) closeSummaryX.addEventListener('click', hideLis);
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                tabLinks.forEach(t => { t.classList.remove('tab-active'); t.classList.add('tab-inactive'); });
+                link.classList.remove('tab-inactive'); link.classList.add('tab-active');
+                tabContents.forEach(c => c.classList.add('hidden'));
+                const target = lisModal.querySelector(`#content-${link.dataset.tab}`);
+                if(target) target.classList.remove('hidden');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        });
     }
 
-    if (btnSavePlan) btnSavePlan.onclick = (e) => { e.preventDefault(); handleLisSubmission('plan'); };
-    if (btnConfirm) btnConfirm.onclick = (e) => { e.preventDefault(); handleLisSubmission('send'); };
-
-    renderLisCategories();
-    updateLisCartUI(); 
-}
-
-// --- ORDER LOGIC: PATHOLOGY ---
+// --- ORDER LOGIC: PATHOLOGY (Updated Beta 6.2 - Standardized Cart) ---
 function initializePathologyScripts() {
     const categoryList = document.getElementById('path-category-list');
     const itemList = document.getElementById('path-item-list');
@@ -1188,7 +1322,27 @@ function initializePathologyScripts() {
             cat.items.forEach(item => {
                 const li = document.createElement('li');
                 li.className = "p-3 bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm hover:shadow-md hover:border-fuchsia-300 cursor-pointer transition-all flex justify-between items-center group mb-2";
-                li.innerHTML = `<div class="flex-1"><div class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-fuchsia-700 text-sm">${item.name}</div><div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1">LOINC: ${item.loinc}</div></div><div class="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400 ml-2 whitespace-nowrap">${item.price}.-</div>`;
+                
+                // Refined 6.2: Container Badge = Gray/White
+                const containerBadge = (item.container && item.container !== '-') 
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white ml-2" title="Container">${item.container}</span>` 
+                    : '';
+                const unitBadge = item.used_unit 
+                    ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 ml-1 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" title="Used Unit">${item.used_unit}</span>` 
+                    : '';
+
+                li.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-center">
+                            <span class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-fuchsia-700 text-sm">${item.name}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1.5 flex items-center">
+                            ${(item.loinc) ? `<span class="text-[10px] mr-1">LOINC:${item.loinc}</span>` : ''}
+                            ${containerBadge}
+                            ${unitBadge}
+                        </div>
+                    </div>
+                    <div class="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400 ml-2 whitespace-nowrap">${item.price}.-</div>`;
                 li.addEventListener('click', () => selectItem(item));
                 itemList.appendChild(li);
             });
@@ -1212,7 +1366,8 @@ function initializePathologyScripts() {
                 inputSite.focus();
                 return;
             }
-            globalPathCart.push({ ...currentItem, site: site });
+            // Beta 6.2: Add default qty = 1
+            globalPathCart.push({ ...currentItem, site: site, qty: "1" });
             updatePathMiniCart();
             inputSite.value = ''; 
             selectedInfoBox.classList.add('hidden');
@@ -1232,8 +1387,32 @@ function initializePathologyScripts() {
         globalPathCart.forEach((item, index) => {
             total += item.price;
             const li = document.createElement('li');
-            li.className = "bg-white dark:bg-[--color-bg-content] p-2 rounded border border-gray-200 dark:border-[--color-border-base] flex justify-between items-start shadow-sm";
-            li.innerHTML = `<div class="flex-1 mr-2"><div class="font-bold text-xs text-gray-700 dark:text-[--color-text-base]">${item.name}</div><div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-0.5"><span class="font-semibold">Site:</span> <span class="text-fuchsia-600 dark:text-fuchsia-400">${item.site || '-'}</span></div></div><button class="text-gray-400 hover:text-red-500 btn-remove-path" data-index="${index}"><i data-lucide="trash-2" class="w-3 h-3"></i></button>`;
+            li.className = "bg-white dark:bg-[--color-bg-content] p-2 rounded border border-gray-200 dark:border-[--color-border-base] flex justify-between items-center shadow-sm gap-2";
+            
+            // Refined 6.2: Split Layout (Name/Tag Left, Input/Unit Right) + Black Unit
+            li.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col mr-2">
+                            <span class="font-bold text-xs text-gray-700 dark:text-[--color-text-base]">${item.name}</span>
+                            ${(item.container && item.container !== '-') ? `<div class="mt-1"><span class="px-2 py-0.5 rounded text-[9px] bg-gray-500 text-white inline-block">${item.container}</span></div>` : ''}
+                            ${item.site ? `<div class="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 mt-1 truncate">Site: ${item.site}</div>` : ''}
+                        </div>
+                        
+                        <div class="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                             <div class="relative">
+                                <input type="text" readonly value="${item.qty}" 
+                                       class="w-10 p-0.5 text-center text-[10px] border border-fuchsia-300 rounded bg-gray-50 text-gray-600 cursor-default">
+                            </div>
+                            <span class="text-[10px] text-black dark:text-[--color-text-base] w-8 text-left">${item.used_unit || ''}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pl-2 border-l border-gray-100 dark:border-[--color-border-base] ml-2">
+                    <span class="text-xs font-bold text-gray-600 dark:text-[--color-text-muted]">${item.price}</span>
+                    <button class="text-gray-400 hover:text-red-500 btn-remove-path p-1 rounded hover:bg-red-50 transition-colors" data-index="${index}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            `;
             miniCartList.appendChild(li);
         });
         totalPriceEl.innerText = total.toLocaleString();
@@ -1400,39 +1579,73 @@ function loadOrderForEdit(entryId, type) {
     }
 }
 
-// --- 3. SUCCESS MODAL ---
+// --- 3. SUCCESS MODAL (Updated Beta 6.9) ---
 function showSuccessModal(accNo, cartItems, total, extraDetails = {}) {
     let modal = document.getElementById('order-success-modal');
     if (modal) modal.remove(); 
 
     const div = document.createElement('div');
+    
+    // Badges Logic
     let priorityBadge = '';
-    if (extraDetails && extraDetails.priority === 'STAT') priorityBadge = `<span class="ml-2 px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white shadow-sm">STAT</span>`;
-    else if (extraDetails && extraDetails.priority) priorityBadge = `<span class="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Routine</span>`;
+    if (extraDetails && extraDetails.priority === 'STAT') priorityBadge = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white shadow-sm">STAT</span>`;
+    else if (extraDetails && extraDetails.priority) priorityBadge = `<span class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-700 dark:text-gray-300">Routine</span>`;
 
     const fastingBadge = (extraDetails && extraDetails.fasting) ? `<span class="ml-2 px-2 py-0.5 rounded text-xs font-bold bg-orange-500 text-white shadow-sm">Fasted</span>` : '';
+    
+    // Info: Order No & Record Meta
+    const orderNoHtml = extraDetails.orderNo ? `<div class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-1">Order No: ${extraDetails.orderNo}</div>` : '';
+    
+    const metaHtml = (extraDetails.dvm || extraDetails.dept) ? 
+        `<div class="mt-2 text-[11px] text-gray-600 dark:text-gray-300 flex items-center justify-center gap-3 bg-gray-50 dark:bg-gray-800/50 py-1 px-3 rounded-lg border border-gray-100 dark:border-gray-700">
+            <span class="flex items-center"><i data-lucide="user" class="w-3 h-3 mr-1 text-gray-400"></i>${extraDetails.dvm || '-'}</span>
+            <span class="text-gray-300">|</span>
+            <span class="flex items-center"><i data-lucide="building-2" class="w-3 h-3 mr-1 text-gray-400"></i>${extraDetails.dept || '-'}</span>
+         </div>` : '';
+
+    // Beta 6.9: Notes Display
+    const pharmNoteHtml = extraDetails.pharmacyNote ? 
+        `<div class="mt-2 w-full text-left bg-orange-50 dark:bg-orange-900/20 p-2 rounded border border-orange-100 dark:border-orange-800/30">
+            <span class="text-[10px] font-bold text-orange-700 dark:text-orange-400 uppercase">Pharmacy Note:</span>
+            <div class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">${extraDetails.pharmacyNote}</div>
+         </div>` : '';
+
+    const orderNoteHtml = extraDetails.orderNote ? 
+        `<div class="mt-1 w-full text-left bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700">
+            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Order Note:</span>
+            <div class="text-xs text-gray-700 dark:text-gray-300 mt-0.5">${extraDetails.orderNote}</div>
+         </div>` : '';
 
     div.innerHTML = `
         <div id="order-success-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[150] backdrop-blur-sm">
-            <div class="bg-white dark:bg-[--color-bg-content] rounded-xl shadow-2xl p-0 max-w-md w-full flex flex-col overflow-hidden border border-gray-200 dark:border-[--color-border-base] animate-fade-in-up">
-                <div class="p-6 text-center bg-green-50 dark:bg-green-900/10 border-b border-green-100 dark:border-green-900/20">
+            <div class="bg-white dark:bg-[--color-bg-content] rounded-xl shadow-2xl p-0 max-w-md w-full flex flex-col overflow-hidden border border-gray-200 dark:border-[--color-border-base] animate-fade-in-up" style="max-height: 90vh;">
+                <div class="p-6 text-center bg-green-50 dark:bg-green-900/10 border-b border-green-100 dark:border-green-900/20 overflow-y-auto flex-shrink-0">
                     <div class="w-16 h-16 bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner"><i data-lucide="check" class="w-8 h-8"></i></div>
                     <h3 class="text-xl font-bold text-gray-800 dark:text-[--color-text-base]">Order Confirmed!</h3>
-                    <div class="mt-3 flex flex-col items-center space-y-2">
-                        <div class="inline-block px-3 py-1 bg-white dark:bg-[--color-bg-base] rounded border border-green-200 dark:border-green-800 text-sm font-mono font-bold text-green-700 dark:text-green-400 shadow-sm">${accNo}</div>
-                        <div class="flex justify-center items-center">${priorityBadge}${fastingBadge}</div>
+                    
+                    <div class="mt-3 flex flex-col items-center w-full">
+                        <div class="inline-block px-3 py-1 bg-white dark:bg-[--color-bg-base] rounded border border-green-200 dark:border-green-800 text-sm font-mono font-bold text-green-700 dark:text-green-400 shadow-sm">
+                            Acc No: ${accNo}
+                        </div>
+                        ${orderNoHtml}
+                        <div class="flex justify-center items-center mt-2 gap-2">${priorityBadge}${fastingBadge}</div>
+                        ${metaHtml}
+                        ${pharmNoteHtml}
+                        ${orderNoteHtml}
                     </div>
                 </div>
-                <div class="p-4 bg-gray-50 dark:bg-[--color-bg-secondary] flex-1 overflow-y-auto max-h-60">
+                <div class="p-4 bg-gray-50 dark:bg-[--color-bg-secondary] flex-1 overflow-y-auto min-h-0">
                     <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2 px-2">Order Summary</h4>
                     <ul id="modal-item-list" class="space-y-2 text-sm"></ul>
                 </div>
-                <div class="p-4 border-t border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content]">
-                    <div class="flex justify-between items-center mb-4"><span class="text-gray-600 dark:text-[--color-text-muted] font-medium">Total Amount</span><span class="text-xl font-bold text-blue-600 dark:text-blue-400">${total}.-</span></div>
-                    <div class="text-[10px] text-gray-400 text-center mb-4 px-2 italic bg-gray-50 dark:bg-transparent py-2 rounded border border-dashed border-gray-200 dark:border-gray-700">*Note: รหัสที่แสดงคือ Accession No. (สำหรับห้อง Lab/สติกเกอร์สิ่งส่งตรวจ) <br>ส่วน Order No. (สำหรับใบสั่ง/การเงิน) จะถูกบันทึกในระบบแยกต่างหาก</div>
+                <div class="p-4 border-t border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] flex-shrink-0">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-600 dark:text-[--color-text-muted] font-medium">Total Amount</span>
+                        <span class="text-xl font-bold text-blue-600 dark:text-blue-400">${total}.-</span>
+                    </div>
                     <div class="flex space-x-3">
                         <button onclick="document.getElementById('order-success-modal').remove()" class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-[--color-border-base] dark:hover:bg-gray-600 text-gray-700 dark:text-[--color-text-base] rounded-lg font-semibold text-sm transition-colors">Close</button>
-                        <button class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm flex items-center justify-center shadow-lg shadow-blue-600/20 transition-all active:scale-95"><i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print Label</button>
+                        <button id="btn-print-modal" class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm flex items-center justify-center shadow-lg shadow-blue-600/20 transition-all active:scale-95"><i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print Label</button>
                     </div>
                 </div>
             </div>
@@ -1446,16 +1659,62 @@ function showSuccessModal(accNo, cartItems, total, extraDetails = {}) {
     if (cartItems && cartItems.length > 0) {
         cartItems.forEach(item => {
             const li = document.createElement('li');
-            li.className = "bg-white dark:bg-[--color-bg-content] p-3 rounded border border-gray-200 dark:border-[--color-border-base] shadow-sm flex justify-between items-start";
+            li.className = "bg-white dark:bg-[--color-bg-content] p-3 rounded border border-gray-200 dark:border-[--color-border-base] shadow-sm flex justify-between items-start gap-3";
+            
+            // Container Badge
             let details = '';
-            if (item.container) details = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-white text-gray-700 border border-gray-400 ml-2 shadow-sm dark:bg-transparent dark:text-[--color-text-base] dark:border dark:border-[--color-text-base]">${item.container}</span>`;
-            else if (item.site) details = `<div class="text-xs text-fuchsia-600 dark:text-fuchsia-400 mt-0.5 font-medium">Site: ${item.site}</div>`;
+            if (item.container && item.container !== '-') {
+                details = `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white ml-2" title="Container">${item.container}</span>`;
+            }
+            
+            // Sub-details (Label / Site)
+            let subText = '';
+            if (item.label) {
+                const formattedLabel = item.label.replace(/\n/g, '<br>');
+                subText = `<div class="text-[10px] text-orange-700 dark:text-orange-400 mt-1 break-words border-l-2 border-orange-200 pl-2 leading-relaxed">${formattedLabel}</div>`;
+            } else if (item.site) {
+                subText = `<div class="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 mt-1 font-medium">Site: ${item.site}</div>`;
+            }
 
-            li.innerHTML = `<div class="flex-1"><div class="font-medium text-gray-800 dark:text-[--color-text-base] flex items-center flex-wrap gap-1">${item.name}${item.container ? details : ''} </div>${!item.container ? details : ''}</div><div class="font-bold text-gray-600 dark:text-gray-400 ml-3">${item.price}</div>`;
+            // Price & Unit
+            const qtyVal = item.qty ? parseFloat(item.qty) : 1;
+            const lineTotal = (item.price * qtyVal).toLocaleString();
+            const unitText = item.used_unit || item.unit || '';
+
+            li.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-1 mb-1">
+                        <span class="font-bold text-xs text-gray-800 dark:text-[--color-text-base]">${item.name}</span>
+                        ${details}
+                    </div>
+                    ${subText}
+                </div>
+                
+                <div class="text-right flex flex-col items-end flex-shrink-0 ml-2">
+                    <span class="font-bold text-xs text-gray-800 dark:text-[--color-text-base]">${lineTotal}</span>
+                    <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 whitespace-nowrap">
+                        x${qtyVal} ${unitText}
+                    </div>
+                </div>
+            `;
             listContainer.appendChild(li);
         });
     } else {
         listContainer.innerHTML = '<li class="text-center text-gray-400 italic">No items</li>';
+    }
+    
+    // Bind Print Button (Beta 6.9 Logic)
+    const printBtn = document.getElementById('btn-print-modal');
+    if(printBtn) {
+        printBtn.onclick = () => {
+            document.getElementById('order-success-modal').remove(); // Close success modal
+            // Call Global Function from order-rx-init.js
+            if (typeof window.openRxPrintModal === 'function') {
+                window.openRxPrintModal(cartItems); 
+            } else {
+                console.error("Function window.openRxPrintModal not found.");
+            }
+        };
     }
     
     if (typeof lucide !== 'undefined') lucide.createIcons();

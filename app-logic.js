@@ -180,6 +180,8 @@ async function loadModuleContent(contentFile) {
             initializeOrderPEScripts();
         } else if (contentFile === 'order_tx_content.html') {
             if (typeof initializeOrderTxScripts === 'function') initializeOrderTxScripts();
+        } else if (contentFile === 'order_rx_content.html') {
+            if (typeof initializeOrderRxScripts === 'function') initializeOrderRxScripts();
         } else if (contentFile === 'order_lis_content.html') {
             // *** FIX: เรียกชื่อฟังก์ชันให้ตรงกับใน app-init.js ***
             if (typeof initializeLabScripts === 'function') {
@@ -219,29 +221,66 @@ function initializeTabSwitching() {
 }
 
 function initializeAssessmentScripts() {
-    // ... (Code for Assessment Script kept same as original to save space)
-    // ... (Assume logic for copy button, problem list, etc. is here)
-    // ... (Just ensure renderAssessmentHistoryTable is called if needed)
-    
-    // Re-binding listeners (Simplified for brevity, assumes existing logic is fine)
+    console.log("Initialize Assessment Scripts (Restored)");
+
+    // 1. Copy Button Logic
+    const setupCopyBtn = (btnId, contentId) => {
+        const btn = document.getElementById(btnId);
+        const content = document.getElementById(contentId);
+        
+        if (btn && content) {
+            // Remove old listeners (clone) to prevent duplicates if re-initialized
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default
+                const textToCopy = content.innerText;
+                
+                // Call Global Helper function
+                if (typeof copyAndSparkle === 'function') {
+                    copyAndSparkle(newBtn, textToCopy);
+                } else {
+                    console.warn("copyAndSparkle function not found.");
+                    navigator.clipboard.writeText(textToCopy); // Fallback
+                }
+            });
+        }
+    };
+
+    // Setup all 3 copy buttons
+    setupCopyBtn('copy-assessment-note-btn', 'assessment-note-content');
+    setupCopyBtn('copy-problem-list-btn', 'problem-list-content');
+    setupCopyBtn('copy-diagnosis-btn', 'diagnosis-content');
+
+    // 2. Problem List Modal Logic
     const openProblemListBtn = document.getElementById('open-problem-list-modal');
     const problemListModal = document.getElementById('problem-list-modal'); 
     if (openProblemListBtn && problemListModal) {
          openProblemListBtn.addEventListener('click', () => problemListModal.classList.remove('hidden'));
+         
          const closeBtn = document.getElementById('problem-list-popup-close-x');
          if(closeBtn) closeBtn.addEventListener('click', () => problemListModal.classList.add('hidden'));
+         
+         const cancelBtn = document.getElementById('problem-list-popup-cancel');
+         if(cancelBtn) cancelBtn.addEventListener('click', () => problemListModal.classList.add('hidden'));
     }
     
-    // History Table
+    // 3. History Table
     const assessmentHistoryTableBody = document.getElementById('assessment-history-table-body');
     if (assessmentHistoryTableBody && typeof assessmentHistoryData !== 'undefined') {
         assessmentHistoryTableBody.innerHTML = '';
         assessmentHistoryData.forEach(item => {
             const row = document.createElement('tr');
-            row.className = "hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50";
-            row.innerHTML = `<td class="p-3">${item.datetimeStr}</td><td class="p-3">${item.dvm}</td><td class="p-3">${item.department}</td>`;
+            row.className = "hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary]/50 border-b border-gray-100 dark:border-[--color-border-base]";
+            row.innerHTML = `
+                <td class="p-3 text-gray-700 dark:text-[--color-text-base]">${item.datetimeStr}</td>
+                <td class="p-3 text-gray-700 dark:text-[--color-text-base]">${item.dvm}</td>
+                <td class="p-3 text-gray-700 dark:text-[--color-text-base]">${item.department}</td>
+            `;
             assessmentHistoryTableBody.appendChild(row);
         });
     }
+    
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }

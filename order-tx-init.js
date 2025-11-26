@@ -78,15 +78,24 @@ function initializeOrderTxScripts() {
             const li = document.createElement('li');
             li.className = "p-3 bg-white dark:bg-[--color-bg-content] border border-gray-200 dark:border-[--color-border-base] rounded-lg shadow-sm hover:shadow-md hover:border-blue-300 cursor-pointer transition-all flex justify-between items-center group mb-2";
             
-            const containerBadge = item.container ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 ml-2 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">${item.container}</span>` : '';
+            // Refined 6.2: Container = Gray/White, Used Unit = Gray/Gray
+            const containerBadge = (item.container && item.container !== '-') 
+                ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white ml-2" title="Container">${item.container}</span>` 
+                : '';
+            
+            const unitBadge = item.used_unit 
+                ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 ml-1 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" title="Used Unit">${item.used_unit}</span>` 
+                : '';
             
             li.innerHTML = `
                 <div class="flex-1">
                     <div class="flex items-center">
-                        <span class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-blue-600 transition-colors">${item.name}</span>
+                        <span class="font-semibold text-gray-800 dark:text-[--color-text-base] group-hover:text-blue-600 transition-colors text-sm">${item.name}</span>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1 flex items-center">
-                        Code: ${item.id} ${containerBadge}
+                    <div class="text-xs text-gray-500 dark:text-[--color-text-muted] mt-1.5 flex items-center">
+                        <span class="font-mono text-[10px] text-gray-400 mr-1">${item.id}</span>
+                        ${containerBadge}
+                        ${unitBadge}
                     </div>
                 </div>
                 <div class="text-sm font-bold text-blue-600 dark:text-blue-400 ml-2 whitespace-nowrap">${item.price}.-</div>
@@ -115,7 +124,7 @@ function initializeOrderTxScripts() {
         
         if (globalTxCart.length === 0) {
             cartBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400 text-xs">No items selected</td></tr>';
-            totalPriceEl.innerText = "0";
+            totalPriceEl.innerText = "0 / 0";
             return;
         }
 
@@ -128,35 +137,43 @@ function initializeOrderTxScripts() {
             const tr = document.createElement('tr');
             tr.className = "group hover:bg-gray-50 dark:hover:bg-[--color-bg-secondary] border-b border-gray-100 dark:border-[--color-border-base] last:border-0";
             
+            // Refined 6.2: Split Layout (Left: Name+Tag / Right: Input+Unit)
             tr.innerHTML = `
-                <td class="p-3 pl-4 align-middle w-full">
-                    <div class="flex items-center justify-between">
-                        <div class="font-semibold text-gray-800 dark:text-[--color-text-base] text-xs mr-2">
-                            ${item.name}
+                <td class="p-2 pl-3 align-top w-full">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col mr-2">
+                            <div class="font-semibold text-gray-800 dark:text-[--color-text-base] text-xs">
+                                ${item.name}
+                            </div>
+                            ${(item.container && item.container !== '-') 
+                                ? `<div class="mt-1"><span class="px-2 py-0.5 rounded text-[10px] bg-gray-500 text-white inline-block">${item.container}</span></div>` 
+                                : ''}
                         </div>
-                        <div class="flex items-center space-x-2 flex-shrink-0">
+                        
+                        <div class="flex items-center gap-2 flex-shrink-0 mt-0.5">
                             <div class="relative">
                                 <input type="text" readonly id="tx-qty-${index}" value="${item.qty}" placeholder="-" 
                                        class="w-12 p-1 text-center text-xs border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none bg-white dark:bg-[--color-bg-base] dark:border-[--color-border-base] dark:text-[--color-text-base] cursor-pointer tx-qty-input" 
                                        data-index="${index}">
                             </div>
-                            <span class="text-xs font-bold text-blue-600 dark:text-blue-400 w-8 text-left">${item.container}</span>
+                            <span class="text-xs text-black dark:text-[--color-text-base] font-medium w-8 text-left">${item.used_unit || ''}</span>
                         </div>
                     </div>
                 </td>
-                <td class="p-3 text-right align-middle text-gray-600 dark:text-[--color-text-muted] text-xs font-bold whitespace-nowrap">
+                <td class="p-2 align-top text-right text-gray-600 dark:text-[--color-text-muted] text-xs font-bold whitespace-nowrap pt-3">
                     ${item.price}
                 </td>
-                <td class="p-3 text-center align-middle w-10">
-                    <button class="text-gray-400 hover:text-red-600 transition-colors btn-remove-tx p-0.5 hover:bg-red-50 rounded" data-index="${index}">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <td class="p-2 align-top text-center w-8 pt-2">
+                    <button class="text-gray-400 hover:text-red-600 transition-colors btn-remove-tx p-1 hover:bg-red-50 rounded" data-index="${index}">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                 </td>
             `;
             cartBody.appendChild(tr);
         });
 
-        totalPriceEl.innerText = total.toLocaleString();
+        // Refined 6.2: Format "Count / Price"
+        totalPriceEl.innerText = `${globalTxCart.length} / ${total.toLocaleString()}`;
         
         // 1. Bind Remove Buttons
         document.querySelectorAll('.btn-remove-tx').forEach(btn => {

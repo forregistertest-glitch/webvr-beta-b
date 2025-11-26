@@ -1,1 +1,207 @@
-<div class="p-4"><h1 class="text-xl font-semibold dark:text-[--color-text-base]">Order RX Module</h1><p class="dark:text-[--color-text-base]">(Module content for Order RX)</p></div>
+<div class="h-full flex flex-col bg-gray-50 dark:bg-[--color-bg-base]">
+    
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-white dark:bg-[--color-bg-content] shadow-sm flex-shrink-0">
+        <div>
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-bold text-orange-700 dark:text-orange-500 flex items-center">
+                    <i data-lucide="pill" class="w-6 h-6 mr-2"></i>
+                    Order Rx (ใบสั่งยานำกลับ)
+                </h1>
+                <button id="btn-open-remed" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center transition-all active:scale-95" title="Repeat Order from History">
+                    <i data-lucide="history" class="w-3.5 h-3.5 mr-1"></i> Re-med
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-[--color-text-muted] ml-8">Home Medication & Medical Supplies</p>
+        </div>
+        <div class="flex space-x-2">
+            <div class="flex items-center bg-gray-100 dark:bg-[--color-bg-secondary] px-3 py-1 rounded border border-gray-200 dark:border-[--color-border-base]">
+                <span class="text-xs text-gray-500 dark:text-[--color-text-muted] font-semibold mr-2">Items / Total:</span>
+                <span id="rx-total-price" class="text-sm font-bold text-gray-700 dark:text-[--color-text-base]">0 / 0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 p-4 overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 h-[650px]">
+            
+            <div class="md:col-span-3 bg-white dark:bg-[--color-bg-content] rounded-lg shadow-sm border border-gray-200 dark:border-[--color-border-base] flex flex-col h-full overflow-hidden">
+                <div class="p-3 bg-gray-100 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm flex-shrink-0 text-gray-700 dark:text-[--color-text-base]">
+                    Categories
+                </div>
+                <ul id="rx-category-list" class="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-[--color-border-base]">
+                    </ul>
+            </div>
+
+            <div class="md:col-span-4 bg-white dark:bg-[--color-bg-content] rounded-lg shadow-sm border border-gray-200 dark:border-[--color-border-base] flex flex-col h-full overflow-hidden">
+                <div class="p-3 bg-gray-100 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm flex flex-col gap-2 flex-shrink-0">
+                    <div class="flex justify-between items-center text-gray-700 dark:text-[--color-text-base]">
+                        <span>Select Items</span>
+                        <span id="rx-current-cat-name" class="text-gray-500 font-normal text-xs"></span>
+                    </div>
+                    
+                    <div class="relative">
+                        <input type="text" id="rx-search" placeholder="Search item name..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-orange-500 focus:border-orange-500 dark:bg-[--color-bg-base] dark:border-[--color-border-base] dark:text-[--color-text-base]">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2 text-gray-400"></i>
+                    </div>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">
+                        * พิมพ์ชื่อยาเพื่อค้นหาในหมวดปัจจุบัน (กดเปลี่ยนหมวดเพื่อล้างคำค้นหา)
+                    </p>
+                </div>
+                
+                <ul id="rx-item-list" class="overflow-y-auto flex-1 p-2 space-y-1">
+                    <li class="text-center text-gray-400 mt-10 text-sm">Select a category to view items</li>
+                </ul>
+            </div>
+
+            <div class="md:col-span-5 flex flex-col gap-4 h-full overflow-hidden">
+                
+                <div class="flex-1 bg-white dark:bg-[--color-bg-content] rounded-lg shadow-sm border border-gray-200 dark:border-[--color-border-base] flex flex-col overflow-hidden">
+                    
+                    <div class="p-3 bg-gray-100 dark:bg-[--color-bg-secondary] border-b border-gray-200 dark:border-[--color-border-base] font-semibold text-sm flex justify-between items-center flex-shrink-0 text-gray-700 dark:text-[--color-text-base]">
+                        <span>Drug Details & Cart</span>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                        
+                        <div id="rx-selected-info" class="hidden p-3 bg-orange-50 dark:bg-orange-900/10 rounded border border-orange-200 dark:border-orange-800 border-l-4 border-l-orange-600 transition-all">
+                            <div class="font-bold text-orange-800 dark:text-orange-400 text-sm" id="rx-selected-name"></div>
+                            <div class="text-xs text-orange-600 dark:text-orange-300/80 mt-1" id="rx-selected-code"></div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-[--color-text-muted] mb-1">
+                                    Drug Label / Instruction <span class="text-red-500">*</span>
+                                </label>
+                                <textarea id="rx-drug-label" rows="2" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-orange-500 focus:outline-none dark:bg-[--color-bg-base] dark:border-[--color-border-base] dark:text-[--color-text-base]" placeholder="วิธีใช้ยา (ดึงจากระบบอัตโนมัติถ้ามี)"></textarea>
+                                <p class="text-[10px] text-gray-400 mt-1 text-right">ระบุวิธีใช้สำหรับรายการนี้</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-[--color-text-muted] mb-1">
+                                    Pharmacy Note (Optional)
+                                </label>
+                                <input type="text" id="rx-pharmacy-note" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-orange-500 focus:outline-none dark:bg-[--color-bg-base] dark:border-[--color-border-base] dark:text-[--color-text-base]" placeholder="บันทึกจากเภสัชบันทึกในระบบไม่ลงบนสลากยา">
+                            </div>
+                        </div>
+
+                        <button id="btn-add-rx-cart" disabled class="w-full py-2 px-3 rounded border border-orange-300 bg-orange-50 text-orange-700 text-sm font-bold hover:bg-orange-100 focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-200 disabled:text-gray-400 transition-all flex justify-center items-center dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800 dark:hover:bg-orange-900/30">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Rx List
+                        </button>
+
+                        <div class="border-t border-gray-200 dark:border-[--color-border-base] pt-3">
+                            <div class="text-xs font-semibold text-gray-500 dark:text-[--color-text-muted] mb-2">Rx List (รายการยานำกลับ):</div>
+                            <ul id="rx-mini-cart" class="space-y-2 text-sm pb-2">
+                                <li class="text-center text-xs text-gray-400 italic py-2">No items added yet</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-shrink-0 bg-white dark:bg-[--color-bg-content] rounded-lg shadow-sm border border-gray-200 dark:border-[--color-border-base] p-4 mt-auto space-y-3">
+                    
+                    <div>
+                        <label class="text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted]">Effective Date/Time</label>
+                        <div class="flex gap-2 mt-1">
+                            <input type="date" id="rx-effective-date" class="w-1/2 p-1.5 text-xs border rounded dark:bg-[--color-bg-secondary] dark:border-[--color-border-base] dark:text-[--color-text-base]">
+                            <input type="time" id="rx-effective-time" class="w-1/2 p-1.5 text-xs border rounded dark:bg-[--color-bg-secondary] dark:border-[--color-border-base] dark:text-[--color-text-base]">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted]">Record Meta</label>
+                        <div class="flex gap-2 mt-1">
+                            <select id="rx-dvm" class="w-1/2 p-1.5 text-xs border rounded dark:bg-[--color-bg-secondary] dark:border-[--color-border-base] dark:text-[--color-text-base]">
+                                <option value="" selected disabled>Select DVM</option>
+                                <option value="Dr. AAA">Dr. AAA</option>
+                                <option value="Dr. BBB">Dr. BBB</option>
+                                <option value="Dr. CCC">Dr. CCC</option>
+                            </select>
+                            <select id="rx-dept" class="w-1/2 p-1.5 text-xs border rounded dark:bg-[--color-bg-secondary] dark:border-[--color-border-base] dark:text-[--color-text-base]">
+                                <option value="" selected disabled>Select Dept</option>
+                                <option value="101 อายุรกรรม">101 อายุรกรรม</option>
+                                <option value="102 ศัลยกรรม">102 ศัลยกรรม</option>
+                                <option value="301 คลินิกพิเศษ">301 คลินิกพิเศษ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-500 uppercase dark:text-[--color-text-muted]">Order Note</label>
+                         <textarea id="rx-order-note" rows="1" class="w-full mt-1 p-2 text-xs border rounded focus:ring-1 focus:ring-orange-500 outline-none dark:bg-[--color-bg-secondary] dark:border-[--color-border-base] dark:text-[--color-text-base]" placeholder="บันทึกเพิ่มเติมถึงห้องยา"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btn-save-rx-plan" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg shadow-sm text-xs flex justify-center items-center transition-all active:scale-95">
+                            <i data-lucide="calendar-clock" class="w-4 h-4 mr-1.5"></i> Save as Plan
+                        </button>
+                        <button id="btn-confirm-rx-order" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-2 rounded-lg shadow-sm text-xs flex justify-center items-center transition-all active:scale-95">
+                            <i data-lucide="send" class="w-4 h-4 mr-1.5"></i> Confirm & Send
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="rx-remed-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] hidden">
+        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-5xl w-full flex flex-col max-h-[90vh] overflow-hidden border border-gray-200 dark:border-[--color-border-base]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-gray-50 dark:bg-[--color-bg-secondary]">
+                <h2 class="text-lg font-bold text-gray-800 dark:text-[--color-text-base] flex items-center">
+                    <i data-lucide="history" class="w-5 h-5 mr-2 text-orange-500"></i>
+                    Re-med (ประวัติการสั่งยา)
+                </h2>
+                <button id="close-remed-modal-x" class="text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-auto p-0">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead class="bg-white dark:bg-[--color-bg-content] sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-32">Date/Time (Eff.)</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-24">Order No.</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-24">Acc No.</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] w-64">Items Detail</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] w-32">Order Note</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] w-32">Pharmacy Note</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-24">DVM</th>
+                            <th class="p-3 font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-24">Dept</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-20">Status</th>
+                            <th class="p-3 text-center font-semibold text-gray-700 dark:text-[--color-text-base] border-b border-gray-200 dark:border-[--color-border-base] whitespace-nowrap w-20 sticky right-0 bg-white dark:bg-[--color-bg-content] shadow-l">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rx-remed-table-body" class="divide-y divide-gray-100 dark:divide-[--color-border-base] bg-white dark:bg-[--color-bg-content]">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200 dark:border-[--color-border-base] flex justify-end bg-white dark:bg-[--color-bg-content]">
+                <button id="close-remed-modal-btn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] text-gray-800 dark:text-[--color-text-base] rounded-lg text-sm font-medium transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="rx-print-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[110] hidden">
+        <div class="bg-white dark:bg-[--color-bg-content] rounded-lg shadow-xl max-w-3xl w-full flex flex-col max-h-[90vh] overflow-hidden border border-gray-200 dark:border-[--color-border-base]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-[--color-border-base] bg-gray-50 dark:bg-[--color-bg-secondary]">
+                <h2 class="text-lg font-bold text-gray-800 dark:text-[--color-text-base] flex items-center">
+                    <i data-lucide="printer" class="w-5 h-5 mr-2 text-blue-600"></i>
+                    Print Drug Labels (พิมพ์ฉลากยา)
+                </h2>
+                <button id="close-print-modal-x" class="text-gray-400 hover:text-gray-600 dark:text-[--color-text-muted]"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto bg-gray-50 dark:bg-[--color-bg-base]">
+                <div class="text-xs text-gray-500 mb-2 px-1">รายการยาในใบสั่งนี้ (กดปุ่มด้านหลังเพื่อพิมพ์ฉลาก):</div>
+                <ul id="rx-print-list" class="space-y-3">
+                    </ul>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200 dark:border-[--color-border-base] flex justify-end bg-white dark:bg-[--color-bg-content]">
+                <button id="close-print-modal-btn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-[--color-bg-secondary] dark:hover:bg-[--color-border-base] text-gray-800 dark:text-[--color-text-base] rounded-lg text-sm font-medium transition-colors">Close</button>
+            </div>
+        </div>
+    </div>

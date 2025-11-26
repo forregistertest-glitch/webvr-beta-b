@@ -1,6 +1,36 @@
 # KAHIS EMR PROTOTYPE - VERSION.MD
 (เรียงลำดับจากใหม่ล่าสุดไปเก่าสุด)
 
+## BETA 6.2 - 6.9 VERSION (Full Order Rx Module & System Standardization)
+(26 พฤศจิกายน 2025)
+
+### วัตถุประสงค์ (Objective)
+พัฒนาระบบ **Order Rx (ใบสั่งยานำกลับ)** ให้สมบูรณ์ครบวงจร ตั้งแต่การเลือกยา, การแก้ไขฉลาก (Editable Label), การดึงประวัติเก่า (Re-med), ไปจนถึงการพิมพ์ฉลาก (Print Label) พร้อมทั้งปรับปรุงมาตรฐานการแสดงผลหน่วยนับ (Unit Standardization) และหน้าตาตะกร้าสินค้า (Cart UI) ของทุกโมดูล (Tx, Lab, Patho, Rx) ให้เป็นรูปแบบเดียวกัน (Consistency)
+
+### สิ่งที่อัพเดท (Updates)
+1.  **New Order Rx Module (Full Features):**
+    * **Rx Dashboard:** สร้างหน้าจอสั่งยาโทนสีส้ม (Dark Orange Theme) พร้อมระบบ **Search Box** ค้นหาชื่อยาในหมวด
+    * **Smart Cart:** ตะกร้าสินค้าที่สามารถ **แก้ไขจำนวน (Numpad)** และ **แก้ไขฉลากยา (Multiline Textarea)** ได้อิสระ พร้อมระบบ **Auto-expand** ขยายความสูงกล่องข้อความอัตโนมัติ
+    * **Re-med System:** ฟีเจอร์ดูประวัติการสั่งยาย้อนหลัง (History) และดึงรายการยาจาก Order เก่า (Select) กลับมาสั่งใหม่ได้ (รองรับทุกสถานะ Done/Pending/Cancel)
+    * **Print Label:** เพิ่มปุ่มพิมพ์ฉลากยา (Popup เลือกรายการ) ทั้งในหน้า History และ Success Modal
+2.  **Unit & UI Standardization (Tx, Lab, Patho, Rx):**
+    * **Dual Unit System:** ปรับโครงสร้างข้อมูลให้รองรับ **Container** (หน่วยบรรจุ) และ **Used Unit** (หน่วยใช้) แสดงผลเป็น Badge สีเทา/ขาว เหมือนกันทุกโมดูล
+    * **Inline Cart Layout:** จัดหน้าตาตะกร้าสินค้าใหม่เป็นแบบ Flexbox (ชื่อ+Tag ชิดซ้าย / จำนวน+Unit ชิดขวา) เพื่อความสวยงามและอ่านง่าย
+    * **Total Price Calculation:** แสดงราคารวม (Unit Price x Qty) ในตะกร้าและหน้าสรุปผล
+3.  **Enhanced Meta Data & Notes:**
+    * **Record Meta:** เพิ่ม Dropdown เลือก **DVM** และ **Department** ในหน้าสั่งยาและบันทึกลง History
+    * **Detailed Notes:** เพิ่มช่อง **Pharmacy Note** (โน้ตถึงห้องยา) และ **Order Note** (บันทึกเพิ่มเติม) ส่งต่อไปยังหน้าสรุปผล (Success Modal)
+
+### รายละเอียดทางเทคนิค (Implementation Details)
+1.  **New Files:**
+    * `rx-data.js`: ฐานข้อมูลรายการยาและเวชภัณฑ์ (Catalog) พร้อม `default_label`
+    * `rx-history-data.js`: ข้อมูลตัวอย่างประวัติการสั่งยา (Mock History)
+    * `order_rx_content.html`: หน้าจอ UI หลักของ Order Rx พร้อม Modal (Re-med, Print)
+    * `order-rx-init.js`: Logic ควบคุมการทำงานทั้งหมดของ Rx (Search, Cart, Re-med, Print)
+2.  **Refactored Files:**
+    * `order-tx-init.js`: ปรับ UI ตะกร้าสินค้าให้รองรับ Numpad และ Layout ใหม่
+    * `app-init.js`: ยกเครื่องฟังก์ชัน `initializeLabScripts` และ `initializePathologyScripts` ให้รองรับ Layout มาตรฐานใหม่ และปรับปรุง `showSuccessModal` ให้แสดงข้อมูลครบถ้วน (Order No, Meta, Notes)
+
 ## BETA 6.1 VERSION (Full Data Decoupling & Lab Refactor)
 (25 พฤศจิกายน 2025)
 
